@@ -1,0 +1,31 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tabler/core": "^1.4.0",
+    "axios": "^1.10.0",
+    "cheerio": "^1.1.0",
+    "dayjs": "^1.11.13",
+    "multer": "^2.0.1",
+    "pinia": "^3.0.2",
+    "tabler-ui": "^0.0.34",
+    "tinymce": "^7.9.1",
+    "vue": "^3.5.13",
+    "vue-i18n": "^11.1.4",
+    "vue-router": "^4.5.0",
+    "vue-tinymce-editor": "^1.6.2",
+    "vue3-editor": "^0.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "@vitejs/plugin-vue": "^5.2.2",
+    "vite": "^6.3.1"
+  }
+}

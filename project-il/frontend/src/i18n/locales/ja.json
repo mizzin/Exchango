@@ -1,0 +1,344 @@
+{"error": {
+  "money_password_incorrect": "現在の出金パスワードが一致しません。",
+  "user_not_found": "ユーザーが見つかりません。",
+  "server_error": "サーバーエラーが発生しました。",
+  "password_mismatch": "新しいパスワードが一致しません。",
+  "unknown": "不明なエラーが発生しました。"
+}
+,
+  "nav": {
+    "home": "ホーム",
+    "trade": "取引",
+    "recharge": "チャージ",
+    "withdraw": "出金",
+    "history": "取引履歴",
+    "support": "サポート",
+    "notice": "お知らせ",
+    "inquiry": "1:1お問い合わせ",
+    "mypage": "マイページ",
+    "messages": "メッセージ",
+    "guide": "登録ガイド",
+    "login": "ログイン / 新規登録",
+    "logout": "ログアウト"
+  },"footer": {
+    "exchangeLabel": "為替レート（基準: USD）",
+    "dateLabel": "基準日",
+    "inquiry": "お問い合わせ：1対1掲示板",
+    "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
+  },
+  "charge": {
+    
+    "inputAmount": "入力金額",
+    "amountKrw": "入力金額",
+    "usdPlatform": "USDプラットフォーム",
+    "krwPlatform": "KRWプラットフォーム",
+    "selectCurrency": "通貨を選択",
+    "platformId": "プラットフォームID",
+    "platformIdPlaceholder": "プラットフォームIDを入力",
+    "inputUsd": "USD金額を入力",
+    "inputPlaceholder": "金額を入力",
+    "totalSend": "送金合計",
+    "feeNote": "2%手数料込み",
+    "viewDetails": "詳細を見る",
+    "rate": "為替レート",
+    "amountUsd": "入金額 (USD)",
+    "totalConverted": "換算金額",
+    "submit": "申請する",
+    "recentHistory": "最近のチャージ履歴",
+    "viewMore": "すべて見る",
+    "date": "日付",
+    "currency": "通貨",
+    "amount": "金額",
+    "statusth": "ステータス",
+    "noHistory": "履歴がありません",
+    "inputKrw": "韓国ウォン(KRW)での金額を入力",
+    "inputKrwPlaceholder": "韓国ウォン金額を入力",
+    "fixedCurrencyNotice": "※ 選択したプラットフォームは韓国ウォン(KRW)での精算が固定されます。",
+    "title": "チャージ申請",
+    "selectPlatform": "プラットフォームを選択",
+    "selectPlaceholder": "-- 選択してください --",
+    "koreanWon": "韓国ウォン",
+    "philippinePeso": "フィリピン・ペソ",
+    "usdt": "テザー (USDT)",
+  "alert": {
+    "fillAll": "すべての項目を入力してください。",
+    "minimumAmount": "最低チャージ金額は40ドルです。",
+    "success": "チャージ申請が完了しました。",
+    "error": "申請中にエラーが発生しました。",
+    "noExchange": "選択した通貨に為替レートがありません。",
+    "rateFail": "為替レートの取得に失敗しました：",
+    "historyFail": "チャージ履歴の読み込みに失敗しました："
+  },
+  "status": {
+    "pending": "保留中",
+    "completed": "完了",
+    "rejected": "拒否されました"
+  }
+},
+"history": {
+  "title": "マイ履歴",
+  "rechargeTab": "チャージ履歴",
+  "withdrawTab": "出金履歴",
+  "platform": "プラットフォーム",
+  "platformId": "プラットフォームID",
+  "currency": "通貨",
+  "amount": "金額",
+  "status": "ステータス",
+  "requestDate": "申請日時",
+  "approveDate": "承認日時",
+  "noRecharge": "チャージ履歴はありません。",
+  "wiHistory": "出金履歴はありません。"
+},
+"home": {
+  "title": "MyPointへようこそ",
+  "login": "ログイン",
+  "register": "新規登録",
+  "logout": "ログアウト",
+  "notice": "お知らせ",
+  "exchangeRate": "為替情報",
+  "date": "Date",
+   "external": {
+    "pokerbros": "PokerBros",
+    "xpoker": "X-Poker",
+    "pokernex": "Pokernex",
+    "ggclub": "GG Club"
+  }
+},
+"guide": {
+  "title": "会員登録ガイド",
+  "section": {
+    "required": "✅ 必須案内事項",
+    "warning": "⚠️ 警告とブロックポリシー",
+    "withdraw": "💳 出金について",
+    "rules": "🔒 アカウントルール"
+  },
+  "approval": "🧾 登録後、管理者の承認が必要です。",
+  "platformLimit": "🛠️ 最低1件、最大4件のプラットフォームIDが必要です。",
+  "realNamePhone": "📱 実名および有効な電話番号の入力が必要です。",
+  "referral": "👥 紹介者IDの入力が必要です。",
+  "warningBlock": "🚫 警告が3回累積されるとアカウントが自動的にブロックされます。",
+  "warningMsg": "📬 警告理由はメッセージボックスで通知されます。",
+  "withdrawMessage": "🏦 出金申請時、仮想口座情報のメッセージが自動送信されます。",
+  "adminEditable": "🛠️ 管理者はこの情報を随時更新できます。",
+  "oneAccount": "1人につき1アカウントのみ",
+  "falseInfo": "虚偽情報を入力した場合、サービス利用が制限されることがあります。"
+},
+"login": {
+  "title": "ログイン",
+  "username": "ID",
+  "password": "パスワード",
+  "loginButton": "ログイン",
+  "registerButton": "新規登録"
+},"notice": {
+"backToList":"一覧に戻る"
+},
+"messages": {
+  "title": "マイメッセージ",
+  "subject": "件名",
+  "date": "日時",
+  "status": "ステータス",
+  "read": "既読",
+  "unread": "未読",
+  "noMessages": "メッセージはまだありません。"
+},
+"mypage": {
+  "title": "マイページ",
+  "tabs": {
+    "info": "基本情報",
+    "password": "パスワード変更",
+    "moneyPassword": "出金用パスワード",
+    "bank": "銀行情報"
+  },
+    "balance": "残高(近日公開)",
+    "moneyPasswordUpdated": "出金パスワードが更新されました。",
+    "userInfo": "ユーザー情報",
+    "recommender": "紹介者",
+    "warningCount": "警告数",
+    "language": "言語",
+    "bankName": "銀行名",
+    "bankAccount": "口座番号",
+    "realName": "氏名",
+  "myInfo": "自分の情報",
+  "username": "ユーザーID",
+  "referral": "紹介者ID",
+  "bankInfo": "銀行情報",
+  "linkedPlatforms": "連携済みプラットフォーム",
+  "platformName": "プラットフォーム名",
+  "platformId": "プラットフォームID",
+    "changePassword": "パスワードを変更する",
+    "changeMoneyPassword": "出金パスワードを変更する(近日公開)",
+    "currentPassword": "現在のパスワード",
+    "newPassword": "新しいパスワード",
+    "confirmNewPassword": "パスワード確認",
+    "currentMoneyPassword": "現在の出金パスワード（6桁）",
+    "newMoneyPassword": "新しい出金パスワード（6桁）",
+    "confirmMoneyPassword": "出金パスワード確認",
+    "moneyPasswordHelp": "現在のパスワードが分からない場合は、1:1お問い合わせで管理者に連絡してください。",
+    "bankInfoName": "実名を入力した後、口座名義人と同じ情報で銀行名を入力してください。",
+    "bankInfoSaveFailed": "口座情報の保存に失敗しました。",
+    "bankInfoSaveSuccess": "保存されました。",  "passwordMismatch": "新しいパスワードが一致しません。",
+  "passwordChanged": "パスワードが変更されました。",
+  "passwordChangeFailed": "パスワードの変更に失敗しました。",
+  "common":{ 
+     "save": "保存する"
+}},
+"register": {
+  "emailNote": "メールアドレスはパスワードの再設定に使用されます。正しく入力してください。",
+  "title": "会員登録",
+  "username": "ユーザー名 *",
+  "usernamePlaceholder": "5〜20文字、英数字のみ",
+  "checkAvailability": "重複チェック",
+  "password": "パスワード *","moneyPassword": "出金用パスワード（6桁の数字）*",
+    "moneyPasswordPlaceholder": "6桁の数字を入力してください",
+  "confirmPassword": "パスワード確認 *",
+  "passwordPlaceholder": "8文字以上、英字と数字を含む必要があります",
+  "passwordMismatch": "パスワードが一致しません。",
+  "realName": "氏名 ",
+  "phone": "携帯番号 *",
+  "codePlaceholder": "認証コード入力",
+  "codeInvalid": "認証コードが正しくありません。",
+  "referral": "紹介者 ID",
+  "bankName": "銀行名",
+  "bankAccount": "口座番号",
+  "platform": "プラットフォーム ID ",
+  "addPlatform": "+",
+  "removePlatform": "X",
+  "submit": "登録する",
+  "login": "ログイン","email": "メールアドレス*",
+  "emailPlaceholder": "メールアドレスを入力してください",
+  "sendEmailCode": "認証コードを送信",
+  "enterCodeLabel": "認証コードを入力してください",
+
+  "verifyCode": "コードを確認",
+  "emailVerified": "メール認証が完了しました！",
+  "enterEmail": "メールアドレスを入力してください。",
+  "alert": {
+    "enterCodeAlert": "コードを入力してください。",
+     "verificationFailed": "認証に失敗しました。",
+      "sendEmailFailed": "認証コードの送信に失敗しました。",
+  "usernameAvailable": "ユーザー名は使用可能です。",
+  "usernameTaken": "ユーザー名は既に使用されています。",
+  "checkError": "ユーザー名の確認中にエラーが発生しました。",
+  "emptyUsername": "ユーザー名を入力してください。",
+  "selectPlatformFirst": "まずプラットフォームを選択してください。",
+  "noDuplicatePlatform": "同じプラットフォームを複数選択することはできません。",
+  "enterAllPlatformInfo": "すべてのプラットフォーム情報を入力してください。",
+  "registrationSuccess": "登録が完了しました。管理者の承認をお待ちください。",
+  "registrationFail": "登録に失敗しました。",
+  "enterUsername": "ユーザー名を入力してください。",
+  "success": "登録が完了しました。管理者の承認をお待ちください。",
+   "emailVerified": "メール認証が完了しました！",
+  "fail": "登録に失敗しました。","enterEmail": "メールアドレスを入力してください。",
+    "verificationCodeSent": "認証コードが送信されました。",
+    "sendFailed": "認証コードの送信に失敗しました。",
+    "emailVerificationRequired":"メール認証が必要です。",
+    "fillAllRequiredFields": "*必須項目をすべて入力してください。",
+      "checkUsernameFirst": "ユーザー名の重複確認を先に行ってください。",
+      "passwordMismatch": "パスワードが一致しません。",
+      "invalidMoneyPassword": "出金用パスワードは6桁の数字である必要があります。"
+}
+},
+"inquiry": {
+      "list": {
+        "title": "1:1 お問い合わせ一覧",
+        "newInquiry": "新しいお問い合わせ",
+        "noInquiry": "1:1 お問い合わせ履歴がありません。"
+      },
+      "detail": {
+        "title": "1:1 お問い合わせ詳細",
+        "content": "お問い合わせ内容：",
+        "adminAnswerTitle": "📬 管理者の回答",
+        "noAnswer": "まだ回答が登録されていません。"
+      },
+      "write": {
+          "title": "お問い合わせの送信",
+          "select": "選択",
+          "submit": "送信する",
+          "success": "お問い合わせが送信されました。",
+          "fail": "お問い合わせの送信に失敗しました。",
+          "placeholder": "お問い合わせ内容をご入力ください",
+          "noticeText": "繰り返しのお問い合わせによる対応遅延を防ぐため、以前のお問い合わせに返信があるまで新たにお問い合わせいただけません。"
+
+        },
+      "common": {
+        "subject": "件名",
+        "category": "カテゴリー",
+        "status": "ステータス",
+        "createdAt": "作成日"
+      },
+      "category": {
+            "money": "入出金／資金移動",
+    "account": "アカウントに関するお問い合わせ",
+    "platform": "プラットフォーム登録について",
+    "download": "ダウンロードに関する質問",
+    "etc": "その他のお問い合わせ"
+      },
+      "status": {
+        "answered": "回答済み",
+        "pending": "保留中"
+      },"success": {
+    "created": "お問い合わせが送信されました。"
+  },
+  "error": {
+    "pending_exists": "未回答のお問い合わせがあります。回答後に新しいお問い合わせを送信してください。",
+    "create_failed": "お問い合わせの送信中にエラーが発生しました。"
+  }
+    }, "withdraw": {
+  "title": "出金申請",
+  "selectCurrency": "通貨を選択",
+  "selectPlatform": "プラットフォームを選択",
+  "platformId": "プラットフォーム ID",
+  "amountInput": "$ 金額入力",
+  "expectedReceive": "予想受取金額（{currency}）",
+  "viewDetails": "詳細を見る",
+  "rateWithFee": "適用為替レート（2％手数料込）",
+  "amountUsd": "USD 金額",
+  "estimatedReceive": "予想受取金額",
+  "bankName": "銀行名",
+  "bankAccount": "口座番号",
+  "memoLabel": "受取アドレス / メモ",
+  "memoPlaceholder": "例：ウォレットアドレスまたはメモを入力してください",
+  "onlyOwnAccount": "出金はご本人名義の口座のみご利用いただけます。銀行情報の変更は [マイページ > 銀行情報] にてお願いします。",
+  "agreeCheck": "出金内容をすべて確認し、情報が正確であることを確認しました。",
+  "agreeConfirm": "出金情報の確認に同意します。",
+  "agreeCheck_line1": "※ 入力した情報が正しいことをもう一度ご確認ください。",
+  "agreeCheck_line2": "特にウォレットアドレスの誤入力は、出金失敗の原因となる可能性があります。",
+  "agreeCheck_line3": "誤情報による損失について、当社は一切の責任を負いません。",
+  "submit": "出金申請",
+  "recentWithdraw": " 最近の出金履歴",
+  "noHistory": "出金履歴がありません。",
+
+  "alert": {
+    "agree": "出金情報の確認に同意してください。",
+    "fillAll": "すべての項目を入力してください。",
+    "minimumAmount": "最低出金金額は $40 です。",
+    "success": "出金申請が完了しました。",
+    "error": "申請中にエラーが発生しました。",
+    "noExchange": "選択した通貨の為替情報がありません。",
+    "rateFail": "為替レート取得失敗：",
+    "historyFail": "出金履歴の読み込みに失敗しました："
+  },
+
+  "status": {
+    "pending": "保留中",
+    "completed": "完了",
+    "rejected": "却下"
+  }
+}
+,
+  "common": {
+    "select": "-- 選択 --",
+    "selectPrompt": "-- 選択してください --",
+    "date": "日付",
+    "currency": "通貨",
+    "status": "ステータス",
+    "more": "もっと見る"
+  },
+  "currency": {
+    "krw": "ウォン",
+    "php": "ペソ",
+    "usdt": "テザー"
+  }
+
+}
+ 

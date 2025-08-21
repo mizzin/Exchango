@@ -1,0 +1,331 @@
+{
+  "nav": {
+    "home": "首页",
+    "trade": "交易",
+    "recharge": "充值",
+    "withdraw": "提现",
+    "history": "交易记录",
+    "support": "客户服务",
+    "notice": "公告",
+    "inquiry": "1对1咨询",
+    "mypage": "我的页面",
+    "messages": "消息",
+    "guide": "注册指南",
+    "login": "登录 / 注册",
+    "logout": "登出"
+  },"footer": {
+    "exchangeLabel": "实时汇率（基准：美元）",
+    "dateLabel": "基准日",
+    "inquiry": "咨询：1对1留言板",
+    "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
+  },
+      "charge": {  "amountKrw": "输入金额",
+      "usdPlatform": "USD 平台",
+      "krwPlatform": "KRW 平台",  
+      "selectCurrency": "选择货币",
+      "selectPlatform": "选择平台",
+      "platformId": "平台帐号",
+      "platformIdPlaceholder": "请输入平台帐号",
+      "inputUsd": "输入美元金额",
+      "inputPlaceholder": "输入金额",
+      "totalSend": "总发送金额",
+      "feeNote": "包含2%手续费",
+      "viewDetails": "查看明细",
+      "rate": "汇率",
+      "amountUsd": "充值金额 (USD)",
+      "totalConverted": "换算金额",
+      "submit": "提交",
+      "recentHistory": "最近充值记录",
+      "viewMore": "查看更多",
+      "date": "日期",
+      "currency": "货币",
+      "amount": "金额",
+      "statusth": "状态",
+      "noHistory": "无充值记录",
+      "inputKrw": "输入韩元金额 (KRW)",
+      "inputKrwPlaceholder": "输入韩元金额",
+      "fixedCurrencyNotice": "※ 选定平台的结算货币为韩元 (KRW)。",
+      "title": "充值申请",
+      "selectPlaceholder": "-- 请选择 --",
+      "koreanWon": "韩元",
+      "philippinePeso": "菲律宾比索",
+      "usdt": "泰达币 (USDT)",
+      "alert": {
+      "fillAll": "请填写所有字段。",
+      "minimumAmount": "最低充值金额为40美元。",
+      "success": "充值申请已提交。",
+      "error": "提交过程中发生错误。",
+      "noExchange": "所选货币无可用汇率。",
+      "rateFail": "获取汇率失败：",
+      "historyFail": "加载充值记录失败："
+      },
+      "status": {
+      "pending": "待处理",
+      "completed": "已完成",
+      "rejected": "已拒绝"
+      }
+},
+"history": {"inputAmount": "输入金额",
+  "title": "我的记录",
+  "rechargeTab": "充值记录",
+  "withdrawTab": "提现记录",
+  "platform": "平台",
+  "platformId": "平台账号",
+  "currency": "货币",
+  "amount": "金额",
+  "status": "状态",
+  "requestDate": "申请时间",
+  "approveDate": "批准时间",
+  "noRecharge": "暂无充值记录",
+  "wiHistory": "暂无提现记录"
+},
+"home": {
+  "title": "欢迎来到 MyPoint",
+  "login": "登录",
+  "register": "注册",
+  "logout": "登出",
+  "notice": "公告",
+  "exchangeRate": "汇率信息",
+  "date": "基准日",
+ "external": {
+    "pokerbros": "PokerBros",
+    "xpoker": "X-Poker",
+    "pokernex": "Pokernex",
+    "ggclub": "GG Club"
+  }
+},
+"guide": {
+  "title": "注册指南",
+  "section": {
+    "required": "✅ 必须注意事项",
+    "warning": "⚠️ 警告与封禁政策",
+    "withdraw": "💳 提现说明",
+    "rules": "🔒 账户规则"
+  },
+  "approval": "🧾 注册后需要管理员审核。",
+  "platformLimit": "🛠️ 需填写最少 1 个，最多 4 个平台账号。",
+  "realNamePhone": "📱 需要填写真实姓名和有效手机号码。",
+  "referral": "👥 推荐人 ID 是必填项。",
+  "warningBlock": "🚫 累积 3 次警告将自动封号。",
+  "warningMsg": "📬 警告内容将通过消息通知。",
+  "withdrawMessage": "🏦 提现申请后将自动发送虚拟账户信息消息。",
+  "adminEditable": "🛠️ 管理员可随时修改该信息。",
+  "oneAccount": "每人限一个账户。",
+  "falseInfo": "填写虚假信息可能会限制使用服务。"
+},
+"login": {
+  "title": "登录",
+  "username": "账号",
+  "password": "密码",
+  "loginButton": "登录",
+  "registerButton": "注册"
+},
+"messages": {
+  "title": "我的消息",
+  "subject": "主题",
+  "date": "日期",
+  "status": "状态",
+  "read": "已读",
+  "unread": "未读",
+  "noMessages": "你还没有收到任何消息。"
+},
+"mypage": {
+  "title": "我的页面",
+  "tabs": {
+    "info": "基本信息",
+    "password": "修改密码",
+    "moneyPassword": "提现密码",
+    "bank": "银行信息"
+  },
+    "changePassword": "修改密码","moneyPasswordUpdated": "取款密码已更新。",
+    "changeMoneyPassword": "更改取款密码(即将上线)",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "confirmNewPassword": "确认密码",
+    "currentMoneyPassword": "当前取款密码（6位）",
+    "newMoneyPassword": "新取款密码（6位）",
+    "confirmMoneyPassword": "确认取款密码",
+    "balance": "余额(即将上线)",
+    "userInfo": "用户信息",
+    "recommender": "推荐人",
+    "warningCount": "警告次数",
+    "language": "语言",
+    "bankName": "银行名称",
+    "bankAccount": "账号",
+    "realName": "姓名",
+  "myInfo": "我的信息",
+  "username": "账号",
+  "referral": "推荐人 ID",
+  "bankInfo": "银行信息",
+  "linkedPlatforms": "已绑定平台",
+  "platformName": "平台名称",
+  "platformId": "平台账号",
+   "moneyPasswordHelp": "如不知道当前密码，请通过1:1咨询联系管理员。",
+   "bankInfoName": "请输入真实姓名后，填写与账户持有人一致的银行名称。",
+   "bankInfoSaveFailed": "保存银行账户信息失败。",
+    "bankInfoSaveSuccess": "保存成功。",
+  "common":{  
+    "save": "保存"} 
+},"register": {
+  "emailNote": "邮箱将用于找回密码，请正确填写。",
+  "title": "注册账户",
+  "username": "用户名 *",
+  "usernamePlaceholder": "5-20个字符，仅限字母和数字",
+  "checkAvailability": "检查重复",
+  "password": "密码 *", "moneyPassword": "提现密码（6位数字）*",
+    "moneyPasswordPlaceholder": "请输入6位数字",
+  "confirmPassword": "确认密码 *",
+  "passwordPlaceholder": "至少8个字符，必须包含字母和数字",
+  "passwordMismatch": "密码不一致。",
+  "realName": "姓名 ",
+  "phone": "手机号 *",
+  "verifyCode": "发送验证码",
+  "codePlaceholder": "输入验证码",
+  "codeInvalid": "验证码不正确。",
+  "referral": "推荐人 ID",
+  "bankName": "银行名称",
+  "bankAccount": "银行账号",
+  "platform": "平台 ID ",
+  "addPlatform": "+",
+  "removePlatform": "X",
+  "submit": "注册",
+  "login": "登录","email": "电子邮件*",
+  "emailPlaceholder": "请输入您的邮箱地址",
+  "sendEmailCode": "发送验证码",
+  "alert": {
+  "usernameAvailable": "用户名可用。",
+  "usernameTaken": "用户名已被使用。",
+  "checkError": "检查用户名时发生错误。",
+  "emptyUsername": "请输入用户名。",
+  "passwordMismatch": "密码不一致。",
+  "selectPlatformFirst": "请先选择一个平台。",
+  "noDuplicatePlatform": "不能选择相同的平台。",
+  "enterAllPlatformInfo": "请填写所有平台信息。",
+  "registrationSuccess": "注册成功。请等待管理员审核。",
+  "registrationFail": "注册失败。",
+  "enterUsername": "请输入用户名。",
+  "success": "注册成功。请等待管理员审核。",
+  "fail": "注册失败。",
+   "invalidMoneyPassword": "提款密码必须是6位数字。",
+    "verificationCodeSent": "验证码已发送。",
+    "sendFailed": "验证码发送失败。",
+    "emailVerificationRequired":"需要邮箱验证。",
+      "sendEmailCode": "发送验证码",
+  "verifyCode": "验证代码",
+    "emailVerified": "邮箱验证成功！",
+    "sendEmailFailed": "发送验证码失败。",
+    "verificationFailed": "验证失败。",
+    "enterEmail": "请输入邮箱地址。",
+    "enterCode": "请输入验证码。",
+    "enterCodeLabel": "请输入验证码",
+  "enterCodeAlert": "请输入验证码。",
+      "fillAllRequiredFields": "*必須項目をすべて入力してください。",
+      "checkUsernameFirst": "ユーザー名の重複確認を先に行ってください。"
+}
+},"notice": {
+"backToList":"返回列表"
+},
+ "inquiry": {
+      "list": {
+        "title": "1:1 咨询列表",
+        "newInquiry": "新咨询",
+        "noInquiry": "暂无 1:1 咨询记录。"
+      },
+      "detail": {
+        "title": "1:1 咨询详情",
+        "content": "咨询内容：",
+        "adminAnswerTitle": "📬 管理员回复",
+        "noAnswer": "尚未有回复。"
+      },
+      "write": {
+         "title": "提交咨询",
+        "select": "请选择",
+        "submit": "提交咨询",
+        "success": "您的咨询已提交。",
+        "fail": "提交咨询失败。",
+        "placeholder": "请输入您的咨询内容",
+        "noticeText": "为了防止重复咨询导致回复延迟，在收到上一条咨询的回复之前，您无法提交新的咨询。"
+
+      },
+      "common": {
+        "subject": "标题",
+        "category": "分类",
+        "status": "状态",
+        "createdAt": "提交日期"
+      },
+      "category": {
+        "money": "充值/提现及资金转移",
+        "account": "账户咨询",
+        "platform": "平台注册咨询",
+        "download": "下载问题",
+        "etc": "其他咨询"
+      },
+      "status": {
+        "answered": "已回复",
+        "pending": "待处理"
+      },"success": {
+    "created": "您的提问已成功提交。"
+  },
+  "error": {
+    "pending_exists": "您已有未回复的提问，请等待回复后再提交新的提问。",
+    "create_failed": "提交提问时发生错误。"
+  }
+    },  "withdraw": {
+  "agreeConfirm": "我已确认提款信息无误。",
+  "agreeCheck_line1": "※ 请再次确认您输入的信息是否准确。",
+  "agreeCheck_line2": "特别是钱包地址输入错误可能导致提款失败。",
+  "agreeCheck_line3": "因信息错误造成的损失，本平台不承担责任。",
+  "title": " 提现申请",
+  "selectCurrency": "选择货币",
+  "selectPlatform": "选择平台",
+  "platformId": "平台 ID",
+  "amountInput": "$ 金额",
+  "expectedReceive": "预计到账金额 ({currency})",
+  "viewDetails": "查看详情",
+  "rateWithFee": "汇率（含 2% 手续费）",
+  "amountUsd": "美元金额",
+  "estimatedReceive": "预计到账金额",
+  "bankName": "银行名称",
+  "bankAccount": "银行账户",
+  "memoLabel": "收款地址 / 备注",
+  "memoPlaceholder": "例如：输入钱包地址或备注",
+  "onlyOwnAccount": "仅允许使用本人名下账户进行提现。如需更改银行信息，请前往 [我的页面 > 银行信息]。",
+  "agreeCheck": "我已确认所有提现信息，并保证其准确无误。",
+  "submit": "提交提现申请",
+  "recentWithdraw": "最近的提现记录",
+  "noHistory": "暂无提现记录。",
+
+  "alert": {
+    "agree": "请确认您已核对提款信息。",
+    "fillAll": "请填写所有必填项。",
+    "minimumAmount": "最低提现金额为 $40。",
+    "success": "您的提现申请已提交。",
+    "error": "提交申请时发生错误。",
+    "noExchange": "无可用的汇率信息。",
+    "rateFail": "汇率获取失败：",
+    "historyFail": "提现记录加载失败："
+  },
+
+  "status": {
+    "pending": "待处理",
+    "completed": "已完成",
+    "rejected": "已拒绝"
+  }
+}
+,
+  "common": {
+    "select": "-- 请选择 --",
+    "selectPrompt": "-- 请选择 --",
+    "date": "日期",
+    "currency": "货币",
+    "status": "状态",
+    "more": "更多"
+  },
+  "currency": {
+    "krw": "韩元",
+    "php": "比索",
+    "usdt": "泰达币"
+  }
+
+}
+ 

@@ -1,0 +1,364 @@
+{"error": {
+  "money_password_incorrect": "The current withdrawal password does not match.",
+  "user_not_found": "User not found.",
+  "server_error": "A server error has occurred.",
+  "password_mismatch": "New passwords do not match.",
+  "unknown": "An unknown error has occurred."
+}
+,
+  "nav": {
+    "home": "Home",
+    "trade": "Trade",
+    "recharge": "Recharge",
+    "withdraw": "Withdraw",
+    "history": "History",
+    "support": "Support",
+    "notice": "Notice",
+    "inquiry": "1:1 Inquiry",
+    "mypage": "My Page",
+    "messages": "Messages",
+    "guide": "Join Guide",
+    "login": "Login / Sign Up",
+    "logout": "Logout"
+  },
+    "footer": {
+    "exchangeLabel": "Live exchange rates (Base: USD)",
+    "dateLabel": "Date",
+    "inquiry": "Inquiry: 1:1 Board",
+    "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
+
+  },
+  "charge": { "inputAmount": "Input Amount",
+    "amountKrw": "Entered Amount",
+    "usdPlatform": "USD Platform",
+    "krwPlatform": "KRW Platform",
+     "selectCurrency": "Select Currency",
+  "selectPlatform": "Select Platform",
+  "platformId": "Platform ID",
+  "platformIdPlaceholder": "Enter your platform ID",
+  "inputUsd": "Enter USD amount",
+  "inputPlaceholder": "Enter amount",
+  "totalSend": "Total to Send",
+  "feeNote": "Includes 2% fee",
+  "viewDetails": "View Details",
+  "rate": "Exchange Rate",
+  "amountUsd": "Amount (USD)",
+  "totalConverted": "Converted Amount",
+  "submit": "Submit",
+  "recentHistory": "Recent Recharge History",
+  "viewMore": "View All",
+  "date": "Date",
+  "currency": "Currency",
+  "amount": "Amount",
+  "statusth": "Status",
+  "noHistory": "No history available",
+     "inputKrw": "Enter amount in Korean Won (KRW)",
+     "inputKrwPlaceholder": "Enter Korean Won Amount",
+     "fixedCurrencyNotice": "※ The selected platform uses Korean Won (KRW) as the fixed settlement currency.",
+  "title": "Recharge Request",
+  "selectPlaceholder": "-- Please select --",
+  "koreanWon": "Korean Won",
+  "philippinePeso": "Philippine Peso",
+  "usdt": "Tether (USDT)",
+  "alert": {
+    "fillAll": "Please fill out all fields.",
+    "minimumAmount": "The minimum charge amount is $40.",
+    "success": "Your charge request has been submitted.",
+    "error": "An error occurred during submission.",
+    "noExchange": "No exchange rate available for the selected currency.",
+    "rateFail": "Failed to retrieve exchange rate:",
+    "historyFail": "Failed to load charge history:"
+  },
+  "status": {
+    "pending": "Pending",
+    "completed": "Completed",
+    "rejected": "Rejected"
+  }
+},
+"history": {
+  "title": "My History",
+  "rechargeTab": "Recharge History",
+  "withdrawTab": "Withdraw History",
+    "platform": "Platform",
+  "platformId": "Platform ID",
+
+  "noRecharge": "No recharge history found.",
+  "wiHistory": "No withdrawal history found.",
+  "inputAmount": "Input Amount",
+    "type": "Type",
+  "type_charge": "Deposit",
+  "type_withdraw": "Withdraw",
+  "currency": "Currency",
+  "amount": "External Amount",
+  "usdAmount": "Site USD Amount",
+  "status": "Status",
+  "requestDate": "Request Date",
+  "approveDate": "Approve Date"
+},
+"home": {
+  "title": "Welcome to MyPoint",
+  "login": "Login",
+  "register": "Sign Up",
+  "logout": "Logout",
+  "notice": "Notices",
+  "exchangeRate": "Exchange Rate",
+  "date": "Date",
+   "external": {
+    "pokerbros": "PokerBros",
+    "xpoker": "X-Poker",
+    "pokernex": "Pokernex",
+    "ggclub": "GG Club"
+  }
+},
+"guide": {
+  "title": "Sign-up Guide",
+  "section": {
+    "required": "✅ Important Notes",
+    "warning": "⚠️ Warning Policy",
+    "withdraw": "💳 Withdrawal Info",
+    "rules": "🔒 Account Rules"
+  },
+  "approval": "🧾 Admin approval is required after sign-up.",
+  "platformLimit": "🛠️ Minimum 1, up to 4 platform IDs required.",
+  "realNamePhone": "📱 Real name and valid phone number required.",
+  "referral": "👥 Referral ID is required.",
+  "warningBlock": "🚫 3 accumulated warnings result in account blocking.",
+  "warningMsg": "📬 Warning messages are sent via your message inbox.",
+  "withdrawMessage": "🏦 A message with a virtual account is sent upon withdrawal request.",
+  "adminEditable": "🛠️ Admin may update this info at any time.",
+  "oneAccount": "One account per person.",
+  "falseInfo": "False information may lead to restrictions."
+},
+"login": {
+  "title": "Login",
+  "username": "ID",
+  "password": "Password",
+  "loginButton": "Login",
+  "registerButton": "Sign Up"
+},
+"messages": {
+  "title": "My Messages",
+  "subject": "Subject",
+  "date": "Date",
+  "status": "Status",
+  "read": "Read",
+  "unread": "Unread",
+  "noMessages": "You have no messages yet."
+},
+"mypage": {
+  "title": "My Page",
+    "tabs": {
+    "info": "Basic Info",
+    "password": "Change Password",
+    "moneyPassword": "Withdrawal Password",
+    "bank": "Bank Info"
+  },
+    "changePassword": "Change Password",
+    "changeMoneyPassword": "Change Withdrawal Password(Coming Soon)",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm Password",
+    "currentMoneyPassword": "Current Withdrawal Password (6 digits)",
+    "newMoneyPassword": "New Withdrawal Password (6 digits)",
+    "confirmMoneyPassword": "Confirm Withdrawal Password",
+    "balance": "Balance(Coming Soon)",
+    "userInfo": "User Info",
+    "recommender": "Recommender",
+    "warningCount": "Warning Count",
+    "language": "Language",
+    "bankName": "Bank Name",
+    "bankAccount": "Account Number",
+    "realName": "Real Name",
+  "myInfo": "My Information",
+  "username": "Username",
+  "referral": "Referral ID",
+  "linkedPlatforms": "Linked Platforms",
+  "platformName": "Platform Name",
+  "platformId": "Platform ID", "bankInfo": "Bank Information",
+  "moneyPasswordHelp": "If you don't know your current password, please contact the administrator via 1:1 inquiry.",
+  "bankInfoName": "After entering your real name, please enter the bank name exactly as it appears under the account holder.",
+  "bankInfoSaveFailed": "Failed to save bank account information.",
+  "bankInfoSaveSuccess": "Saved successfully.",  "passwordMismatch": "The new passwords do not match.",
+  "passwordChanged": "Password has been changed.",
+  "passwordChangeFailed": "Failed to change password.","moneyPasswordUpdated": "Withdrawal password has been updated."
+,
+  "common":{  "save": "save" 
+}
+},"notice": {
+"backToList":"List"
+},
+"register": {
+   "emailNote": "Your email will be used for password recovery. Please enter it correctly.",
+  "title": "Sign Up",
+  "username": "Username *",
+  "usernamePlaceholder": "5–20 characters, letters and numbers only",
+  "checkAvailability": "Check Availability",
+  "password": "Password *",  "moneyPassword": "Money Password (6 digits)*",
+    "moneyPasswordPlaceholder": "Enter 6-digit number",
+  "confirmPassword": "Confirm Password *",
+  "passwordPlaceholder": "At least 8 characters, must include both letters and numbers",
+  "passwordMismatch": "Passwords do not match.",
+  "realName": "Full Name",
+  "phone": "Mobile Number *",
+  "codePlaceholder": "Enter verification code",
+  "codeInvalid": "Verification code is incorrect.",
+  "referral": "Referral ID",
+  "bankName": "Bank Name",
+  "bankAccount": "Bank Account Number",
+  "platform": "Platform ID ",
+  "addPlatform": "+",
+  "removePlatform": "X",
+  "submit": "Sign Up",
+  "login": "Log In", "email": "Email",
+  "emailPlaceholder": "Enter your email",
+    "sendEmailCode": "Send Verification Code",
+    "enterCodeLabel": "Enter verification code",
+  
+  "verifyCode": "Verify Code",
+  "emailVerified": "Email verified!",
+
+  "enterEmail": "Please enter your email.",
+  "alert": {
+    "enterCodeAlert": "Please enter the code.",
+    "sendEmailFailed": "Failed to send verification code.",
+     "verificationFailed": "Verification failed.",
+    "usernameAvailable": "Username is available.",
+     "emailVerified": "Email verified successfully!",
+    "usernameTaken": "Username is already taken.",
+    "checkError": "Error while checking username.",
+    "emptyUsername": "Please enter a username.",
+     "selectPlatformFirst": "Please select a platform first.",
+    "noDuplicatePlatform": "You cannot select the same platform more than once.",
+    "enterAllPlatformInfo": "Please enter all platform information.",
+    "registrationSuccess": "Registration completed. Please wait for admin approval.",
+    "registrationFail": "Registration failed.",
+    "enterUsername": "Please enter a username.",
+    "success": "Registration complete. Please wait for admin approval.",
+    "fail": "Registration failed.",
+    "enterEmail": "Please enter your email.",
+    "verificationCodeSent": "Verification code sent.",
+    "sendFailed": "Failed to send verification code.",
+    "emailVerificationRequired": "Email verification is required.",
+     "fillAllRequiredFields": "*Please fill in all required fields.",
+      "checkUsernameFirst": "Please check username availability first.",
+      "passwordMismatch": "Passwords do not match.",
+      "invalidMoneyPassword": "Withdrawal password must be 6 digits."
+  }
+},"inquiry": {
+      "list": {
+        "title": "1:1 Inquiry List",
+        "newInquiry": "New Inquiry",
+        "noInquiry": "No 1:1 inquiry history available."
+      },
+      "detail": {
+        "title": "1:1 Inquiry Details",
+        "content": "Inquiry Content:",
+        "adminAnswerTitle": "📬 Admin Response",
+        "noAnswer": "No response has been posted yet."
+      },
+      "write": {
+        "title": "Submit Inquiry",
+        "select": "Select",
+        "submit": "Submit Inquiry",
+        "success": "Your inquiry has been submitted.",
+        "placeholder": "Please enter your inquiry details",
+        "fail": "Failed to submit your inquiry.",
+        "noticeText": "To prevent delays due to repeated inquiries, you cannot submit a new inquiry until your previous one has been answered."
+        }
+        ,
+      "common": {
+        "subject": "Subject",
+        "category": "Category",
+        "status": "Status",
+        "createdAt": "Created At"
+      },
+      "category": {
+        "money": "Deposit/Withdrawal & Fund Transfer",
+        "account": "Account Inquiry",
+        "platform": "Platform Sign-up",
+        "download": "Download Issues",
+        "etc": "Other"
+      },
+      "status": {
+        "answered": "Answered",
+        "pending": "Pending"
+      }, "success": {
+    "created": "Your inquiry has been submitted."
+  },
+  "error": {
+    "pending_exists": "You already have a pending inquiry. Please wait for a reply before submitting a new one.",
+    "create_failed": "An error occurred while submitting your inquiry.",
+       "fetch_failed": "An error occurred while loading your inquiries."
+  }
+    },"withdraw": {
+      "amountUsd":"amountUsd",
+      "viewDetails":"Detail",
+      "platformId":"platform ID",
+       "bankName": "Bank Name",
+  "bankAccount": "Bank Account Number"
+  ,"agreeConfirm": "I agree that the withdrawal information is correct.",
+      "submit": "Submit Withdrawal",
+      "title": "Withdrawal",
+     "recentHistory": "Recent Withdrawal Requests",
+"memoLabel": "Withdrawal Address / Memo",
+"memoPlaceholder": "e.g., Enter wallet address or memo",
+"agreeCheck_line1": "※ Please double-check that all information entered is accurate.",
+"agreeCheck_line2": "Incorrect wallet addresses may result in failed withdrawals.",
+"agreeCheck_line3": "We are not responsible for any losses caused by incorrect information.",
+"onlyOwnAccount": "Withdrawals are only allowed to accounts under your name. To change your bank info, go to [My Page > Bank Info].",
+"inputAmount": "Enter Amount",
+"amountKrw": "Enter Amount (KRW)",
+"usdPlatform": "USD-Based Withdrawal",
+"usdDesc": "For USD-based platforms such as GG Club and Poker Bros.",
+"krwPlatform": "KRW-Based Withdrawal",
+"selectCurrency": "Select Currency to Exchange",
+"selectPlatform": "Select Platform",
+"selectPlaceholder": "Please Select",
+"platformIdPlaceholder": "Enter your Platform ID",
+"inputUsd": "Enter USD Amount",
+"inputPlaceholder": "Enter Amount",
+"totalSend": "Total Amount to Send",
+"feeNote": "Includes 2% fee",
+"rate": "Exchange Rate",
+"krwDesc": "For fixed KRW platforms like X-Poker and PokerNex.",
+"titleKrw": "KRW Withdrawal",
+"inputKrw": "Enter Withdrawal Amount (₩)",
+"inputKrwPlaceholder": "e.g., 50000",
+"feeNoteKrw": "Amount includes applicable fees.",
+"minimumAmountKrw": "Minimum withdrawal amount is ₩1,000.",
+"titleUsd": "USD Withdrawal Request",
+"selectedCurrency": "Selected Currency",
+"platformSelect": "Select Platform",
+"amountNote": "* Includes transaction fee.",
+"totalConverted": "Total Converted Amount",
+"viewMore": "View More",
+"date": "Date",
+"currency": "Currency",
+"amount": "Amount",
+"statusth": "Status",
+"agree": "Please confirm the accuracy of your withdrawal information.",
+
+"noHistory": "No recent withdrawal history.",
+  "alert": {
+    "agree": "Please confirm the accuracy of your withdrawal information.",
+    "fillAll": "Please fill out all required fields.",
+    "minimumAmount": "The minimum withdrawal amount is $40.",
+    "success": "Your withdrawal request has been submitted.",
+    "error": "An error occurred while submitting your request.",
+    "noExchange": "No exchange rate available for the selected currency.",
+    "rateFail": "Failed to retrieve exchange rate:",
+    "historyFail": "Failed to load withdrawal history:",
+     "requiredCurrency": "Please select the currency.",
+    "requiredAmount": "Please enter the withdrawal amount.",
+    "requiredPassword": "Please enter a 6-digit withdrawal password.",
+     "insufficientBalance": "You do not have enough balance for this withdrawal.",
+    "success": "Your withdrawal request has been submitted successfully."
+  },
+  
+  "status": {
+    "pending": "Pending",
+    "completed": "Completed",
+    "rejected": "Rejected"
+  }
+    }
+  }
