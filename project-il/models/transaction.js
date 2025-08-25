@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false
-    },
+    }, 
     currency: {
       type: DataTypes.STRING,
       allowNull: false

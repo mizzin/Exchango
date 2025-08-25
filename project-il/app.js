@@ -1,49 +1,60 @@
 const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+const logger = require('./utils/logger');
+//이거레알실운여서버용이것만주석풀어야함require('dotenv').config({ path: path.join(__dirname, '.env.production') });
+//console.log('📦 .env 사용 경로:', path.join(__dirname, '.env.production'));
+//console.log('✅ PORT:', process.env.PORT);
+// app.js 맨 위 아래는 로컬테스트환경
+require('dotenv').config({ path: '.env.production.local' });
+
+// const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+// require('dotenv').config({
+//   path: path.resolve(__dirname, envFile)
+// });
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.json());
 
-// ✅ users 라우터 연결
-const userRoutes = require('./routes/user');
-app.use('/users', userRoutes);
-// ✅ 다국어
-const platformRoutes = require('./routes/platformRoutes')
-app.use('/api/platforms', platformRoutes)
+// ✅ Vue 빌드 디렉토리
+const distPath = path.resolve(__dirname, 'frontend', 'dist');
 
-// ✅ users ＡＰＩ연결
-const exchangeRoute = require('./routes/exchange');
-app.use('/exchange-rate', exchangeRoute);
+// ✅ 요청 로그 (정적 자원 제외)
+app.use((req, res, next) => {
+  if (!req.url.startsWith('/assets') && !req.url.endsWith('.svg')) {
+    const ip = req.ip.includes('::ffff:') ? req.ip.replace('::ffff:', '') : req.ip;
+    logger.info(`➡️ ${req.method} ${req.url} 요청 from ${ip}`);
+  }
+  next();
+});
+
+// ✅ 정적 파일 서빙 (딱 한 번만!)
+app.use(express.static(distPath));
+
+// ✅ API 경로는 /api 하위로만!
+app.use('/api/users', require('./routes/user'));
+app.use('/api/platforms', require('./routes/platformRoutes'));
+app.use('/api/exchange-rate', require('./routes/exchange'));
+app.use('/api/transactions', require('./routes/transaction'));
 //0724
 const exchangeRateRouter = require('./routes/exchangeRate');
 app.use('/api/exchange-rate', exchangeRateRouter); 
- 
-const transactionRoutes = require('./routes/transaction');
-app.use('/api/transactions', transactionRoutes);
 
-//이메일 중복 확인 + 인증 코드 생성 API
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
-
-const uploadRoutes = require('./routes/upload')
-app.use('/api/upload', uploadRoutes)
-
-const path = require('path')
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')))
-
-
-// ✅ admin 라우터 연결 전 로그 
-const adminRoutes = require('./routes/admin');
-app.use('/api/admin', adminRoutes);
-
-
+app.use('/api/upload', require('./routes/upload'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/auth', require('./routes/auth'));
+// ✅ 업로드 파일 서빙
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use((req, res, next) => {
+  console.log(`🌐 ${req.method} ${req.originalUrl}`)
+  next()
+})
+// ✅ 마지막 SPA fallback
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
+  logger.info(`🚀 서버 실행 중: http://localhost:${PORT}`);
 });
-
-

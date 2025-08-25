@@ -28,7 +28,7 @@ exports.sendEmailCode = async (req, res) => {
     `, [email, code, expiry]);
   await sendVerificationEmail(email, code, lang); //
     // 메일 발송은 추후에, 지금은 콘솔 출력
-    console.log(`📨 [DEBUG] 인증 코드 for ${email}:${code}`);
+    console.log(`📨 [DEBUG] 인증 코드 for ${email}: ${code}`);
 
     return res.status(200).json({ message: 'Verification code sent (console only).' });
   } catch (err) {

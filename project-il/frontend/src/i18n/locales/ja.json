@@ -4,6 +4,43 @@
   "server_error": "サーバーエラーが発生しました。",
   "password_mismatch": "新しいパスワードが一致しません。",
   "unknown": "不明なエラーが発生しました。"
+},"alert": {
+  "pendingMoneyRequest": "未処理のマネー関連申請があります。",
+  "pendingRequestWithAction": "申請が保留中です。新しい申請の前にステータスを確認してください。",
+  "checkStatus": "ステータス確認"
+}
+,"transfer": {
+  "request1": {
+    "title": "マネー移動申請",
+    "moveType": "移動タイプを選択",
+    "walletToPlatform": "ウォレット → プラットフォーム",
+    "walletToPlatformDesc": "ウォレットから外部プラットフォームに送金",
+    "platformToOther": "プラットフォーム → プラットフォーム / ウォレット",
+    "platformToOtherDesc": "プラットフォーム間またはウォレットへの送金",
+    "fromPlatform": "出発プラットフォーム",
+    "fromPlatformId": "出発プラットフォームID",
+    "toPlatform": "到着プラットフォーム",
+    "toPlatformId": "到着プラットフォームID",
+    "myWallet": "マイウォレット",
+    "amount": "移動金額",
+    "expectedAmount": "受取予定金額",
+    "rateNote": "適用為替レート: 1 {from} → {rate} {to}（2％手数料）",
+    "moneyPassword": "出金パスワード",
+    "submit": "申請する", "alert": {
+      "rateFetchFailed": "為替レートの取得に失敗しました。",
+      "rateNotReady": "為替レートの計算が完了していません。",
+      "failed": "申請に失敗しました。"
+    }
+  },
+  "title": "金額移動",
+  "request": "金額移動申請",
+  "history": "金額移動履歴"
+},
+"wallet": {
+  "title": "マイウォレット"
+},
+"platform": {
+  "title": "外部プラットフォーム"
 }
 ,
   "nav": {
@@ -27,7 +64,20 @@
     "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
   },
   "charge": {
-    
+     "wallet": {
+    "title": "ウォレットチャージ",
+    "method": "チャージ方法",
+    "selectCurrency": "通貨を選択",
+    "krw": "ウォン",
+    "php": "ペソ",
+    "usdt": "テザー",
+    "inputUsdAmount": "チャージしたいUSD",
+    "totalSendWithFee": "入金額（手数料込み）",
+    "submit": "チャージ申請",
+        "fetchRateFailed": "為替レートの取得に失敗しました。",
+    "success": "チャージ申請が完了しました。",
+    "failed": "チャージ申請に失敗しました。"
+  },
     "inputAmount": "入力金額",
     "amountKrw": "入力金額",
     "usdPlatform": "USDプラットフォーム",
@@ -75,7 +125,41 @@
     "rejected": "拒否されました"
   }
 },
-"history": {
+"history": {   "transfer": {
+    "title": "マネー移動申請履歴",
+    "description": "マネー移動の申請履歴を確認できます。",
+    "date": "申請日",
+    "from": "送信元",
+    "to": "送信先",
+    "wallet": "ウォレット",
+    "amount": "移動金額",
+    "converted": "換算金額",
+    "status": "ステータス",
+    "detailTitle": "詳細情報",
+    "type": "履歴タイプ",
+    "rate": "為替レート",
+    "memo": "ユーザーメモ",
+    "adminMemo": "管理者メモ",
+    "startedAt": "開始時間",
+    "processedAt": "処理時間", "expected_amount": "受取金額",
+    "direction": {
+      "walletToPlatform": "ウォレット → プラットフォーム",
+      "platformToWallet": "プラットフォーム → ウォレット",
+      "platformToPlatform": "プラットフォーム → プラットフォーム"
+    }
+  },
+  "wallet": {
+    "title": "ウォレットのチャージ・出金履歴",
+    "description": "サイト内ウォレットのチャージ・出金申請履歴を確認できます。",
+    "date": "申請日",
+    "type": "区分",
+    "currency": "申請通貨",
+    "amountUsd": "申請金額（USD）",
+    "convertedAmount": "換算金額",
+    "status": "ステータス",
+    "approvedAt": "承認日",
+    "noHistory": "チャージまたは出金履歴がありません。"
+  },
   "title": "マイ履歴",
   "rechargeTab": "チャージ履歴",
   "withdrawTab": "出金履歴",
@@ -88,6 +172,12 @@
   "approveDate": "承認日時",
   "noRecharge": "チャージ履歴はありません。",
   "wiHistory": "出金履歴はありません。"
+},
+"status": {
+  "pending": "保留中",
+  "completed": "完了",
+  "rejected": "拒否済み",
+  "cancelled": "キャンセル"
 },
 "home": {
   "title": "MyPointへようこそ",
@@ -261,6 +351,7 @@
 
         },
       "common": {
+        "close": "閉じる",
         "subject": "件名",
         "category": "カテゴリー",
         "status": "ステータス",
@@ -283,7 +374,14 @@
     "pending_exists": "未回答のお問い合わせがあります。回答後に新しいお問い合わせを送信してください。",
     "create_failed": "お問い合わせの送信中にエラーが発生しました。"
   }
-    }, "withdraw": {
+    }, "withdraw": {  "wallet": {
+    "title": "ウォレット出金",
+    "selectError": "※ 通貨を選択してください。",
+    "minAmountError": "※ 最低出金金額は40 USDです。",
+    "balanceExceeded": "※ 残高を超えています。",
+    "passwordError": "※ 6桁の数字パスワードを入力してください。",
+    "agreeError": "※ 出金内容に同意してください。"
+  },
   "title": "出金申請",
   "selectCurrency": "通貨を選択",
   "selectPlatform": "プラットフォームを選択",

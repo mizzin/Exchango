@@ -1,4 +1,6 @@
 // models/userModel.js
+console.log('📦 userModel 시작');
+
 const db = require('../db');
 
 const getAllUsers = async () => {
@@ -43,7 +45,6 @@ const updateBankInfo = async (userId, { real_name, bank_name, bank_account }) =>
   return result
 }
 // 사용자 저장
-
 const createUser = async (data) => {
   const {
     username,
@@ -54,7 +55,7 @@ const createUser = async (data) => {
     real_name,
     referral_id,
     language,
-    money_password  
+    money_password
   } = data;
 
   const [result] = await db.query(`
@@ -92,7 +93,6 @@ const insertUserPlatforms = async (userId, platforms) => {
 };
 
 
-
 const findUserByUsernameWithPassword = async (username) => {
   const [rows] = await db.query(`
     SELECT * FROM users WHERE username = ?
@@ -122,37 +122,43 @@ const getNoticeById = async (id) => {
   return rows[0]
 }
 
-const getPrevNotice = async (id) => {
-  const [rows] = await db.query(
-    'SELECT id, title, created_at FROM notices WHERE id < ? ORDER BY id DESC LIMIT 1',
-    [id]
-  )
-  return rows[0]
+const getPrevNotice = async (id, lang) => {
+  const [[row]] = await db.query(`
+    SELECT id, title, created_at 
+    FROM notices 
+    WHERE id < ? AND language = ? 
+    ORDER BY id DESC 
+    LIMIT 1
+  `, [id, lang])
+  return row
 }
-
-const getNextNotice = async (id) => {
-  const [rows] = await db.query(
-    'SELECT id, title, created_at FROM notices WHERE id > ? ORDER BY id ASC LIMIT 1',
-    [id]
-  )
-  return rows[0]
+const getNextNotice = async (id, lang) => {
+  const [[row]] = await db.query(`
+    SELECT id, title, created_at 
+    FROM notices 
+    WHERE id > ? AND language = ? 
+    ORDER BY id ASC 
+    LIMIT 1
+  `, [id, lang])
+  return row
 }
 
 module.exports = {
-  createUser,
   getAllUsers,
   updateUser,
   deleteUser,
   deleteUserById,
   getUserById,
   findUserByUsername,
+  createUser,
   insertUserPlatforms,
+  findUserByUsername,
   findUserByUsernameWithPassword,
   findUserByIdWithPassword,
   updatePassword,
   getAllPublicNotices,
   getNoticeById,
   getPrevNotice,
-  getNextNotice,  
+  getNextNotice,
   updateBankInfo
 };

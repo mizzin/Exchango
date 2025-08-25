@@ -1,94 +1,96 @@
 <template>
   <UserLayout>
     <div class="transfer-form">
-      <h2>머니 이동 신청</h2>
-          <!-- 이동 선택 -->
-<div class="form-group">
-  <label class="form-label">이동 유형 선택</label>
-  <div class="radio-group">
-      <label
-        class="radio-option"
-        :class="{ selected: form.from_type === 'wallet' }"
-      >
-        <input type="radio" value="wallet" v-model="form.from_type" />
-        <div class="radio-content">
-          <strong>지갑 → 플랫폼</strong>
-          <span class="radio-desc">내 지갑에서 외부 플랫폼으로 머니 전송</span>
-        </div>
-      </label>
+      <h2>{{ $t('transfer.request1.title') }}</h2>
 
-        <label
-          class="radio-option"
-          :class="{ selected: form.from_type === 'platform' }"
-        >
-          <input type="radio" value="platform" v-model="form.from_type" />
-          <div class="radio-content">
-            <strong>플랫폼 → 플랫폼 / 지갑</strong>
-            <span class="radio-desc">플랫폼 간 이동 또는 플랫폼에서 내 지갑으로 전송</span>
-          </div>
-        </label>
-      </div>
+    <div v-if="hasPending" class="pending-banner">
+         <i class="icon-warning" />
+        {{ $t('alert.pendingMoneyRequest') }}
+        <a href="/wallet/transfer/history">{{ $t('alert.checkStatus') }}</a>
     </div>
+    <div class="form-content" style="position:relative;">
+      <div v-if="hasPending" class="blur-overlay">
+        </div>
+      <!-- 이동 선택 -->
+      <div class="form-group">
+        <label class="form-label">{{ $t('transfer.request1.moveType') }}</label>
+        <div class="radio-group">
+          <label class="radio-option" :class="{ selected: form.from_type === 'wallet' }">
+            <input type="radio" value="wallet" v-model="form.from_type" />
+            <div class="radio-content">
+              <strong>{{ $t('transfer.request1.walletToPlatform') }}</strong>
+              <span class="radio-desc">{{ $t('transfer.request1.walletToPlatformDesc') }}</span>
+            </div>
+          </label>
 
-      <!-- 출발 플랫폼 정보 -->
-      <div class="form-group" v-if="form.from_type === 'platform'">
-        <label>출발 플랫폼</label>
-        <select v-model="form.from_platform_id">
-          <option v-for="p in platformOptions" :key="p.id" :value="p.id">{{ p.name }}</option>
-        </select>
-        <input v-model="form.from_platform_user_id" placeholder="출발 플랫폼 ID" />
+          <label class="radio-option" :class="{ selected: form.from_type === 'platform' }">
+            <input type="radio" value="platform" v-model="form.from_type" />
+            <div class="radio-content">
+              <strong>{{ $t('transfer.request1.platformToOther') }}</strong>
+              <span class="radio-desc">{{ $t('transfer.request1.platformToOtherDesc') }}</span>
+            </div>
+          </label>
+        </div>
       </div>
 
+      <!-- 출발 플랫폼 -->
+      <div class="form-group" v-if="form.from_type === 'platform'">
+        <label>{{ $t('transfer.request1.fromPlatform') }}</label>
+        <select v-model="form.from_platform_id">
+          <option v-for="p in platformOptions" :key="p.platform_id" :value="p.platform_id">{{ p.name }}</option>
+        </select>
+        <input v-model="form.from_platform_user_id" :placeholder="$t('transfer.request1.fromPlatformId')" />
+      </div>
 
-      <!-- 도착 플랫폼 정보 -->
+      <!-- 도착 플랫폼 -->
       <div class="form-group">
-        <label>도착 플랫폼</label>
+        <label>{{ $t('transfer.request1.toPlatform') }}</label>
         <select v-model="form.to_platform_id">
-        <option disabled value="">도착 플랫폼 </option>
-         <option value="wallet">내 지갑</option> 
-        <option
-          v-for="p in platformOptions"
-          :key="p.id"
-          :value="p.id"
-        >
-          {{ p.name }}
-        </option>
-      </select>
-
-        <input v-model="form.to_platform_user_id" placeholder="도착 플랫폼 ID" />
+          <option disabled value="">{{ $t('transfer.request1.toPlatform') }}</option>
+          <option value="wallet">{{ $t('transfer.request1.myWallet') }}</option>
+          <option v-for="p in platformOptions" :key="p.platform_id" :value="p.platform_id">{{ p.name }}</option>
+        </select>
+        <input v-model="form.to_platform_user_id" :placeholder="$t('transfer.request1.toPlatformId')" />
       </div>
 
       <!-- 금액 입력 -->
       <div class="form-group">
-        <label>이동 금액 ({{ fromCurrency }})</label>
+        <label>{{ $t('transfer.request1.amount') }} ({{ fromCurrency }})</label>
         <input type="number" v-model.number="form.amount" @input="calculateExpected" />
       </div>
 
       <!-- 예상 수령 금액 -->
       <div class="form-group" v-if="form.expected_amount > 0">
-        <label>예상 수령 금액 ({{ toCurrency }})</label>
+        <label>{{ $t('transfer.request1.expectedAmount') }} ({{ toCurrency }})</label>
         <div>{{ form.expected_amount.toLocaleString() }} {{ toCurrency }}</div>
-        <small>적용 환율: 1 {{ fromCurrency }} → {{ form.exchange_rate }} {{ toCurrency }} (수수료 2%)</small>
-
       </div>
 
       <!-- 출금 비밀번호 -->
       <div class="form-group">
-        <label>출금 비밀번호</label>
+        <label>{{ $t('transfer.request1.moneyPassword') }}</label>
         <input type="password" v-model="form.money_password" />
       </div>
 
-      <button class="btn-submit" @click="submit">신청하기</button>
+      <button class="btn-submit" @click="submit">{{ $t('transfer.request1.submit') }}</button>
+      </div>
     </div>
   </UserLayout>
 </template>
 
+
 <script setup>
 import UserLayout from '@/components/UserLayout.vue'
-import { ref, onMounted, watch, computed  } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import axios from '@/axiosUser'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
-const platforms = ref([])
+// ✅ 추가: pending 상태
+const hasPending = ref(false)
+
+// (선택) 안 쓰는 변수면 지워도 됨
+// const platforms = ref([])
+
 const form = ref({
   from_type: 'wallet',
   from_platform_id: null,
@@ -101,48 +103,78 @@ const form = ref({
   money_password: '',
   memo: '',
 })
+
+const platformOptions = ref([])
+
+const getCurrencyByPlatformId = (id) => {
+  if (!id || id === 'wallet') return 'USD'
+  const p = platformOptions.value.find(p => String(p.platform_id) === String(id))
+  return p?.currency || 'USD'
+}
+
 const fromCurrency = computed(() => {
   return form.value.from_type === 'wallet'
     ? 'USD'
     : getCurrencyByPlatformId(form.value.from_platform_id)
 })
+const toCurrency = computed(() => getCurrencyByPlatformId(form.value.to_platform_id))
 
-const toCurrency = computed(() => {
-  return form.value.to_platform_id === 'wallet'
-    ? 'USD'
-    : getCurrencyByPlatformId(form.value.to_platform_id)
-})
-
-const platformOptions = ref([])
-
-const fetchPlatformOptions   = async () => {
+const fetchPlatformOptions = async () => {
   try {
     const lang = localStorage.getItem('lang') || 'en'
-    const res = await axios.get(`/api/platforms?lang=${lang}`)
+    const res = await axios.get(`/platforms?lang=${lang}`)
     platformOptions.value = res.data
   } catch (err) {
-    console.error('플랫폼 목록 로딩 실패:', err)
+    console.error('Platform list:', err)
   }
 }
-const getCurrencyByPlatformId = (id) => {
-  const p = platformOptions.value.find(p => p.id === id)
-  return p?.currency || 'USD'
+
+// ✅ 추가: pending 체크 (전역 차단형)
+const checkPending = async () => {
+  try {
+  const res = await axios.get('/users/me/transactions/pending-check?status=pending');
+     console.log('📦 raw res.data:', res.data)
+    const arr = Array.isArray(res.data.transactions) ? res.data.transactions : []
+    const pendingTypes = [
+      'charge', 'withdraw',
+      'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform',
+      'platform_charge', 'wallet_charge', 'platform_withdraw', 'wallet_withdraw'
+    ]
+   // hasPending.value = arr.some(tx => pendingTypes.includes(tx.type))
+   hasPending.value = arr.some(
+      tx => tx.status === 'pending' && pendingTypes.includes(tx.type)
+    )
+  } catch (e) {
+    console.log('axios 에러:', e)
+    hasPending.value = false
+  }
 }
-//계산 결과값이 벡엔드에서 한번더 검증함. 수정시 함께 해야함.
+
+// 계산 결과값이 백엔드에서 한번 더 검증됨. 수정 시 함께 반영할 것.
 const calculateExpected = async () => {
   if (!form.value.amount || !form.value.to_platform_id) return
 
   form.value.exchange_rate = 1
   form.value.expected_amount = form.value.amount
 
-  if (fromCurrency.value !== toCurrency.value) {
+  if (fromCurrency.value && toCurrency.value && fromCurrency.value !== toCurrency.value) {
     try {
-      const res = await axios.get(`/api/exchange-rate?from=${fromCurrency.value}&to=${toCurrency.value}`)
-      const rate = res.data.rate
-      form.value.exchange_rate = rate
-      form.value.expected_amount = Math.floor(form.value.amount * rate * 0.98)
+      const res = await axios.get(`/exchange-rate?from=${fromCurrency.value}&to=${toCurrency.value}`)
+      let rate = res.data.rate
+      if (rate == null && res.data.rates) {
+        const fromR = res.data.rates[fromCurrency.value]
+        const toR   = res.data.rates[toCurrency.value]
+        if (!fromR || !toR) throw new Error('지원되지 않는 통화입니다.')
+        rate = toR / fromR
+      }
+      if (!rate) return alert(t('transfer.request1.alert.rateFetchFailed'))
+
+      form.value.exchange_rate = Number(rate.toFixed(6))
+      // 수수료 제외 없이 기대값(지금 로직대로면 0% fee)
+      form.value.expected_amount = Math.floor(form.value.amount * rate)
     } catch (err) {
-      console.error('환율 가져오기 실패:', err)
+      console.error('❌ 환율 요청 실패:', err)
+      alert(t('transfer.request1.alert.rateFetchFailed'))
     }
   }
 }
@@ -155,21 +187,67 @@ watch([
 ], calculateExpected)
 
 const submit = async () => {
-  try {
-    console.log(JSON.stringify(form.value, null, 2))
+  // ✅ 제출 직전에도 최신 상태로 재확인 (경쟁 상태 방지)
+  await checkPending()
+  if (hasPending.value) {
+    return alert(t('alert.pendingRequestWithAction'))
+  }
 
-    const res = await axios.post('/api/transactions/wallet/transfer', form.value)
-    
+  if (!form.value.exchange_rate || !form.value.expected_amount) {
+    return alert(t('transfer.request1.alert.rateNotReady'))
+  }
+
+  try {
+    const res = await axios.post('/transactions/wallet/transfer', form.value)
     alert(res.data.message)
+    // 필요하면 새로고침
+    window.location.reload()
   } catch (err) {
-    alert(err.response?.data?.message || '신청 실패')
+    alert(err.response?.data?.message || t('transfer.request1.alert.failed'))
   }
 }
 
-onMounted(fetchPlatformOptions)
+onMounted(() => {
+  fetchPlatformOptions()
+  checkPending() // ✅ 페이지 진입 시 체크
+})
 </script>
 
+
 <style scoped>
+.pending-banner {
+  background-color: #fff3cd; /* 연한 노랑 (경고 느낌) */
+  color: #856404;            /* 어두운 갈색 텍스트 */
+  border: 1px solid #ffeeba;
+  padding: 12px 16px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+.pending-banner i {
+  color: #856404;
+  font-size: 18px;
+}
+
+.pending-banner a {
+  margin-left: auto;
+  color: #0d6efd; /* 파란색 링크 */
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+
+.blur-overlay {
+  position: absolute; top:0; left:0; right:0; bottom:0;
+  background: rgba(255,255,255,0.8);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size: 17px; z-index:10;
+  pointer-events: all;
+}
 
 .transfer-form{
   background-color: #fff;

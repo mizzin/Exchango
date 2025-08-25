@@ -1,5 +1,3 @@
-       <!--외부 플랫폼 충전 신청-->
-
 <template>
   <AdminLayout>
     <div class="admin-trade">
@@ -146,7 +144,7 @@ const loadTransactions = async () => {
 
   const { username, status, currency } = filters.value
 
-  try {
+  try { 
     const res = await axios.get('/admin/trade/recharge', {
       headers: { Authorization: `Bearer ${token}` },
       params: {
@@ -158,7 +156,7 @@ const loadTransactions = async () => {
         endDate: filters.value.endDate
       }
     })
-console.log('📦 응답 데이터:', res.data)
+
 
     transactions.value = res.data.rows || []
     totalPages.value = Math.ceil(res.data.total / 10) || 1

@@ -1,3 +1,5 @@
 {
-    "workbench.colorTheme": "beautiful"
+    "files.exclude": {
+        "localhost:3000": true
+    }
 }

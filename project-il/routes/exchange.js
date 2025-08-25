@@ -9,6 +9,7 @@ router.get('/', async (req, res) => {
     res.json({ success: true, rates , date: rates.updated_at});
   } catch (err) {
     console.error('❌ 환율 조회 실패:', err.message);
+        console.error('❌ 환율 조회 실패:', err.message);
     res.status(500).json({ success: false, message: '환율 가져오기 실패' });
   }
 });

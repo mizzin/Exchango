@@ -1,39 +1,52 @@
 <template>
-    <UserLayout>
-      <div class="wallet-charge">
-        <h2>{{ $t('charge.title') }}</h2>
-      <!-- 충전 수단 선택 -->
-<div class="form-group">
-  <label>충전 수단</label>
-  <select v-model="currency" @change="fetchExchangeRate">
-    <option disabled value="">통화 선택</option>
-    <option value="KRW">₩ 원화</option>
-    <option value="PHP">₱ 페소</option>
-    <option value="USDT">₮ 테더</option>
-  </select>
-</div>
+  <UserLayout>
+    <div class="wallet-charge">
+      <h2>{{ $t('charge.wallet.title') }}</h2>
 
-    <div class="form-group">
-      <label>적립하고 싶은 USD</label>
-      <input type="number" v-model.number="amountUsd" @input="calculateSendAmount" />
+    <div v-if="hasPending" class="pending-banner">
+         <i class="icon-warning" />
+        {{ $t('alert.pendingMoneyRequest') }}
+        <a href="/wallet/history">{{ $t('alert.checkStatus') }}</a>
     </div>
-
-          <!-- 입금해야 할 금액 표시 -->
+    <div class="form-content" style="position:relative;">
+      <div v-if="hasPending" class="blur-overlay">
+        </div>
+      <!-- 충전 수단 선택 -->
       <div class="form-group">
-        <label>입금할 금액 (수수료 포함)</label>
+        <label>{{ $t('charge.wallet.method') }}</label>
+        <select v-model="currency" @change="fetchExchangeRate">
+          <option disabled value="">{{ $t('charge.wallet.selectCurrency') }}</option>
+          <option value="KRW">₩ {{ $t('charge.wallet.krw') }}</option>
+          <option value="PHP">₱ {{ $t('charge.wallet.php') }}</option>
+          <option value="USDT">₮ {{ $t('charge.wallet.usdt') }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>{{ $t('charge.wallet.inputUsdAmount') }}</label>
+        <input type="number" v-model.number="amountUsd" @input="calculateSendAmount" />
+      </div>
+
+      <!-- 입금해야 할 금액 표시 -->
+      <div class="form-group">
+        <label>{{ $t('charge.wallet.totalSendWithFee') }}</label>
         <input type="text" :value="`${sendAmountWithFee.toLocaleString()} ${currency}`" readonly class="readonly-input" />
       </div>
-            
-      <button class="btn-submit" :disabled="!canSubmit" @click="submit">충전 신청</button>
+
+      <button class="btn-submit" :disabled="!canSubmit" @click="submit">{{ $t('charge.wallet.submit') }}</button>
+    </div>
     </div>
   </UserLayout>
 </template>
 
+
 <script setup>
-import { reactive, computed, ref, watch } from 'vue'
+import { reactive, computed, ref, watch, onMounted } from 'vue'
 import UserLayout from '@/components/UserLayout.vue'
 import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
+
+const hasPending = ref(false)
 
 const { t } = useI18n()
 
@@ -59,7 +72,7 @@ const fetchExchangeRate = async () => {
 
     calculateUsd()
   } catch (e) {
-    alert('환율 정보를 불러오지 못했습니다.')
+    alert(t('charge.wallet.fetchRateFailed'))
   }
 }
 
@@ -89,25 +102,93 @@ const sendAmountWithFee = computed(() => {
 
 const submit = async () => {
   try {
-      await axios.post('/api/transactions/wallet/charge', {
+      await axios.post('/transactions/wallet/charge', {
       currency: currency.value,
       local_amount: sendAmountWithFee.value,
       amount_usd: amountUsd.value,
        expected_amount: sendAmountWithFee.value,
-    })
-    alert('충전 신청이 완료되었습니다.')
+    }) 
+     alert(t('charge.wallet.success'))
     currency.value = ''
     localAmount.value = 0
     usdAmount.value = 0
+    alert(t('withdraw.alert.success'))
+    window.location.reload() 
   } catch (e) {
     console.error(e)
-    alert('충전 신청에 실패했습니다.')
+     alert(t('charge.wallet.failed'))
   }
 }
+
+const checkPending = async () => {
+  try {
+    const res = await axios.get('/users/me/transactions/pending-check?status=pending');
+
+    console.log('📦 raw res.data:', res.data)
+
+    const arr = Array.isArray(res.data.transactions) ? res.data.transactions : []
+    
+
+    const pendingTypes = [
+      'charge', 'withdraw',
+      'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform',
+      'platform_charge', 'wallet_charge', 'platform_withdraw', 'wallet_withdraw'
+    ]
+
+    arr.forEach(tx => {
+      console.log(`[TX] id: ${tx.id}, type: ${tx.type}, status: ${tx.status}`)
+    })
+    hasPending.value = arr.some(
+      tx => tx.status === 'pending' && pendingTypes.includes(tx.type)
+    )
+
+    console.log('🚨 hasPending.value:', hasPending.value)
+
+  } catch (e) {
+    console.log('❌ 에러:', e)
+    hasPending.value = false
+  }
+}
+
+
+onMounted(checkPending)
 </script>
 
 
 <style scoped>
+.pending-banner {
+  background-color: #fff3cd; /* 연한 노랑 (경고 느낌) */
+  color: #856404;            /* 어두운 갈색 텍스트 */
+  border: 1px solid #ffeeba;
+  padding: 12px 16px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+.pending-banner i {
+  color: #856404;
+  font-size: 18px;
+}
+
+.pending-banner a {
+  margin-left: auto;
+  color: #0d6efd; /* 파란색 링크 */
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+
+.blur-overlay {
+  position: absolute; top:0; left:0; right:0; bottom:0;
+  background: rgba(255,255,255,0.8);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size: 17px; z-index:10;
+  pointer-events: all;
+}
 .wallet-charge {
   background-color: #fff;
   max-width: 420px;

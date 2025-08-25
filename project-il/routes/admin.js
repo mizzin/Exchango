@@ -10,7 +10,7 @@ const transactionController = require('../controllers/transactionController')
  router.use('/', (req, res, next) => {
    console.log(`[AdminRoute] ${req.method} ${req.originalUrl}`);
    next();
-}); 
+});
 // ✅ 회원 승인 API
 router.patch('/users/:id/approve', verifyToken, isAdmin, adminController.approveUser);
 router.patch('/users/:id/reject', verifyToken, isAdmin, adminController.rejectUser);
@@ -41,12 +41,20 @@ router.get('/trade/recharge', verifyToken, isAdmin, transactionController.getRec
 router.get('/trade/withdraw', verifyToken, isAdmin, transactionController.getWithdrawTransactions)
 // 관리자 충전 내역 조회 0721
 router.get('/transactions/wallet-charge', verifyToken, isAdmin, transactionController.getWalletChargeList);
-// 충전 승인/거절 처리 0721
-router.patch('/transactions/:id/approve', verifyToken, isAdmin, transactionController.approveTransaction)
-router.patch('/transactions/:id/reject',verifyToken,  isAdmin, transactionController.rejectTransaction)
+// 관리자 출금 내역 조회 0721
+router.get('/transactions/wallet-withdraw', verifyToken, isAdmin, transactionController.getWalletWithdrawList);
+
+// ✅ 내지갑 충전 승인/거절
+router.patch('/transactions/wallet-charge/:id/approve', verifyToken, isAdmin, transactionController.approveTransaction)
+router.patch('/transactions/wallet-charge/:id/reject', verifyToken, isAdmin, transactionController.rejectTransaction)
+
+// ✅ 내지갑 출금 승인/거절
+router.patch('/transactions/wallet-withdraw/:id/approve', verifyToken, isAdmin, transactionController.approveWithdrawTransaction)
+router.patch('/transactions/wallet-withdraw/:id/reject', verifyToken, isAdmin, transactionController.rejectWithdrawTransaction)
+
 // 머니이동 관리자 승은/거절
 router.get('/wallet/transfer', verifyToken, isAdmin, transactionController.getAllMoveRequests);
-
+ 
 router.patch('/wallet/transfer/:id/approve', verifyToken, isAdmin, transactionController.approvePlatformMove);
 router.patch('/wallet/transfer/:id/reject', verifyToken, isAdmin, transactionController.rejectPlatformMove);
 
@@ -68,6 +76,7 @@ router.patch('/users/:id/platforms/:platformId', verifyToken, isAdmin, adminCont
 
 //모든 신청내역조회
 router.get('/requests', verifyToken, isAdmin, transactionController.getAllRequests)
+
 
 
 // 공지 등록

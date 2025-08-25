@@ -15,13 +15,8 @@
       <label>{{ $t('withdraw.selectPlatform') }}</label>
       <select v-model="platform" @change="updateExchangeRate">
       <option disabled value="">{{ $t('withdraw.selectPlaceholder') }}</option>
-      <option
-        v-for="item in filteredPlatforms"
-        :key="item.id"
-        :value="item.id"
-      >
-        {{ item.name }}
-      </option>
+    <option value="x-poker">X-Poker</option>
+        <option value="pokernex">PokerNex</option>
     </select>
     </div>
 
@@ -89,7 +84,7 @@
         <p class="warning-text">
         <label class="agree-label">
           <input type="checkbox" v-model="form.agree" />
-          {{ t('withdraw.agreeConfirm') }}
+           {{ t('withdraw.agreeConfirm') }}
         </label>
           {{ $t('withdraw.agreeCheck_line1') }}<br />
           {{ $t('withdraw.agreeCheck_line2') }}
@@ -165,10 +160,18 @@ const fetchPlatformOptions = async () => {
   platforms.value = res.data
 }
 const filteredPlatforms = computed(() => {
-  const allowedIds  = ['x-poker', 'pokernex']
-  return platforms.value.filter(p => allowedIds.includes(p.id.toLowerCase()))
-})
+  const blockedIds = ['x-poker', 'pokernex'];
 
+  // platforms.value가 배열이 아니면 빈 배열 반환
+  if (!Array.isArray(platforms.value)) return [];
+
+  return platforms.value.filter(p => {
+    // id가 없으면 '' 로 대체
+    const rawId = p.id ?? p.platform_id ?? '';
+    const id   = String(rawId).toLowerCase();
+    return !blockedIds.includes(id);
+  });
+});
 const fetchUserPlatformIds = async () => {
   const res = await axios.get('/users/me/withdraws', {
     headers: {
@@ -266,7 +269,6 @@ const calculateConvertedAmount = () => {
 watch(
   () => [form.amount, form.currency],
   () => {
-       console.log('[watch] amount:', form.amount, '/ currency:', form.currency)
     if (form.currency && form.amount) {
       fetchExchangeRate()
     }
@@ -299,15 +301,14 @@ if (form.amount < 40) return alert(t('withdraw.alert.minimumAmount'))
       platform_id: platform.value,
       platform_user_id: platformUserId.value,
       user_memo: form.user_memo,
-      expected_amount: convertedAmount.value,
+      expected_amount: convertedAmount.value
     }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('user_token')}`
       }
     })
-    console.log(form.amount);
     alert(t('withdraw.alert.success'))
-    window.location.reload()
+    window.location.reload() 
     await fetchHistory() // ✅ 출금 후 내역 갱신도 추가해주면 좋음
   } catch (e) {
     console.error(e)

@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted,watch } from 'vue'
 import axios from '@/axiosUser'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -146,17 +146,18 @@ console.log('KRW:', rates['KRW'], 'USDT:', rates['USDT'])
 }
 
 
-
 const totalWithFeeDisplay = computed(() =>
   totalWithFee.value > 0 ? `${totalWithFee.value.toLocaleString()} ${selectedCurrency.value}` : ''
-)
+) 
 
 const calculateTotal = () => {
   if (!krwAmount.value || !exchangeRate.value) return
 totalWithFee.value = Math.round(krwAmount.value * exchangeRate.value * 1.02)
-
-
 }
+
+watch([krwAmount, exchangeRate], () => {
+  calculateTotal()
+})
 
 
 const fetchUserPlatformIds = async () => {
@@ -226,7 +227,7 @@ const submit = async () => {
 
   try {
     await axios.post(
-      '/api/transactions',
+      '/transactions',
       {
         type: 'platform_charge',
         amount: krwAmount.value,

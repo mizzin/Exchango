@@ -11,7 +11,7 @@ const readFilter = ref('') // '', 'true', 'false'
 
 const fetchMessages = async () => {
   const token = localStorage.getItem('admin_token')
-  const res = await axios.get('/admin/messages/sent', {
+  const res = await axios.get('/admin/messages/sent', { 
     headers: { Authorization: `Bearer ${token}` }
   })
   messages.value = res.data.messages

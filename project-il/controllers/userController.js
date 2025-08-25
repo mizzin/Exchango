@@ -4,7 +4,7 @@ const userModel = require('../models/userModel');
 const messageModel = require('../models/messageModel');
 const jwt = require('jsonwebtoken');
 console.log('📦 userController 시작');
-
+const sendTelegramMessage = require('../utils/telegram')
 const db = require('../db');
 
 exports.getUsers = async (req, res) => {
@@ -56,92 +56,6 @@ exports.checkUsername = async (req, res) => {
   res.json({ available: true });
 };
 
-//회원가입 API
-exports.register = async (req, res) => {
-  const {
-    username, password, email,
-    phone, country_code, real_name,
-    referral_id, language,
-    platforms, money_password   
-  } = req.body;
-
-// 1. 필수값 확인
-  if (!username || !password || !email || !phone) {
-    return res.status(400).json({ message: 'Required field missing' });
-  }
-
- // 2. 아이디 중복 체크
-  const existingUser = await userModel.findUserByUsername(username);
-  if (existingUser) {
-    return res.status(409).json({ message: 'This ID is already in use.' });
-  }
-
-   // 3. 이메일 중복 체크
-  const [existingEmail] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
-  if (existingEmail.length > 0) {
-    return res.status(409).json({ message: 'This email address has already been registered.' });
-  }
-
-  // 4. 이메일 인증 여부 확인
-  const [verification] = await db.query(
-    'SELECT code, expires_at FROM email_verifications WHERE email = ?',
-    [email]
-  );
-
-  if (verification.length === 0) {
-    return res.status(400).json({ message: 'Email verification is required.' });
-  }
-
-  const { expires_at } = verification[0];
-  if (new Date() > new Date(expires_at)) {
-    return res.status(400).json({ message: 'Email verification has expired.' });
-  }
-
-  // 5. 추천인 유효성 확인 (선택)
-  if (referral_id) {
-    const refUser = await userModel.findUserByUsername(referral_id);
-    if (!refUser) {
-      return res.status(400).json({ message: 'Invalid referral ID.' });
-    }
-  }
-  // ✅ ② 머니 비밀번호 필수 체크 (6자리 숫자)
-  if (!/^\d{6}$/.test(money_password)) {
-    return res.status(400).json({ message: 'Money password must be exactly 6 digits.' });
-  }
-  // 6. 비밀번호 해싱
-  const hashed = await bcrypt.hash(password, 10);
-
-  // ✅ ③ 머니 비밀번호도 해싱
-  const hashedMoneyPassword = await bcrypt.hash(money_password, 10);
-  try {
-    // 7. 사용자 생성 0630
-    const userId = await userModel.createUser({
-      username,
-      password: hashed,
-      email,
-      phone,
-      country_code,
-      real_name: real_name || null,
-      referral_id: referral_id || null,
-      language,
-      money_password: hashedMoneyPassword
-    });
-
-    // 8. 플랫폼 정보 저장 (platforms가 있을 때만)
-    if (Array.isArray(platforms) && platforms.length > 0) {
-      await userModel.insertUserPlatforms(userId, platforms);
-    }
-
-
-    // 9. 인증 기록 삭제 (선택)
-    await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);
-
-    res.status(201).json({ message: 'Membership registration successful! This is an emergency measure.' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'server error', error: err.message });
-  }
-};
 
 //로그인 API
 exports.login = async (req, res) => {
@@ -314,6 +228,10 @@ exports.register = async (req, res) => {
       await userModel.insertUserPlatforms(userId, platforms);
     }
 
+    // 📢 텔레그램 알림 보내기 (여기 추가!)
+    await sendTelegramMessage(
+      `[회원가입]\n아이디: ${username}\n이메일: ${email}\n전화번호: ${phone}\n언어국가${language}`
+    );
 
     // 9. 인증 기록 삭제 (선택)
     await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);
@@ -510,6 +428,12 @@ exports.createInquiry = async (req, res) => {
       VALUES (?, ?, ?, ?)
     `, [userId, category, title, content]);
 
+    // 📢 여기서 텔레그램 알림 전송!
+    await sendTelegramMessage(
+      `[1:1 문의]\n유저ID: ${userId}\n카테고리: ${category}\n제목: ${title}\n내용: ${content}`
+    );
+
+
     res.status(201).json({ message: 'inquiry.success.created' });
   } catch (err) {
     res.status(500).json({ error: 'DB 오류', details: err.message });
@@ -555,7 +479,6 @@ exports.getUserInquiries = async (req, res) => {
 exports.getInquiryById = async (req, res) => {
   const inquiryId = req.params.id;
   const userId = req.user.id;
-console.log('req.user:', req.user)
 
   try {
     const [[inquiry]] = await db.query(`
@@ -599,7 +522,7 @@ exports.getWalletTransactions = async (req, res) => {
 
       ORDER BY created_at DESC
     `, [userId, userId]);
-
+ 
     res.json({ transactions });
   } catch (error) {
     console.error('❌ [getWalletTransactions] 에러:', error);
@@ -607,4 +530,35 @@ exports.getWalletTransactions = async (req, res) => {
   }
 };
 
+
+// GET /users/me/transactions
+// 신청조회. 두번 신청 차단
+// 신청 조회 - 두 번 신청 방지용
+exports.getMyTransactions = async (req, res) => {
+  try {
+    const userId = req.user?.id
+    const status = req.query.status
+
+
+    if (!userId) return res.status(400).json({ message: '유저 정보 없음' })
+
+    // ✅ query와 params 선언
+    let query = 'SELECT * FROM transactions WHERE user_id = ?'
+    const params = [userId]
+
+    if (status) {
+      query += ' AND status = ?'
+      params.push(status)
+    }
+
+    console.log('🧾 최종 SQL 쿼리:', query)
+    console.log('📦 파라미터:', params)
+
+    const [rows] = await db.query(query, params)
+    res.json({ transactions: rows })
+  } catch (err) {
+    console.error('❌ Error in getMyTransactions:', err)
+    res.status(500).json({ message: '서버 오류', error: err.message })
+  }
+}
 

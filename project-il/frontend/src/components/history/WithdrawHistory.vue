@@ -5,9 +5,9 @@
          <tr>
           <th>{{ $t('history.platform') }}</th>
           <th>{{ $t('history.platformId') }}</th>
-          <th>$</th>
+          <th>{{ $t('history.inputAmount') }}</th>
           <th>{{ $t('history.currency') }}</th>
-          <th>{{ $t('history.expectedAmount') }}</th>
+          <th>{{ $t('history.expected_amount') }}</th>
           <th>{{ $t('history.status') }}</th>
           <th>{{ $t('history.requestDate') }}</th>
           <th>{{ $t('history.approveDate') }}</th>
@@ -19,7 +19,7 @@
             <td>{{ item.platform_user_id }}</td>
             <td>{{ item.amount }}</td>
             <td>{{ item.currency }}</td>
-            <td>{{ item.expected_amount }}</td>
+               <td>{{ item.expected_amount }}</td>
             <td>{{ formatStatus(item.status) }}</td>
             <td>{{ formatDate(item.created_at) }}</td>
             <td>
@@ -54,6 +54,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from '@/axiosUser'
 import '@/assets/style.css'
+import dayjs from 'dayjs'
 
 const history = ref([]) 
 const currentPage = ref(1)
@@ -63,9 +64,8 @@ const platformOptions = ref([])
 const fetchPlatformOptions = async () => {
   const lang = localStorage.getItem('lang') || 'ko'
   try {
-    const res = await axios.get(`/api/platforms?lang=${lang}`)
+    const res = await axios.get(`/platforms?lang=${lang}`)
     platformOptions.value = res.data // ex) [{ id: '001', name: 'A플랫폼' }, ...]
-    console.log(platformOptions.value);
   } catch (err) {
     console.error('플랫폼 목록 불러오기 실패:', err)
   }
@@ -115,8 +115,9 @@ const changePage = (page) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
-const formatDate = (str) => {
-  return new Date(str).toLocaleString()
+
+const formatDate = (date) => {
+  return dayjs(date).format('YYYY.MM.DD HH:mm:ss')
 }
 
 const formatStatus = (status) => {

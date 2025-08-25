@@ -1,6 +1,7 @@
        <!-- 📄 지갑 출금 -->
 <template>
   <AdminLayout>
+    <ConfirmModal ref="confirmModal" />
     <div class="admin-trade">
       <h2>지갑 출금</h2>
       <p>사이트 지갑(usd)출금 신청 목록 (승인/거절)</p>
@@ -43,8 +44,10 @@
         <thead>
           <tr>
             <th>사용자</th>
-            <th>통화</th>
-            <th>금액</th>
+                <th>선택한통화</th>
+            <th>줘야하는금액</th>
+            <th>입력금액</th>
+            
             <th>상태</th>
             <th>요청일</th>
             <th>승인일시</th>
@@ -55,7 +58,9 @@
           <tr v-for="item in list" :key="item.id">
             <td>{{ item.username }}</td>
             <td><span class="currency-pill">{{ item.currency }}</span></td>
-            <td>{{ Number(item.amount).toLocaleString() }}</td>
+            <td>{{ Number(item.expected_amount).toLocaleString() }}</td>
+                        <td>{{ Number(item.amount).toLocaleString() }}</td>
+
             <td>
               <span :class="['status-badge', item.status]">
                 {{ formatStatus(item.status) }}
@@ -89,9 +94,12 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-
 import axios from '@/axiosAdmin'
 import AdminLayout from '@/components/AdminLayout.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
+
+
+const confirmModal = ref(null)
 
 // 데이터 변수
 const list = ref([])
@@ -154,28 +162,30 @@ const setDateRange = (range) => {
 // 리스트 조회
 const fetchList = async () => {
   try {
-    const res = await axios.get('/admin/transactions/wallet-charge', {
-      params: {
-        page: page.value, 
-        limit,
-        username: filters.value.username,
-        status: filters.value.status,
-        currency: filters.value.currency,
-        startDate: filters.value.startDate,
-        endDate: filters.value.endDate
-      }
-    })
+    console.log('[UI-FETCH] filters=', JSON.parse(JSON.stringify(filters.value)))
 
+    // ✨ 비어있는 값은 아예 안 보내도록 안전하게
+    const params = { page: page.value, limit }
+    if (filters.value.username?.trim()) params.username = filters.value.username.trim()
+    if (filters.value.status) params.status = filters.value.status
+    if (filters.value.currency) params.currency = filters.value.currency
+    if (filters.value.startDate && filters.value.endDate) {
+      params.startDate = filters.value.startDate
+      params.endDate = filters.value.endDate
+    }
+
+    console.log('[UI-PARAMS]', params)
+
+    const res = await axios.get('/admin/transactions/wallet-withdraw', { params })
     console.log('✅ res data:', res.data)
+
     list.value = res.data.data || []
     total.value = res.data.total || 0
-
-    // 이 위치로 옮기기
-    console.log('✅ 할당 후 list:', list.value)
   } catch (e) {
-    console.error('❌ 충전 내역 로딩 실패:', e)
+    console.error('❌ 출금 내역 로딩 실패:', e)
   }
 }
+
 
 // 상태 텍스트 변환
 const formatStatus = (status) => {
@@ -188,7 +198,7 @@ const formatStatus = (status) => {
 }
 
 // 날짜 형식 변환
-const formatDate = (dateStr) => {
+const formatDate = (dateStr) => { 
   if (!dateStr) return '-'
   const d = new Date(dateStr)
   return d.toLocaleString()
@@ -211,17 +221,28 @@ const nextPage = () => {
 // 승인/거절 처리
 const approve = async (id) => {
   if (!confirm('정말 승인하시겠습니까?')) return
-  await axios.patch(`/admin/transactions/${id}/approve`)
+  await axios.patch(`/admin/transactions/wallet-withdraw/${id}/approve`)
   alert('승인 완료')
   fetchList()
 }
 
 const reject = async (id) => {
-  if (!confirm('정말 거절하시겠습니까?')) return
-  await axios.patch(`/admin/transactions/${id}/reject`)
-  alert('거절 완료')
-  fetchList()
+  const reason = await confirmModal.value.open('출금 거절 사유 입력', '해당 요청을 거절하시겠습니까?')
+
+  if (!reason || reason.trim() === '') {
+    alert('거절 사유를 입력해야 합니다.')
+    return
+  }
+
+  try {
+    await axios.patch(`/admin/transactions/wallet-withdraw/${id}/reject`, { reason })
+    alert('거절 완료')
+    fetchList()
+  } catch (err) {
+    alert('거절 실패: ' + (err.response?.data?.message || err.message))
+  }
 }
+
 
 onMounted(fetchList)
 </script>

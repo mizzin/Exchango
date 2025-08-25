@@ -1,12 +1,13 @@
 
-//금전 관련 로직 중심, 내부 지갑 트랜잭션 관리
+//controllers>transactionController.js
 const db = require('../db');
-const bcrypt = require('bcrypt');
 const { getCustomRates } = require('../utils/rateUtil')
 const sendMessage = require('../utils/sendMessage')
+const bcrypt = require('bcrypt');
 const transaction = require('../models/transaction');
+const sendTelegramMessage = require('../utils/telegram');
 
-//충전신청
+//충전신청 0728 쿼리 외부
 exports.createTransaction = async (req, res) => {
   const {
     amount,            // USD 금액
@@ -15,19 +16,30 @@ exports.createTransaction = async (req, res) => {
     platform_id,       // 플랫폼 ID (변경됨)
     platform_user_id,  // 사용자 입력 플랫폼 아이디
     type,
-     expected_amount  
+    expected_amount  
   } = req.body
 
   const userId = req.user.id
+// 2. 중복 신청 방지 - 금액 관련 전체로 확장
+const [existing] = await db.execute(
+  `SELECT id FROM transactions
+   WHERE user_id = ? AND status = 'pending' AND type IN (
+      'charge', 'withdraw', 'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform'
+   )`,
+  [userId]
+);
+if (existing.length > 0) {
+   return res.status(400).json({ message: 'You already have a pending money-related request.' });
+}
 
   if (!amount || !currency || !local_amount || !platform_id || !platform_user_id) {
-    return res.status(400).json({ message: '필수 입력값 누락' })
+    return res.status(400).json({ message: 'Value to enter' })
   }
 
   try {
     const [[user]] = await db.query('SELECT username FROM users WHERE id = ?', [userId])
 
-    await db.query(`
+     await db.query(`
       INSERT INTO transactions 
       (user_id, type, amount, krw_amount, currency,expected_amount, platform_id, platform_user_id, status, confirmed_by_admin, admin_note)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', false, '')
@@ -35,6 +47,12 @@ exports.createTransaction = async (req, res) => {
 
     // 💬 자동 쪽지 발송 (충전신청 시)
     if (type === 'charge') {
+
+        await sendTelegramMessage(
+        `[충전신청]\n유저명: ${user.username}\n플랫폼: ${platform_id}\n입력ID: ${platform_user_id}\n금액: ${amount} ${currency}\n환산금액: ${expected_amount}`
+        )
+
+
       const templateKey = `recharge_guide_${currency.toLowerCase()}`
       const [[template]] = await db.query('SELECT content FROM message_templates WHERE `template_key` = ?', [templateKey])
 
@@ -45,14 +63,14 @@ exports.createTransaction = async (req, res) => {
 
         await sendMessage({
           to_user_id: userId,
-          subject: '💬 충전 안내',
+          subject: '💬 Charging Information',
           content,
           type: 'system'
         })
       }
     }
 
-    res.status(201).json({ message: '충전 신청이 완료되었습니다.' })
+    res.status(201).json({ message: 'Your charging request has been completed..' })
 
   } catch (error) {
     console.error('[ERROR] createTransaction:', error)
@@ -60,9 +78,22 @@ exports.createTransaction = async (req, res) => {
   }
 }
 
-//출금신청 사용자
+//출금신청 사용자 0728 쿼리외부
 exports.createWithdrawTransaction = async (req, res) => {
   const userId = req.user.id;
+
+ // 2. 중복 신청 방지 - 금액 관련 전체로 확장
+    const [existing] = await db.execute(
+      `SELECT id FROM transactions
+      WHERE user_id = ? AND status = 'pending' AND type IN (
+          'charge', 'withdraw', 'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform'
+      )`,
+      [userId]
+    );
+if (existing.length > 0) {
+   return res.status(400).json({ message: 'You already have a pending money-related request.' });
+}
+
   const {
     amount,
     currency,
@@ -70,15 +101,15 @@ exports.createWithdrawTransaction = async (req, res) => {
     platform_id ,
     platform_user_id,
     user_memo,
-    expected_amount  
+    expected_amount 
   } = req.body;
 
  if (!amount || !currency || !platform_id || !platform_user_id || krw_amount == null) {
-  return res.status(400).json({ message: '필수 항목이 누락되었습니다.' });
+  return res.status(400).json({ message: 'A required field is missing.' });
 }
 
   if (amount < 40) {
-    return res.status(400).json({ message: '최소 출금 금액은 $40입니다.' });
+    return res.status(400).json({ message: 'The minimum withdrawal amount is $40.' });
   }
 
   try {
@@ -94,7 +125,7 @@ exports.createWithdrawTransaction = async (req, res) => {
         platform_user_id,
         user_memo,
         status
-      ) VALUES (?, 'platform_withdraw', ?, ?, ?, ?, ?, ?, ?, 'pending')
+      ) VALUES (?, 'platform_withdraw', ?, ?, ?, ?,? ,?, ?, 'pending')
     `, [
       userId,
       amount,
@@ -106,14 +137,19 @@ exports.createWithdrawTransaction = async (req, res) => {
       user_memo || ''
     ]);
 
-    res.status(201).json({ message: '출금 신청이 완료되었습니다.', transactionId: result.insertId });
+    // 📢 출금신청시 텔레그램 알림!
+    await sendTelegramMessage(
+      `[출금신청]\n유저ID: ${userId}\n플랫폼: ${platform_id}\n입력ID: ${platform_user_id}\n출금액: ${amount} ${currency}\n환산금액: ${expected_amount}\n메모: ${user_memo || '-'}`
+    );
+
+    res.status(201).json({ message: 'Withdrawal request has been completed.', transactionId: result.insertId });
   } catch (err) {
     console.error('[ERROR] 출금 신청 실패:', err);
-    res.status(500).json({ message: '출금 신청 중 오류가 발생했습니다.' });
+    res.status(500).json({ message: 'An error occurred while requesting withdrawal.' });
   }
 };
 
-//출금내역 사용자
+//출금내역 사용자 0728 쿼리외부
 exports.getMyWithdraws = async (req, res) => {
   const userId = req.user.id;
 
@@ -133,7 +169,7 @@ exports.getMyWithdraws = async (req, res) => {
   }
 }
 
-//충전내역조회 0721
+//충전내역조회 0728 쿼리 외부
 exports.getMyRechargeTransactions = async (req, res) => {
   const userId = req.user.id
 
@@ -154,7 +190,7 @@ exports.getMyRechargeTransactions = async (req, res) => {
   }
 }
 
-//충전관리자가조회
+//충전관리자가조회 외부
 exports.getRechargeTransactions = async (req, res) => {
   const { username, status, currency, startDate, endDate, page = 1 } = req.query;
   const limit = 10;
@@ -208,15 +244,19 @@ exports.getRechargeTransactions = async (req, res) => {
   }
 };
 
+// 충전 승인 처리 관리자 0728 외부
+
 // 충전 승인 처리
 exports.approveRecharge = async (req, res) => {
   const id = req.params.id
+  const adminId = req.admin?.id || null // 🔹로그인한 관리자 ID
+
   try {
-    const [result] = await db.query(`
+      const [result] = await db.query(`
       UPDATE transactions 
-      SET status = 'completed', confirmed_by_admin = true 
-      WHERE id = ? AND type = 'charge'
-    `, [id])
+      SET status = 'completed', confirmed_by_admin = true, admin_id = ?, updated_at = NOW()
+      WHERE id = ? AND type = 'platform_charge'
+    `, [adminId, id])
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: '해당 충전 신청을 찾을 수 없습니다.' })
@@ -228,15 +268,17 @@ exports.approveRecharge = async (req, res) => {
     res.status(500).json({ message: '서버 오류' })
   }
 }
-// 충전 거절 처리
+// 충전 거절 처리 외부
 exports.rejectRecharge = async (req, res) => {
   const id = req.params.id
-  try {
+  const adminId = req.admin?.id || null // 🔹관리자 ID 추가
+ try {
     const [result] = await db.query(`
       UPDATE transactions 
-      SET status = 'rejected', confirmed_by_admin = true 
+      SET status = 'rejected', confirmed_by_admin = true, admin_id = ?, updated_at = NOW()
       WHERE id = ? AND type = 'platform_charge'
-    `, [id])
+    `, [adminId, id])
+
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: '해당 충전 신청을 찾을 수 없습니다.' })
@@ -249,7 +291,7 @@ exports.rejectRecharge = async (req, res) => {
   }
 }
 
-//충전내역역
+//충전내역역 외부
 exports.submitRechargeRequest = async (req, res) => {
   const userId = req.user.id
   const { amount, currency, platform_id , platform_user_id } = req.body
@@ -294,8 +336,7 @@ exports.submitRechargeRequest = async (req, res) => {
     res.status(500).json({ message: '충전 신청 실패', error: err })
   }
 }
-
-//관리자 출금 조회
+//관리자 출금 조회 외부
 exports.getWithdrawTransactions = async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -324,7 +365,7 @@ exports.getWithdrawTransactions = async (req, res) => {
   }
 }
 
-// 출금 승인 신청
+// 출금 승인 신청 외부
 exports.approveWithdraw = async (req, res) => {
   const id = req.params.id
   try {
@@ -340,7 +381,7 @@ exports.approveWithdraw = async (req, res) => {
     res.status(500).json({ message: '출금 승인 중 오류 발생' })
   }
 }
-// 출금 거절 신청
+// 출금 거절 신청 외부
 exports.rejectWithdraw = async (req, res) => {
   const id = req.params.id
   try {
@@ -356,13 +397,30 @@ exports.rejectWithdraw = async (req, res) => {
     res.status(500).json({ message: '출금 거절 중 오류 발생' })
   }
 }
-// controllers/transactionController.js 지갑 충전 0721 추가로 위에 타입도 수정해줘야함.  platform_charge
+
+
+// controllers/transactionController.js 지갑 충전 0721 
+//내 지갑 충전 사용자가 입금신청
 exports.createWalletRecharge = async (req, res) => {
   const userId = req.user.id;
+
   const { currency, amount_usd, local_amount,expected_amount } = req.body;
 
+  //중복금액방지
+  const [existing] = await db.execute(
+  `SELECT id FROM transactions
+   WHERE user_id = ? AND status = 'pending' AND type IN (
+      'charge', 'withdraw', 'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform'
+   )`,
+  [userId]
+);
+if (existing.length > 0) {
+   return res.status(400).json({ message: 'You already have a pending money-related request.' });
+}
+
+
   if (!currency || !amount_usd || !local_amount) {
-    return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
+    return res.status(400).json({ message: 'A required field is missing.' });
   }
 
   try {
@@ -376,6 +434,11 @@ exports.createWalletRecharge = async (req, res) => {
       [userId, amount_usd, local_amount, currency,expected_amount]
     );
 
+   // 📢 여기! 충전신청시 텔레그램 알림 추가
+    await sendTelegramMessage(
+      `[지갑 충전신청]\n유저명: ${user.username}\n충전금액: ${amount_usd} USD (${currency})\n환산금액: ${expected_amount}`
+    );
+
     // ✅ 쪽지 템플릿 전송
     const templateKey = `recharge_guide_${currency.toLowerCase()}`;
     const [[template]] = await db.query('SELECT content FROM message_templates WHERE `template_key` = ?', [templateKey]);
@@ -387,72 +450,87 @@ exports.createWalletRecharge = async (req, res) => {
 
       await sendMessage({
         to_user_id: userId,
-        subject: '💬 충전 안내',
+        subject: '💬 Recharge Information',
         content,
         type: 'system'
       });
     }
 
-    res.status(201).json({ message: '내 지갑 충전 신청이 완료되었습니다.' });
+    res.status(201).json({ message: 'Wallet recharge request has been submitte.' });
   } catch (err) {
     console.error('[ERROR] createWalletRecharge:', err);
-    res.status(500).json({ message: '충전 신청 처리 실패' });
+    res.status(500).json({ message: 'Failed to process the recharge request' });
   }
 };
 
-// 내 지갑 출금
+// 내 지갑 출금 신청  사용자
 exports.createWalletWithdraw = async (req, res) => {
   const userId = req.user.id;
-  const { currency, amount_usd, local_amount, user_memo, expected_amount } = req.body;
+  const { currency, amount_usd, local_amount, user_memo, expected_amount, money_password } = req.body;
+  
+  //중복금액방지
+  const [existing] = await db.execute(
+  `SELECT id FROM transactions
+   WHERE user_id = ? AND status = 'pending' AND type IN (
+      'charge', 'withdraw', 'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform'
+   )`,
+  [userId]
+);
+if (existing.length > 0) {
+   return res.status(400).json({ message: 'You already have a pending money-related request.' });
+}
 
-  // 필수값 개별 검사
-  if (currency === undefined || currency === null || currency === '') {
-    return res.status(400).json({ message: 'Currency is required.' });
-  }
-
-  if (amount_usd === undefined || amount_usd === null || amount_usd === '') {
-    return res.status(400).json({ message: 'Withdrawal amount (USD) is required.' });
-  }
-
-  if (local_amount === undefined || local_amount === null || local_amount === '') {
-    return res.status(400).json({ message: 'Converted local amount is required.' });
-  }
-
-  // PHP 또는 USDT일 때는 user_memo가 필수
-  if ((currency === 'PHP' || currency === 'USDT') && (!user_memo || user_memo.trim() === '')) {
+  if (!currency) return res.status(400).json({ message: 'Currency is required.' });
+  if (!amount_usd) return res.status(400).json({ message: 'Withdrawal amount (USD) is required.' });
+  if (!local_amount) return res.status(400).json({ message: 'Converted local amount is required.' });
+  if (!money_password || typeof money_password !== 'string' || money_password.length !== 6)
+    return res.status(400).json({ message: 'Please enter your 6-digit withdrawal password.' });
+  if ((currency === 'PHP' || currency === 'USDT') && (!user_memo || user_memo.trim() === ''))
     return res.status(400).json({ message: 'Withdrawal address or memo is required for PHP/USDT.' });
-  }
-
-  // ↓ 아래는 테스트용 로그
-  console.log({ userId, currency, amount_usd, local_amount, user_memo });
 
   try {
-    if (currency === 'PHP' || currency === 'USDT') {
-      // memo 있는 경우
-      await db.query(
-        `INSERT INTO transactions 
-         (user_id, type, amount, krw_amount, currency, expected_amount, user_memo, status, created_at)
-         VALUES (?, 'wallet_withdraw', ?, ?, ?, ?,?, 'pending', NOW())`,
-        [userId, amount_usd, local_amount, currency, expected_amount, user_memo]
-      );
-    } else {
-      // memo 없는 경우 (예: KRW)
-      await db.query(
-        `INSERT INTO transactions 
-         (user_id, type, amount, krw_amount, currency, expected_amount, status, created_at)
-         VALUES (?, 'wallet_withdraw', ?, ?, ?,  ?, 'pending', NOW())`,
-        [userId, amount_usd, local_amount, currency, expected_amount]
-      );
+    // 유저 정보 조회 및 비밀번호 검증
+    const [userRows] = await db.query('SELECT money_password FROM users WHERE id = ?', [userId]);
+    const user = userRows[0];
+
+    if (!user || !user.money_password)
+      return res.status(403).json({ message: '출금 비밀번호가 설정되어 있지 않습니다.' });
+
+    const isPasswordMatch = await bcrypt.compare(money_password, user.money_password);
+    if (!isPasswordMatch) {
+      return res.status(403).json({ message: '출금 비밀번호가 일치하지 않습니다.' });
     }
 
+    // 출금 신청 INSERT
+    const query = currency === 'PHP' || currency === 'USDT'
+      ? `INSERT INTO transactions 
+         (user_id, type, amount, krw_amount, currency, expected_amount, user_memo, status, created_at)
+         VALUES (?, 'wallet_withdraw', ?, ?, ?, ?, ?, 'pending', NOW())`
+      : `INSERT INTO transactions 
+         (user_id, type, amount, krw_amount, currency, expected_amount, status, created_at)
+         VALUES (?, 'wallet_withdraw', ?, ?, ?, ?, 'pending', NOW())`;
+
+    const params = currency === 'PHP' || currency === 'USDT'
+      ? [userId, amount_usd, local_amount, currency, expected_amount, user_memo]
+      : [userId, amount_usd, local_amount, currency, expected_amount];
+
+    await db.query(query, params);
+
+       // 📢 출금신청시 텔레그램 알림 추가!
+    await sendTelegramMessage(
+      `[지갑 출금신청]\n유저명: ${user.username}\n출금액: ${amount_usd} USD (${currency})\n환산금액: ${local_amount}\n메모: ${user_memo || '-'}`
+    );
+
     res.status(201).json({ message: '출금 신청이 완료되었습니다.' });
+
   } catch (err) {
     console.error('[ERROR] createWalletWithdraw:', err);
     res.status(500).json({ message: '출금 신청 처리 실패' });
   }
 };
 
-//사이트 내 충전출금 신청 목록 API 0721 관리자
+
+//사이트 내 충전 신청 목록 API 0721 관리자
 exports.getWalletChargeList = async (req, res) => {
   const {
     page = 1,
@@ -473,7 +551,7 @@ exports.getWalletChargeList = async (req, res) => {
     let baseQuery = `
       FROM transactions t
       JOIN users u ON t.user_id = u.id
-      WHERE t.type IN ('wallet_charge', 'wallet_withdraw')
+      WHERE t.type = 'wallet_charge' 
     `;
 
     const conditions = [];
@@ -494,11 +572,6 @@ exports.getWalletChargeList = async (req, res) => {
       params.push(currency.trim());
     }
 
-    if (type.trim()) {
-      conditions.push(`t.type = ?`);
-      params.push(type.trim());
-    }
-
     if (startDate && endDate) {
       conditions.push(`DATE(t.created_at) BETWEEN ? AND ?`);
       params.push(startDate, endDate);
@@ -511,21 +584,21 @@ exports.getWalletChargeList = async (req, res) => {
 
     // 최종 쿼리문
     const listQuery = `
-      SELECT t.*, u.username
-      ${baseQuery}
-      ORDER BY t.created_at DESC
-      LIMIT ${parsedLimit} OFFSET ${parsedOffset}
-    `;
+        SELECT t.*, u.username
+        ${baseQuery}
+        ORDER BY t.created_at DESC
+        LIMIT ${parsedLimit} OFFSET ${parsedOffset}
+      `;
 
-    const countQuery = `
-      SELECT COUNT(*) as total
-      ${baseQuery}
-    `;
-    params.push(parsedLimit, parsedOffset);
-
-    // ⚠️ db.query로 바꿔도 테스트 가능 (prepared statement 문제 회피)
-    const [rows] = await db.execute(listQuery, params);
-    const [countRows] = await db.execute(countQuery, params);
+const countQuery = `
+  SELECT COUNT(*) as total
+  ${baseQuery}
+`;
+// ⚠️ 여기! LIMIT/OFFSET은 쿼리에 직접 들어가 있으니, params에 넣지 말 것!
+const [rows] = await db.execute(listQuery, params);
+const [countRows] = await db.execute(countQuery, params.slice(0, params.length));
+console.log('✅ 최종 baseQuery:', baseQuery);
+console.log('✅ 최종 params:', params);
 
     res.json({ data: rows, total: countRows[0].total });
   } catch (err) {
@@ -534,7 +607,7 @@ exports.getWalletChargeList = async (req, res) => {
   }
 };
 
-//사이트 내 충전 신청 승인/거절API 0721
+//사이트 내 충전 신청 승인/거절API 0721 관리자
 exports.approveTransaction = async (req, res) => {
   const transactionId = req.params.id
   const adminId = req.admin?.id || null // 로그인한 관리자 ID
@@ -558,9 +631,10 @@ exports.approveTransaction = async (req, res) => {
     try {
       // 🔹1. 거래 상태 완료로 변경
       await connection.execute(
-        'UPDATE transactions SET status = ?, updated_at = NOW() WHERE id = ?',
-        ['completed', transactionId]
-      )
+        'UPDATE transactions SET status = ?, admin_id = ?, updated_at = NOW() WHERE id = ?',
+        ['completed', adminId, transactionId]
+      );
+
 
       // 🔹 3.  user_balances 삽입 또는 업데이트
       const [balanceRows] = await connection.execute(
@@ -622,8 +696,170 @@ exports.rejectTransaction = async (req, res) => {
 
     await sendMessage({
       to_user_id: tx.user_id,
-      subject: '❌ 충전 거절 안내',
-      content: `요청하신 ${tx.amount} ${tx.currency} 충전이 거절되었습니다.\n\n사유: ${reason}`,
+     subject: '❌ Notification: Deposit Request Declined',
+content: `We regret to inform you that your deposit request for ${tx.amount} ${tx.currency} has been declined.\n\nReason: ${reason}\n\nIf you believe this is an error or need further assistance, please contact our support team.`,
+      type: 'system'
+    });
+
+    res.json({ message: '거절이 완료되었습니다.' });
+  } catch (err) {
+    console.error('❌ rejectTransaction error:', err);
+    res.status(500).json({ message: 'Internal Server Error', error: err.message });
+  }
+};
+
+//사이트 내 출금 신청 목록 API 0721 관리자 wallet_withdraw
+
+exports.getWalletWithdrawList = async (req, res) => {
+  try {
+    // limiit 오탈자도 수용
+    const rawLimit = req.query.limit ?? req.query.limiit ?? 20
+    const limit = Math.max(1, Number(rawLimit) || 20)
+
+    const { page = 1, status = '', currency = '', startDate = '', endDate = '' } = req.query
+    const username = (req.query.username ?? '').trim()
+
+    const where = [`t.type = 'wallet_withdraw'`]
+    const params = []
+
+    if (username) {
+      if (/^\d+$/.test(username)) {
+        where.push('(u.id = ? OR u.username LIKE ?)')
+        params.push(Number(username), `%${username}%`)
+      } else {
+        where.push('u.username LIKE ?')
+        params.push(`%${username}%`)
+      }
+    }
+
+    if (status)   { where.push('t.status = ?');   params.push(status) }
+    if (currency) { where.push('t.currency = ?'); params.push(currency) }
+    if (startDate && endDate) {
+      where.push('t.created_at >= ? AND t.created_at < DATE_ADD(?, INTERVAL 1 DAY)')
+      params.push(startDate, endDate)
+    }
+
+    const offset = (Number(page) - 1) * Number(limit)
+    const sqlBase = `
+      FROM transactions t
+      JOIN users u ON u.id = t.user_id
+      WHERE ${where.join(' AND ')}
+    `
+
+    const [rows] = await db.query(
+      `SELECT
+         t.id, t.user_id, u.username,
+         t.amount, t.currency, t.expected_amount, t.status,
+         t.created_at, t.updated_at
+       ${sqlBase}
+       ORDER BY t.id DESC
+       LIMIT ?, ?`,
+      [...params, offset, Number(limit)]
+    )
+
+    const [[cnt]] = await db.query(`SELECT COUNT(*) AS total ${sqlBase}`, params)
+
+    console.log('[CTL-OUT]', { rows: rows.length, total: cnt.total })
+    // ✅ 프론트가 기대하는 포맷으로 반환
+    return res.json({ data: rows, total: cnt.total })
+  } catch (e) {
+    console.error('[CTL-ERR getWalletWithdrawList]', e)
+    return res.status(500).json({ message: 'Failed to load list' })
+  }
+}
+
+//사이트 내 출금 신청 승인/거절API 0721 관리자
+exports.approveWithdrawTransaction = async (req, res) => {
+  const transactionId = req.params.id
+  const adminId = req.admin?.id || null // 로그인한 관리자 ID
+
+  try {
+    // 🔹 1. 트랜잭션 조회
+    const [rows] = await db.execute(
+      'SELECT * FROM transactions WHERE id = ? AND type = ? AND status = ?',
+      [transactionId, 'wallet_withdraw', 'pending']
+    )
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Transaction not found or already processed' })
+    }
+
+    const tx = rows[0]
+
+    const connection = await db.getConnection()
+    await connection.beginTransaction()
+
+    try {
+      // 🔹1. 거래 상태 완료로 변경
+      await connection.execute(
+        'UPDATE transactions SET status = ?, admin_id = ?, updated_at = NOW() WHERE id = ?',
+        ['completed', adminId, transactionId]
+      );
+
+
+      // 🔹 3.  user_balances 삽입 또는 업데이트
+      const [balanceRows] = await connection.execute(
+        'SELECT * FROM user_balances WHERE user_id = ?',
+        [tx.user_id]
+      )
+
+      if (balanceRows.length === 0) {
+        await connection.execute(
+          'INSERT INTO user_balances (user_id, balance) VALUES (?, ?)',
+          [tx.user_id, tx.amount]
+        )
+      } else {
+        await connection.execute(
+        'UPDATE user_balances SET balance = balance - ? WHERE user_id = ?',
+        [tx.amount, tx.user_id]
+      )
+      }
+      await connection.commit()
+      connection.release()
+
+      res.json({ message: 'Transaction approved and balance updated' })
+    } catch (innerErr) {
+      await connection.rollback()
+      connection.release()
+      console.error('❌ approveTransaction inner error:', innerErr)
+      res.status(500).json({ message: 'Transaction failed', error: innerErr.message })
+    }
+  } catch (err) {
+    console.error('❌ approveTransaction error:', err)
+    res.status(500).json({ message: 'Internal Server Error', error: err.message })
+  }
+}
+exports.rejectWithdrawTransaction = async (req, res) => {
+  const transactionId = req.params.id;
+  const adminId = req.admin?.id || null;
+  const { reason } = req.body;
+
+  if (!reason || reason.trim() === '') {
+    return res.status(400).json({ message: '거절 사유를 입력해주세요.' });
+  }
+
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM transactions WHERE id = ? AND type = ? AND status = ?',
+      [transactionId, 'wallet_withdraw', 'pending']
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Transaction not found or already processed' });
+    }
+
+    const tx = rows[0];
+
+    await db.execute(
+      'UPDATE transactions SET status = ?, admin_id = ?, updated_at = NOW() WHERE id = ?',
+      ['rejected', adminId, transactionId]
+    );
+
+    await sendMessage({
+      to_user_id: tx.user_id,
+subject: '❌ Notification: Withdrawal Request Declined',
+content: `We regret to inform you that your withdrawal request for ${tx.amount} ${tx.currency} has been declined.\n\nReason: ${reason}\n\nIf you believe this is an error or need assistance, please contact our support team.`,
+
       type: 'system'
     });
 
@@ -673,15 +909,17 @@ exports.requestPlatformMove = async (req, res) => {
       }
     }
 
-    // ✅ 2. 중복 신청 방지
-    const [existing] = await db.execute(
-      `SELECT id FROM site_transactions 
-       WHERE user_id = ? AND type = 'platform_move' AND status = 'pending'`,
-      [userId]
-    );
-    if (existing.length > 0) {
-       return res.status(400).json({ message: 'You already have a pending transfer request.' });
-    }
+// 2. 중복 신청 방지 - 금액 관련 전체로 확장
+const [existing] = await db.execute(
+  `SELECT id FROM transactions
+   WHERE user_id = ? AND status = 'pending' AND type IN (
+      'charge', 'withdraw', 'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform'
+   )`,
+  [userId]
+);
+if (existing.length > 0) {
+   return res.status(400).json({ message: 'You already have a pending money-related request.' });
+}
 
     // ✅ 3. 출금 비밀번호 확인
     const [[user]] = await db.execute(`SELECT money_password FROM users WHERE id = ?`, [userId]);
@@ -703,32 +941,73 @@ exports.requestPlatformMove = async (req, res) => {
     }
 
     // ✅ 5. 환율 계산 검증 (from_currency ≠ to_currency 인 경우)
-    const [[toPlat]] = await db.execute(`SELECT currency FROM platforms WHERE id = ?`, [to_platform_id]);
-    let fromCurrency = 'USD';
-    if (from_type === 'platform') {
-      const [[fromPlat]] = await db.execute(`SELECT currency FROM platforms WHERE id = ?`, [from_platform_id]);
-      fromCurrency = fromPlat?.currency || 'USD';
-    }
-
-    if (fromCurrency !== toPlat?.currency) {
-      const expected = Math.floor(amount * exchange_rate * 0.98); // 수수료 2%
-      if (expected !== expected_amount) {
-        return res.status(400).json({ message: 'Expected amount does not match calculated amount based on exchange rate and fees.' });
-      }
-    }
-// ✅ 5.5. 트랜잭션 타입 결정
-let transactionType = '';
-
-if (from_type === 'wallet' && to_platform_id && to_platform_id !== 'wallet') {
-  transactionType = 'transfer'; // 내 지갑 → 플랫폼
-} else if (from_type === 'platform' && (!to_platform_id || to_platform_id === 'wallet')) {
-  transactionType = 'platform_withdraw'; // 플랫폼 → 내 지갑
-} else if (from_type === 'platform' && to_platform_id && to_platform_id !== 'wallet') {
-  transactionType = 'platform_to_platform'; // 플랫폼 → 플랫폼
-} else {
-  transactionType = 'unknown';
+// 1) toCurrency 결정: 'wallet' 또는 빈값이면 USD, 그 외엔 플랫폼에서 조회
+let toCurrency = 'USD';
+if (to_platform_id && to_platform_id !== 'wallet') {
+  const [[toPlat]] = await db.execute(
+    `SELECT currency FROM platforms WHERE id = ?`,
+    [to_platform_id]
+  );
+  toCurrency = toPlat?.currency || 'USD';
 }
 
+// 2) fromCurrency 결정: 기본 USD, 플랫폼 선택 시 플랫폼 통화 조회
+let fromCurrency = 'USD';
+if (from_type === 'platform') {
+  const [[fromPlat]] = await db.execute(
+    `SELECT currency FROM platforms WHERE id = ?`,
+    [from_platform_id]
+  );
+  fromCurrency = fromPlat?.currency || 'USD';
+}
+
+// 3) 서로 다른 통화일 때만 환율 검증
+if (fromCurrency !== toCurrency) {
+  const cleanRate = parseFloat(parseFloat(exchange_rate).toFixed(6));
+  const expected = Math.floor(amount * cleanRate);
+
+  console.log('--- 환율 검증 로깅 ---');
+  console.log('fromCurrency:', fromCurrency);
+  console.log('toCurrency:', toCurrency);
+  console.log('amount:', amount);
+  console.log('exchange_rate:', exchange_rate);
+  console.log('expected_amount (프론트 보낸 값):', expected_amount);
+  console.log('expected (서버 계산):', expected);
+
+  if (expected !== expected_amount) {
+    return res.status(400).json({
+      message:
+      'Expected amount does not match calculated amount based on exchange rate.'
+    });
+  }
+}
+
+// 5.5. 트랜잭션 타입 결정 (수정본)
+let transactionType = 'unknown';
+
+if (
+  from_type === 'wallet' &&               // 출발이 내 지갑이고
+  !from_platform_id &&                     // from_platform_id 가 비어 있고
+  to_platform_id &&                        // to_platform_id 가 존재하며
+  to_platform_id !== 'wallet'              // 내 지갑 아닐 때
+) {
+  transactionType = 'wallet_to_platform';  // 지갑 → 플랫폼
+}
+else if (
+  from_type === 'platform' &&              // 출발이 플랫폼이고
+  from_platform_id &&                      // from_platform_id 가 채워져 있으며
+  (!to_platform_id || to_platform_id === 'wallet') // to_platform_id 가 비어 있거나 내 지갑일 때
+) {
+  transactionType = 'platform_to_wallet';  // 플랫폼 → 지갑
+}
+else if (
+  from_type === 'platform' &&              // 출발이 플랫폼이고
+  from_platform_id &&                      // from_platform_id 가 채워져 있으며
+  to_platform_id &&                        // to_platform_id 가 존재하며
+  to_platform_id !== 'wallet'              // 내 지갑 아닐 때
+) {
+  transactionType = 'platform_to_platform';// 플랫폼 → 플랫폼
+}
 
   // 💡 '내 지갑' 선택한 경우 to_platform_id를 null 또는 'internal'로 변환
   const toPlatformIdForDB = to_platform_id === 'wallet' ? null : to_platform_id;
@@ -756,6 +1035,10 @@ await db.execute(
   ]
 );
 
+// 📢 머니이동 신청시 텔레그램 알림 추가!
+await sendTelegramMessage(
+  `[머니이동 신청]\n유저ID: ${userId}\n유형: ${transactionType}\n출발: ${from_type} ${from_platform_id || ''}/${from_platform_user_id || ''}\n도착: ${to_platform_id || ''}/${to_platform_user_id || ''}\n금액: ${amount}\n환산금액: ${expected_amount || ''}\n메모: ${memo || '-'}`
+);
 
     return res.json({ message: 'Transfer request submitted successfully.' });
 
@@ -764,7 +1047,7 @@ await db.execute(
     return res.status(500).json({ message: 'server errer' });
   }
 };
-//머니이동 사용자 이력조회 0724
+//머니이동 사용자 신청 이력조회 0724 
 exports.getPlatformMoveHistory = async (req, res) => {
   const userId = req.user.id;
   console.log('[getPlatformMoveHistory] req.user:', req.user);
@@ -773,24 +1056,33 @@ exports.getPlatformMoveHistory = async (req, res) => {
 
   try {
     let sql = `
-      SELECT 
-        id,
-        amount,
-        type,
-        currency,
-        platform_id AS to_platform_id,
-        platform_user_id AS to_platform_user_id,
-        user_memo AS memo,
-        status,
-        confirmed_by_admin,
-        admin_note,
-        created_at,
-        updated_at
-      FROM transactions
-     WHERE user_id = ? AND type IN ('wallet_charge', 'platform_charge', 'wallet_withdraw', 'platform_withdraw', 'platform_to_platform', 'transfer', 'reward', 'penalty')
+  SELECT 
+    id,
+    amount,
+    type,
+    currency,
+    to_platform_id,
+    to_platform_user_id,
+    expected_amount,
+    exchange_rate,
+    from_type,
+    from_platform_id,
+    from_platform_user_id,
+    user_memo AS memo,
+    status,
+    confirmed_by_admin,
+    admin_note,
+    created_at,
+    updated_at
+  FROM transactions
+  WHERE user_id = ? AND type IN (
+      'wallet_to_platform',
+  'platform_to_wallet',
+  'platform_to_platform',
+  'transfer'
+  )
+`;
 
-
-    `;
 
     const params = [userId];
 
@@ -801,14 +1093,14 @@ exports.getPlatformMoveHistory = async (req, res) => {
     }
 
     if (from_type) {
-      sql += ` AND platform_name = ?`; // 예: 'wallet' 또는 'platformA'
-      params.push(from_type);
-    }
+  sql += ` AND from_type = ?`;
+  params.push(from_type);
+}
 
-    if (to_platform_id) {
-      sql += ` AND platform_id = ?`;
-      params.push(to_platform_id);
-    }
+if (to_platform_id) {
+  sql += ` AND to_platform_id = ?`; 
+  params.push(to_platform_id);
+}
 
     sql += ` ORDER BY created_at DESC`;
 
@@ -824,115 +1116,96 @@ exports.getPlatformMoveHistory = async (req, res) => {
 //머니이동 관리자승인/거절 0724  승인시 transactions에서 상태 승인으로 바뀌고 user_blance 테이블 업데이트 되고 site_transactions 여기에 따로 기록 남는 구조 
 // 거절 시 transactions에서 상태 거절로 바뀌고 user_blance, site_transactions 아무 영향없음.
 exports.approvePlatformMove = async (req, res) => {
-  const { id } = req.params; // transactions.id
-  const adminId = req.admin.id;
+  const { id } = req.params;
+  if (!req.user?.id) return res.status(401).json({ message: 'Unauthenticated' });
+  const adminId = req.user.id;
 
   const connection = await db.getConnection();
   try {
-    // 🔹 1. 트랜잭션 조회
     const [txRows] = await connection.query(
-      'SELECT * FROM transactions WHERE id = ? AND type = "transfer" AND status = "pending"',
+      `SELECT id,user_id,amount,from_type,to_platform_id,to_platform_user_id,status
+       FROM transactions
+       WHERE id=? AND type IN ('wallet_to_platform','platform_to_platform','platform_to_wallet') AND status='pending'`,
       [id]
     );
-
-    if (txRows.length === 0) {
-      return res.status(404).json({ message: 'Transfer request not found or already processed.' });
-    }
-
     const tx = txRows[0];
+    if (!tx) return res.status(404).json({ message: 'Transfer request not found or already processed.' });
 
     await connection.beginTransaction();
 
-    // 🔹 2. transactions 상태 업데이트
     await connection.execute(
-      `UPDATE transactions 
-       SET status = 'completed', confirmed_by_admin = 1, admin_id = ?, updated_at = NOW()
-       WHERE id = ?`,
+      `UPDATE transactions SET status='completed', confirmed_by_admin=1, admin_id=?, updated_at=NOW() WHERE id=?`,
       [adminId, id]
     );
 
-    // 🔹 3. user_balances에서 금액 차감 (지갑에서 이동한 경우만)
-    if (tx.platform_id === null || tx.platform_id === 'wallet') {
-      const [balRows] = await connection.execute(
-        'SELECT balance FROM user_balances WHERE user_id = ?',
-        [tx.user_id]
-      );
-
-      if (balRows.length === 0 || balRows[0].balance < tx.amount) {
-        await connection.rollback();
-        return res.status(400).json({ message: 'Insufficient wallet balance.' });
-      }
-
-      await connection.execute(
-        'UPDATE user_balances SET balance = balance - ? WHERE user_id = ?',
-        [tx.amount, tx.user_id]
-      );
+    if (tx.from_type === 'wallet') {
+      const [balRows] = await connection.execute('SELECT balance FROM user_balances WHERE user_id=?', [tx.user_id]);
+      if (!balRows.length) { await connection.rollback(); return res.status(400).json({ message: 'Wallet balance not found.' }); }
+      if (balRows[0].balance < tx.amount) { await connection.rollback(); return res.status(400).json({ message: 'Insufficient wallet balance.' }); }
+      await connection.execute('UPDATE user_balances SET balance = balance - ? WHERE user_id=?', [tx.amount, tx.user_id]);
     }
 
-    // 🔹 4. site_transactions에 로그 기록
     await connection.execute(
-      `INSERT INTO site_transactions 
-       (user_id, type, amount, reason, from_type, to_platform_id, to_platform_user_id, status, approved_by_admin, admin_id, created_at, updated_at)
-       VALUES (?, 'platform_move', ?, '머니이동 승인', 'wallet', ?, ?, 'completed', 1, ?, NOW(), NOW())`,
-      [
-        tx.user_id,
-        tx.amount,
-        tx.platform_id,
-        tx.platform_user_id,
-        adminId
-      ]
+      `INSERT INTO site_transactions
+       (user_id,type,amount,reason,from_type,to_platform_id,to_platform_user_id,status,approved_by_admin,admin_id,created_at,updated_at)
+       VALUES (?,?,?,?,?,?,?,'approved',1,?,NOW(),NOW())`,
+      [tx.user_id, 'platform_move', tx.amount, '머니이동 승인', tx.from_type, tx.to_platform_id, tx.to_platform_user_id, adminId]
     );
 
     await connection.commit();
-    res.json({ message: 'Transfer approved successfully.' });
+    return res.json({ message: 'Transfer approved successfully.' });
   } catch (err) {
-    await connection.rollback();
+    try { await connection.rollback(); } catch {}
     console.error('approvePlatformMove error:', err);
-    res.status(500).json({ message: 'Internal Server Error', error: err.message });
+    return res.status(500).json({ message: 'Internal Server Error', error: err.message });
   } finally {
     connection.release();
   }
 };
+
+
 // 사용자 머니 이동 신청 거절 API + 쪽지 발송
 exports.rejectPlatformMove = async (req, res) => {
-  const { id } = req.params; // transactions.id
-  const { reason } = req.body;
-  const adminId = req.admin.id;
+  const { id } = req.params;              // transactions.id
+  const { reason } = req.body || {};
 
-  if (!reason) {
-    return res.status(400).json({ message: 'Rejection reason is required.' });
-  }
+  // 1) 인증 가드
+  if (!req.user?.id) return res.status(401).json({ message: 'Unauthenticated' });
+  const adminId = req.user.id;
+
+  // 2) 입력 가드
+  if (!reason) return res.status(400).json({ message: 'Rejection reason is required.' });
 
   try {
-    // 🔹 transactions 테이블에서 요청 찾기
-    const [txRows] = await db.query(
-      `SELECT * FROM transactions 
-       WHERE id = ? AND type = 'transfer' AND status = 'pending'`,
+    // 3) 존재/상태 가드
+    const [rows] = await db.query(
+      `SELECT id, user_id, status
+         FROM transactions
+        WHERE id=? 
+          AND type IN ('wallet_to_platform','platform_to_platform','platform_to_wallet')
+          AND status='pending'`,
       [id]
     );
+    const tx = rows[0];
+    if (!tx) return res.status(404).json({ message: 'Transfer request not found or already processed.' });
 
-    if (txRows.length === 0) {
-      return res.status(404).json({ message: 'Transfer request not found or already processed.' });
-    }
-
-    const transaction = txRows[0];
-
-    // 🔹 사용자 정보 조회 (쪽지 발송용)
-    const [[user]] = await db.query(`SELECT username FROM users WHERE id = ?`, [transaction.user_id]);
-
-    // 🔹 상태 업데이트 + 관리자 메모 저장
+    // 4) 상태 업데이트
     await db.query(
       `UPDATE transactions 
-       SET status = 'rejected', confirmed_by_admin = 0, admin_note = ?, admin_id = ?, updated_at = NOW()
-       WHERE id = ?`,
+          SET status='rejected',
+              confirmed_by_admin=0,
+              admin_note=?,
+              admin_id=?,
+              updated_at=NOW()
+        WHERE id=?`,
       [reason, adminId, id]
     );
 
-    // 🔹 쪽지 전송
+    // 5) 사용자 알림(쪽지)
     await sendMessage({
-      to_user_id: transaction.user_id,
-      subject: '❌ 머니 이동 신청이 거절되었습니다',
-      content: reason, // 관리자가 입력한 거절 사유 그대로 발송
+      to_user_id: tx.user_id,
+      subject: '❌ Your request to transfer funds has been denied',
+      content: reason,
       type: 'system'
     });
 
@@ -945,6 +1218,7 @@ exports.rejectPlatformMove = async (req, res) => {
 
 
 //머니이동 관리자  요청 조회 0724
+//머니이동 관리자 요청 조회 (수정됨)
 exports.getAllMoveRequests = async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -953,13 +1227,28 @@ exports.getAllMoveRequests = async (req, res) => {
         t.user_id,
         u.username,
         t.amount,
-        t.reason,
         t.status,
+        t.currency,
+        t.from_type,
+        t.from_platform_id,
+        t.from_platform_user_id,
+        t.to_platform_id,
+        t.to_platform_user_id,
+        t.expected_amount,
+        t.exchange_rate,
+        t.user_memo,
+        t.admin_note,
+        t.confirmed_by_admin,
         t.created_at,
         t.updated_at
       FROM transactions t
       JOIN users u ON t.user_id = u.id
-      WHERE t.type = 'platform_move'
+      WHERE t.type IN (
+        'wallet_to_platform',
+        'platform_to_wallet',
+        'platform_to_platform',
+        'transfer'
+      )
       ORDER BY t.created_at DESC`
     );
 
@@ -969,43 +1258,8 @@ exports.getAllMoveRequests = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch move requests.' });
   }
 };
-//머니이동 관리자  전체 요청 조회 0724
-exports.getAllMoveRequests = async (req, res) => {
-  try {
-    const [rows] = await db.query(`
-      SELECT 
-        st.id,
-        st.user_id,
-        u.username,
-        st.amount,
-        st.reason,
-        st.status,
-        st.created_at,
-        st.updated_at,
-        st.from_platform_id,
-        st.from_platform_user_id,
-        st.to_platform_id,
-        st.to_platform_user_id,
-        st.memo,
-        st.reject_reason,
-        st.admin_id,
-        a.username AS admin_username
-      FROM site_transactions st
-      JOIN users u ON st.user_id = u.id
-      LEFT JOIN admins a ON st.admin_id = a.id
-      WHERE st.type = 'platform_move'
-      ORDER BY st.created_at DESC
-    `);
-
-    res.json({ success: true, data: rows });
-  } catch (error) {
-    console.error('getAllMoveRequests error:', error);
-    res.status(500).json({ success: false, message: 'Failed to load move requests.' });
-  }
-};
 
 // 모든 신청내역을 관리 관리자
-
 exports.getAllRequests = async (req, res) => {
   try {
     const { type, status, username, startDate, endDate, page = 1, limit = 15 } = req.query
@@ -1068,3 +1322,5 @@ if (endDate) {
     res.status(500).json({ message: '서버 오류' })
   }
 }
+
+

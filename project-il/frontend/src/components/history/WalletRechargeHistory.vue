@@ -53,6 +53,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from '@/axiosUser'
+import dayjs from 'dayjs'
 
 const history = ref([])
 const userBalance = ref(0)
@@ -113,7 +114,9 @@ const changePage = (page) => {
   }
 }
 
-const formatDate = (str) => new Date(str).toLocaleString()
+const formatDate = (date) => {
+  return dayjs(date).format('YYYY.MM.DD HH:mm:ss')
+}
 
 const formatStatus = (status) => {
   switch (status) {

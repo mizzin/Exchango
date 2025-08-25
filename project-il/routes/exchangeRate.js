@@ -6,7 +6,7 @@ router.get('/', async (req, res) => {
   const { from, to } = req.query;
 
  
- // console.log('📦 쿼리 파라미터:', { from, to });
+  console.log('📦 쿼리 파라미터:', { from, to });
 
   if (!from || !to) {
     return res.status(400).json({ message: 'from, to 쿼리 파라미터가 필요합니다.' });

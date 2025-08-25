@@ -1,72 +1,73 @@
 <template>
   <UserLayout>
     <div class="recharge-history">
-    <div class="wallet-balance">
-      💰 {{ $t('mypage.balance') }}: <strong>{{ userBalance.toLocaleString() }} USD</strong>
+      <h2>{{ $t('history.wallet.title') }}</h2>
+      <p>{{ $t('history.wallet.description') }}</p>
+
+      <table v-if="paginatedHistory.length">
+        <thead>
+          <tr>
+            <th>{{ $t('history.wallet.date') }}</th>
+            <th>{{ $t('history.wallet.type') }}</th>
+            <th>{{ $t('history.wallet.currency') }}</th>
+            <th>{{ $t('history.wallet.amountUsd') }}</th>
+            <th>{{ $t('history.wallet.convertedAmount') }}</th>
+            <th>{{ $t('history.wallet.status') }}</th>
+            <th>{{ $t('history.wallet.approvedAt') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in paginatedHistory" :key="item.id">
+            <td>{{ formatDate(item.created_at) }}</td>
+            <td>{{ formatType(item.type) }}</td>
+            <td>{{ item.currency }}</td>
+            <td>{{ formatAmount(item.amount) }} USD</td>
+            <td>
+              {{ formatAmount(item.krw_amount) }}
+              {{ item.currency }}
+            </td>
+            <td>
+              <span :class="'badge status-' + item.status">
+                {{ formatStatus(item.status) }}
+              </span>
+            </td>
+            <td>
+              <span v-if="item.status === 'completed'">
+                {{ formatDate(item.updated_at) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div v-else style="text-align: center; padding: 2rem; color: #777;">
+        {{ $t('history.wallet.noHistory') }}
+      </div>
+
+      <div class="pagination" v-if="totalPages > 1">
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">&lt;</button>
+        <button
+          v-for="page in visiblePages"
+          :key="page"
+          @click="changePage(page)"
+          :class="{ active: currentPage === page }"
+        >
+          {{ page }}
+        </button>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">&gt;</button>
+      </div>
     </div>
-    <table v-if="paginatedHistory.length">
-  <thead>
-    <tr>
-      <th>신청일</th>
-      <th>구분</th>
-      <th>신청통화</th>
-      <th>신청금액 (USD)</th>
-      <th>환산금액</th>
-      <th>상태</th>
-      <th>승인일</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="item in paginatedHistory" :key="item.id">
-      <td>{{ formatDate(item.created_at) }}</td>
-      <td>{{ formatType(item.type) }}</td>
-      <td>{{ item.currency }}</td>
-      <td>{{ formatAmount(item.amount) }} USD</td>
-      <td>
-        {{ formatAmount(item.krw_amount) }}
-        {{ item.currency }}
-      </td>
-      <td>
-        <span :class="'badge status-' + item.status">
-          {{ formatStatus(item.status) }}
-        </span>
-      </td>
-      <td>
-        <span v-if="item.status === 'completed'">
-          {{ formatDate(item.updated_at) }}
-        </span>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-
-
-    <div v-else style="text-align: center; padding: 2rem; color: #777;">
-      {{ $t('history.noRechargeHistory') }}
-    </div>
-
-    <div class="pagination" v-if="totalPages > 1">
-      <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">&lt;</button>
-      <button
-        v-for="page in visiblePages"
-        :key="page"
-        @click="changePage(page)"
-        :class="{ active: currentPage === page }"
-      >
-        {{ page }}
-      </button>
-      <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">&gt;</button>
-    </div>
-  </div>
   </UserLayout>
 </template>
+
  
 <script setup>
 import UserLayout from '@/components/UserLayout.vue'
 import { ref, computed, onMounted } from 'vue'
 import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n';
+import dayjs from 'dayjs'
+
 
 const { t } = useI18n();
 const history = ref([])
@@ -92,8 +93,12 @@ const fetchHistoryAndBalance = async () => {
     history.value = res1.data.transactions || []
     userBalance.value = res2.data.balance || 0
   } catch (err) {
-    console.error('❌ 충전 이력 또는 잔액 불러오기 실패:', err)
+    console.error('❌ Failed to load recharge history or wallet balance:', err)
   }
+}
+
+const formatDate = (date) => {
+  return dayjs(date).format('YYYY.MM.DD HH:mm:ss')
 }
 
 const formatAmount = (num) => {
@@ -141,7 +146,6 @@ const changePage = (page) => {
   }
 }
 
-const formatDate = (str) => new Date(str).toLocaleString()
 
 const formatStatus = (status) => {
   switch (status) {

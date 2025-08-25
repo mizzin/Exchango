@@ -20,11 +20,12 @@ exports.verifyToken = (req, res, next) => {
   }
 }
 
-// 관리자 전용 미들웨어
+// 관리자 전용 미들웨어 0724
 exports.isAdmin = (req, res, next) => {
 //console.log('🛡️ ADMIN CHECK:', req.user)
   if (req.user.role !== 'admin') {
     return res.status(403).json({ message: '관리자 전용 접근입니다.' })
   }
+    req.admin = req.user
   next()  // 관리자라면 다음 미들웨어로 넘어가기
 }

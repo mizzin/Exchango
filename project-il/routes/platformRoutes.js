@@ -1,7 +1,8 @@
 // routes/platformRoutes.js
+
 const express = require('express')
 const router = express.Router()
-const db = require('../db')
+const db = require('../db') // 예: mysql2 or your db wrapper
 
 router.get('/', async (req, res) => {
   const lang = req.query.lang || 'ko'
@@ -14,15 +15,10 @@ router.get('/', async (req, res) => {
       WHERE pt.language = ?
       ORDER BY p.id
     `, [lang])
-
-    const platforms = rows.map(row => ({
-      id: row.platform_id,
-      name: row.name,
-      currency: row.currency
-    }))
-    res.json(platforms)
+    
+    res.json(rows)
   } catch (err) {
-    console.error('❌ 플랫폼 목록 로딩 실패:', err)
+    console.error('플랫폼 목록 로딩 실패:', err)
     res.status(500).json({ message: '플랫폼 목록 불러오기 실패', error: err.message })
   }
 })

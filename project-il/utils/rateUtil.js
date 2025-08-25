@@ -1,3 +1,4 @@
+//utils>rateUtil.js
 const axios = require('axios');
 const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
@@ -30,9 +31,9 @@ exports.getCustomRates = async () => {
     result.PHP = rates.PHP ?? null;
     result.CNY = rates.CNY ?? null;
 
-    // ✅ 네이버에서 KRW
+    // ✅ 네이버 페이지 (EUC-KR 디코딩)
     const res = await axios.get('https://finance.naver.com/marketindex/exchangeList.naver', {
-      responseType: 'arraybuffer'
+      responseType: 'arraybuffer'  // 중요!
     });
     const decoded = iconv.decode(res.data, 'EUC-KR');
     const $ = cheerio.load(decoded);
@@ -49,10 +50,12 @@ exports.getCustomRates = async () => {
 
     if (usdRate) {
       result.KRW = usdRate;
+      result.USDT = usdRate;
     } else {
       console.error('❌ 네이버에서 KRW 환율을 찾을 수 없습니다.');
     }
 
+    
     // ✅ USDT는 업비트 기준으로
     const upbitUSDT = await getUpbitUSDT();
     if (upbitUSDT) {
@@ -60,7 +63,7 @@ exports.getCustomRates = async () => {
     } else if (usdRate) {
       result.USDT = usdRate; // fallback
     }
-
+    
     return result;
   } catch (err) {
     console.error('[환율 수집 실패]', err.message);

@@ -13,13 +13,66 @@
     "guide": "注册指南",
     "login": "登录 / 注册",
     "logout": "登出"
-  },"footer": {
+  },"alert": {
+  "pendingMoneyRequest": "您有尚未处理的资金相关申请。",
+  "pendingRequestWithAction": "您有正在处理中申请。请在提交新申请前查看状态。",
+  "checkStatus": "查看状态"
+}
+,"transfer": { 
+    "request1": {
+    "title": "资金转移申请",
+    "moveType": "选择转移类型",
+    "walletToPlatform": "钱包 → 平台",
+    "walletToPlatformDesc": "将资金从钱包转移至外部平台",
+    "platformToOther": "平台 → 平台 / 钱包",
+    "platformToOtherDesc": "平台之间或平台到钱包的转账",
+    "fromPlatform": "出发平台",
+    "fromPlatformId": "出发平台ID",
+    "toPlatform": "目标平台",
+    "toPlatformId": "目标平台ID",
+    "myWallet": "我的钱包",
+    "amount": "转移金额",
+    "expectedAmount": "预计到账金额",
+    "rateNote": "适用汇率: 1 {from} → {rate} {to}（2%手续费）",
+    "moneyPassword": "提现密码",
+    "submit": "提交申请",
+     "alert": {
+      "rateFetchFailed": "无法获取汇率信息。",
+      "rateNotReady": "汇率计算尚未完成。",
+      "failed": "提交失败。"
+    }
+  },
+  "title": "金额转移",
+  "request": "转移申请",
+  "history": "转移记录"
+},"wallet": {
+  "title": "我的钱包"
+},
+"platform": {
+  "title": "外部平台"
+}
+,
+  "footer": {
     "exchangeLabel": "实时汇率（基准：美元）",
     "dateLabel": "基准日",
     "inquiry": "咨询：1对1留言板",
     "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
   },
-      "charge": {  "amountKrw": "输入金额",
+      "charge": { 
+          "wallet": {
+    "title": "钱包充值",
+    "method": "充值方式",
+    "selectCurrency": "选择货币",
+    "krw": "韩元",
+    "php": "比索",
+    "usdt": "泰达币",
+    "inputUsdAmount": "要充值的 USD",
+    "totalSendWithFee": "需汇款金额（含手续费）",
+    "submit": "提交充值",
+     "fetchRateFailed": "无法获取汇率信息。",
+    "success": "充值申请已成功提交。",
+    "failed": "充值申请失败。"
+  }, "amountKrw": "输入金额",
       "usdPlatform": "USD 平台",
       "krwPlatform": "KRW 平台",  
       "selectCurrency": "选择货币",
@@ -65,7 +118,41 @@
       "rejected": "已拒绝"
       }
 },
-"history": {"inputAmount": "输入金额",
+"history": { "transfer": {
+    "title": "资金转移申请记录",
+    "description": "您可以查看您的资金转移申请记录。",
+    "date": "申请时间",
+    "from": "来源",
+    "to": "目的地",
+    "wallet": "钱包",
+    "amount": "转移金额",
+    "converted": "换算金额",
+    "status": "状态",
+    "detailTitle": "详细信息",
+    "type": "记录类型",
+    "rate": "汇率",
+    "memo": "用户备注",
+    "adminMemo": "管理员备注",
+    "startedAt": "开始时间",
+    "processedAt": "处理时间","expected_amount": "到账金额",
+    "direction": {
+      "walletToPlatform": "钱包 → 平台",
+      "platformToWallet": "平台 → 钱包",
+      "platformToPlatform": "平台 → 平台"  }
+  },
+   "wallet": {
+    "title": "钱包充值/提现记录",
+    "description": "您可以查看站内钱包的充值/提现申请记录。",
+    "date": "申请日期",
+    "type": "类型",
+    "currency": "申请币种",
+    "amountUsd": "申请金额（USD）",
+    "convertedAmount": "换算金额",
+    "status": "状态",
+    "approvedAt": "批准日期",
+    "noHistory": "暂无充值或提现记录。"
+  },
+  "inputAmount": "输入金额",
   "title": "我的记录",
   "rechargeTab": "充值记录",
   "withdrawTab": "提现记录",
@@ -78,6 +165,11 @@
   "approveDate": "批准时间",
   "noRecharge": "暂无充值记录",
   "wiHistory": "暂无提现记录"
+},"status": {
+  "pending": "待处理",
+  "completed": "已完成",
+  "rejected": "已拒绝",
+  "cancelled": "已取消"
 },
 "home": {
   "title": "欢迎来到 MyPoint",
@@ -248,6 +340,7 @@
 
       },
       "common": {
+         "close": "关闭",
         "subject": "标题",
         "category": "分类",
         "status": "状态",
@@ -270,7 +363,14 @@
     "pending_exists": "您已有未回复的提问，请等待回复后再提交新的提问。",
     "create_failed": "提交提问时发生错误。"
   }
-    },  "withdraw": {
+    },  "withdraw": {  "wallet": {
+    "title": "钱包提现",
+    "selectError": "※ 请选择货币。",
+    "minAmountError": "※ 最低提现金额为40美元。",
+    "balanceExceeded": "※ 超出可用余额。",
+    "passwordError": "※ 请输入6位数字密码。",
+    "agreeError": "※ 您必须同意提现条款。"
+  },
   "agreeConfirm": "我已确认提款信息无误。",
   "agreeCheck_line1": "※ 请再次确认您输入的信息是否准确。",
   "agreeCheck_line2": "特别是钱包地址输入错误可能导致提款失败。",

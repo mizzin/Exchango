@@ -24,14 +24,14 @@ const externalSites = [
   {
     name: 'pokernex',
     url: 'https://pokernex.net/',
-    image: home004 , 
-    
+    image: home004 ,
+
   },
   {
     name: 'pokerbros',
     url: 'https://pokerbroskorea.net/',
-    image: home001, 
-    
+    image: home001,
+
   }
 ];
 
@@ -82,10 +82,49 @@ onMounted(() => {
 
 const formatRate = val => Number(val).toFixed(2)
 const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
+
+const showOverlay = ref(true)
+// URL에 preview=true 있으면 닫기 버튼 보이고 오버레이 닫기 가능
+const canClose = new URLSearchParams(window.location.search).has('preview')
+
+onMounted(() => {
+  // 만약 이전에 닫았었다면 (세션 스토리지에 기록), 아예 보이지 않게
+  if (sessionStorage.getItem('overlayClosed') === '1') {
+    showOverlay.value = false
+  }
+})
+
+function closeOverlay() {
+  showOverlay.value = false
+  sessionStorage.setItem('overlayClosed', '1')
+}
 </script>
 
 <template>
   <UserLayout>
+<!-- home.vue -->
+  <!-- 오픈 전 안내 오버레이 -->
+<!-- 퍼블리싱 오버레이 -->
+<div v-if="showOverlay" class="prelaunch-overlay">
+  <div class="bg-aurora"></div>
+  <div class="particle-bg">
+    <div class="particle" v-for="n in 30" :key="n" :style="{ '--i': Math.random() }"></div>
+  </div>
+  <div class="prelaunch-modal">
+    <div class="pulse-title">T R A N A S I A</div>
+    <h2>🎉 Official Launch: August 20 🎉</h2>
+    <p class="tagline"></p>
+    <p>We're coming soon — and we're coming strong. 💫</p>
+  </div>
+      <button
+      v-if="canClose"
+      class="close-btn"
+      @click="closeOverlay"
+    >✕</button>
+
+</div>
+
+
     <div class="home">
 
       <!-- 🔹 외부 링크 카드 영역 -->
@@ -103,7 +142,7 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
           </a>
         </div>
       </section>
-      
+
       <!-- 기존 공지사항 / 환율 -->
       <section class="section-grid">
       <div class="card notice-card">
@@ -192,13 +231,13 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
   position: absolute;
   bottom: 0;
   left: 0;
-  padding: 0.5rem 1rem; 
-  background: rgba(0, 0, 0, 0.4); 
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
   width: 100%;
   box-sizing: border-box;
 }
 .card-title {
-  font-size: 0.95rem; 
+  font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
   margin: 0;
@@ -315,11 +354,11 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
   padding: 0.2rem;
 }
   .card {
-    padding: 0 !important; 
+    padding: 0 !important;
   }
-  
+
   .card-img {
-    height: 120px; 
+    height: 120px;
   }
 
   .card-title {
@@ -327,9 +366,190 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
   }
 
   .card-body {
-    padding: 0.3rem 0.7rem; 
+    padding: 0.3rem 0.7rem;
   }
+}
+/* 오픈 전 안내 오버레이 */
+/* 전체 오버레이 */
+.prelaunch-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(10, 10, 20, 0.85);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
 
+@keyframes shineText {
+  0% { background-position: 0% }
+  100% { background-position: 200% }
+}
+
+/* 꽃가루 입자 애니메이션 */
+.particle-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0));
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: floatParticle 10s linear infinite;
+  top: 100%;
+  left: calc(100% * var(--i, 0.5));
+}
+
+.particle:nth-child(odd) {
+  background: radial-gradient(circle, #f5c542, rgba(255, 255, 255, 0));
+}
+.particle:nth-child(even) {
+  background: radial-gradient(circle, #ff84d4, rgba(255, 255, 255, 0));
+}
+
+.particle:nth-child(n) {
+  --i: calc(var(--random, 0.1) * 1.0);
+  animation-delay: calc(var(--i) * -10s);
+}
+
+/* 애니메이션 */
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-120vh) scale(1.2);
+    opacity: 0;
+  }
+}
+@keyframes riseZoom {
+  0% {
+    transform: scale(0.9) translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.prelaunch-modal {
+  animation: riseZoom 0.8s ease-out;
+}
+
+/* 중앙 모달 */
+.prelaunch-modal {
+  position: relative;
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 1.5rem;
+  z-index: 2;
+  text-align: center;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
+  animation: slideUpFade 1s ease-out;
+}
+
+/* 트렌디한 타이틀 */
+.pulse-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #3c5ef0, #a5b8ff, #3c5ef0);
+  background-size: 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shineText 3s linear infinite,  2s ease-in-out infinite;
+}
+
+
+.bg-aurora {
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle at 30% 30%, #3c5ef0 0%, transparent 60%),
+              radial-gradient(circle at 70% 70%, #ff4081 0%, transparent 60%);
+  animation: auroraMove 15s ease-in-out infinite;
+  z-index: 0;
+  opacity: 0.25;
+  filter: blur(80px);
+}
+
+@keyframes auroraMove {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-10%, -10%) rotate(30deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+
+
+
+.drumroll {
+  font-family: monospace;
+  animation: drumrollWiggle 1s infinite;
+  color: #ff4081;
+  font-weight: bold;
+}
+
+@keyframes drumrollWiggle {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes slideUpFade {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 반응형 */
+@media screen and (max-width: 480px) {
+  .prelaunch-modal {
+    padding: 1.5rem 1rem;
+  }
+  .pulse-title {
+    font-size: 1.4rem;
+  }
+}
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  color: #fff;
+  font-size: 1.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  z-index: 1000;
+}
 </style>

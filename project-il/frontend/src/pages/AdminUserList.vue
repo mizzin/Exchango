@@ -3,42 +3,42 @@
   <AdminLayout>
     <div class="admin-users">
       <h2>회원 목록</h2>
-      <div class="row g-2 mb-3">
-  <div class="col-sm-2">
-    <input v-model="filters.username" class="form-control" placeholder="아이디" />
-  </div>
-  <div class="col-sm-2">
-    <select v-model="filters.status" class="form-select">
-      <option value="">전체 상태</option>
-      <option value="pending">대기중</option>
-      <option value="approved">승인됨</option>
-      <option value="blocked">차단됨</option>
-    </select>
-  </div>
-  <div class="col-sm-2">
-    <input type="date" v-model="filters.startDate" class="form-control" />
-  </div>
-  <div class="col-sm-2">
-    <input type="date" v-model="filters.endDate" class="form-control" />
-  </div>
-  <div class="col-sm-2 form-check mt-2">
-    <input type="checkbox" v-model="filters.warningOnly" class="form-check-input" id="warnOnly" />
-    <label class="form-check-label" for="warnOnly">경고 1회 이상</label>
-  </div>
+      <div class="filter-row">
+        <input v-model="filters.username" placeholder="아이디" />
 
+        <select v-model="filters.status">
+          <option value="">전체 상태</option>
+          <option value="pending">대기중</option>
+          <option value="approved">승인됨</option>
+          <option value="blocked">차단됨</option>
+        </select>
+
+        <input type="date" v-model="filters.startDate" />
+        ~
+        <input type="date" v-model="filters.endDate" />
+
+        <label class="checkbox-label">
+          <input type="checkbox" v-model="filters.warningOnly" />
+          경고 1회 이상
+        </label>
+        </div>
+        <div class="filter-row">
+        
+
+        <input v-model="filters.referral_id" placeholder="추천인 ID" />
+
+        <button @click="fetchUsers">검색</button>
+        <button @click="resetFilters">초기화</button>
       </div>
-      <div class="mb-3">
-        <button @click="fetchUsers" class="btn btn-primary me-2">검색</button>
-        <button @click="resetFilters" class="btn btn-secondary">초기화</button>
-      </div>
-      <table class="table table-bordered">
-        <thead class="thead-light">
+      <table>
+        <thead>
           <tr>
             <th>아이디</th>
             <th>이름</th>
             <th>상태</th>
+            <th>지갑금액(usd)</th>
             <th>가입일</th>
-            <th>승인 여부</th>
+            <th>승인 여부</th> 
             <th>상세</th>
           </tr>
         </thead>
@@ -46,38 +46,38 @@
           <tr v-for="user in users" :key="user.id">
             <td>{{ user.username }}</td>
             <td>{{ user.real_name || '-' }}</td>
+            <td>{{ user.status || '-' }}</td>
             <td>
-              <span :class="['badge', statusColor(user.status)]">{{ user.status }}</span>
+              <span v-if="user.balance != null">
+    {{ Number(user.balance).toLocaleString(undefined, { maximumFractionDigits: 0 }) }} USD
+              </span>
+              <span v-else>-</span>
             </td>
-            <td>{{ formatDate(user.created_at) }}</td>
+            <td>{{ user.created_at ? formatDate(user.created_at) : '-' }}</td>
             <td>
               <template v-if="user.status === 'pending'">
-                <button class="btn btn-success btn-sm me-1" @click="approve(user.id)">승인</button>
-                <button class="btn btn-danger btn-sm" @click="reject(user.id)">거절</button>
+                <button class="btn-approve" @click="approve(user.id)">승인</button>
+                <button class="btn-reject" @click="reject(user.id)">거절</button>
               </template>
-              <span v-else>{{ formatStatus(user.status) }}</span>
+              <span v-else-if="user.status === 'approved'">승인됨</span>
+              <span v-else-if="user.status === 'rejected'">거절됨</span>
+              <span v-else>처리완료</span>
             </td>
             <td>
-              <button class="btn btn-outline-primary btn-sm" @click="viewUser(user.id)">상세보기</button>
+              <button @click="viewUser(user.id)">상세보기</button>
             </td>
           </tr>
         </tbody>
       </table>
 
-            <!-- 페이지네이션 -->
-      <div class="pagination justify-content-center mt-4">
-        <button class="btn btn-outline-secondary btn-sm me-1" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">이전</button>
-        <button
-          v-for="page in visiblePages"
-          :key="page"
-          class="btn btn-sm me-1"
-          :class="currentPage === page ? 'btn-primary' : 'btn-outline-secondary'"
-          @click="changePage(page)">
-          {{ page }}
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
+      <!-- 페이지네이션 -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">이전</button>
+        <span v-for="page in visiblePages" :key="page">
+          <button :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
+        </span>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
       </div>
-
     </div>
   </AdminLayout>
   </template>
@@ -104,29 +104,6 @@
     platform: '',
     referral_id: ''
   })
-  const statusColor = (status) => {
-  switch (status) {
-    case 'pending':
-      return 'bg-warning text-dark'
-    case 'approved':
-      return 'bg-success'
-    case 'blocked':
-    case 'rejected':
-      return 'bg-danger'
-    default:
-      return 'bg-secondary'
-  }
-}
-const formatStatus = (status) => {
-  switch (status) {
-    case 'pending': return '대기중'
-    case 'approved': return '승인됨'
-    case 'blocked': return '차단됨'
-    case 'rejected': return '거절됨'
-    default: return status
-  }
-}
-
       const platformOptions = ref([])
 
       const fetchPlatformOptions = async () => {
@@ -242,12 +219,106 @@ const formatStatus = (status) => {
     margin: auto;
     padding: 2rem;
   }
+  table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 0.2rem;
+    text-align: center;
+  }
+ thead {
+  background-color: #f0f4ff;
+  font-weight: bold;
+ }
+ tbody tr:hover {
+  background-color: #eef3ff; 
+  transition: background-color 0.2s ease;
+}
+  .pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+.pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+}
+.pagination .active {
+  font-weight: bold;
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+.btn-approve,
+.btn-reject {
+  margin: 2px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-approve {
+  background: #4a6cf7;
+  color: white;
+}
+
+.btn-approve:hover {
+  background: #3a56d8;
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.date-filter-row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.filter-row input:not([type="checkbox"]),
+.filter-row select {
+  height: 36px;
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-width: 140px;
+  max-width: 200px;
+}
+
 
 .checkbox-label {
   display: flex;
   align-items: center;
   gap: 4px;
   white-space: nowrap;
+}
+
+.btn-search,
+.btn-reset {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-search {
+  background-color: #4a6cf7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-reset {
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
   </style>

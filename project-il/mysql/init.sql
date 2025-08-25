@@ -54,6 +54,13 @@ ADD COLUMN from_type ENUM('wallet', 'platform') DEFAULT 'wallet' AFTER reason,
 ADD COLUMN exchange_rate DECIMAL(18,6) DEFAULT NULL AFTER to_platform_user_id,
 ADD COLUMN updated_at DATETIME DEFAULT NULL;
 
+ALTER TABLE site_transactions
+DROP FOREIGN KEY site_transactions_ibfk_2;
+
+ALTER TABLE site_transactions
+ADD CONSTRAINT fk_site_transactions_admin
+  FOREIGN KEY (admin_id) REFERENCES users(id)
+    ON DELETE SET NULL;
 
 
 CREATE TABLE IF NOT EXISTS email_verifications (
@@ -160,7 +167,7 @@ MODIFY COLUMN type ENUM(
   'platform_charge',   -- 플랫폼으로 바로 충전
   'wallet_withdraw',   -- 내 지갑에서 출금
   'platform_withdraw', -- 플랫폼으로 출금
-  'transfer',          -- 머니 이동 (내 지갑 → 플랫폼)
+  'transfer',          -- 머니 이동 (내 지갑 → 플랫폼) 
   'reward',            -- 보상
   'penalty'            -- 패널티 또는 차감
 ) NOT NULL;
@@ -173,7 +180,8 @@ ALTER TABLE transactions
   ADD COLUMN to_platform_id VARCHAR(10) AFTER platform_user_id,
   ADD COLUMN to_platform_user_id VARCHAR(50) AFTER to_platform_id,
   ADD COLUMN exchange_rate DECIMAL(10,4) AFTER user_memo,
-  ADD COLUMN expected_amount DECIMAL(10,2) AFTER exchange_rate;
+  ADD COLUMN expected_amount DECIMAL(10,2) AFTER exchange_rate
+  ADD COLUMN admin_id INT NULL AFTER status;
 
 ALTER TABLE transactions ADD COLUMN expected_amount DECIMAL(10,2) NULL;
 ALTER TABLE transactions MODIFY COLUMN type VARCHAR(30);

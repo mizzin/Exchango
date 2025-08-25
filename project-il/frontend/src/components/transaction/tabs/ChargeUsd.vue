@@ -17,8 +17,8 @@
       <option disabled value="">{{ $t('charge.selectPlaceholder') }}</option>
       <option
         v-for="item in filteredPlatforms"
-        :key="item.id"
-        :value="item.id"
+        :key="item.platform_id"
+        :value="item.platform_id"
       >
         {{ item.name }}
       </option>
@@ -121,14 +121,23 @@ const totalAmount = ref(0)
 
 const fetchPlatformOptions = async () => {
   const lang = localStorage.getItem('lang') || 'ko'
-  const res = await axios.get(`/api/platforms?lang=${lang}`)
+  const res = await axios.get(`/platforms?lang=${lang}`)
   platforms.value = res.data
+
 }
 const filteredPlatforms = computed(() => {
-  const blockedIds = ['x-poker', 'pokernex']
-  return platforms.value.filter(p => !blockedIds.includes(p.id.toLowerCase()))
-})
+  const blockedIds = ['x-poker', 'pokernex'];
 
+  // platforms.value가 배열이 아니면 빈 배열 반환
+  if (!Array.isArray(platforms.value)) return [];
+
+  return platforms.value.filter(p => {
+    // id가 없으면 '' 로 대체
+    const rawId = p.id ?? p.platform_id ?? '';
+    const id   = String(rawId).toLowerCase();
+    return !blockedIds.includes(id);
+  });
+});
 const fetchUserPlatformIds = async () => {
   const res = await axios.get('/users/me', {
     headers: {
@@ -183,14 +192,15 @@ const exchangeRateDisplay = computed(() => {
   return exchangeRate.value ? exchangeRate.value.toFixed(2) : '-'
 })
 const isChargeValid = computed(() => {
+
   return (
-    platform.value &&
-    platformUserId.value &&
-    usdAmount.value &&
-    selectedCurrency.value &&
+    !!platform.value &&
+    !!platformUserId.value &&
+    !!usdAmount.value &&
+    !!selectedCurrency.value &&
     usdAmount.value >= 40
-  )
-})
+  );
+});
 const submit = async () => {
   if (!platform.value || !platformUserId.value || !usdAmount.value || !selectedCurrency.value) {
     return alert(t('charge.alert.fillAll')) 
@@ -201,14 +211,14 @@ const submit = async () => {
   }
 
   try {
-    await axios.post('/api/transactions', {
+    await axios.post('/transactions', {
       type: 'platform_charge',
       amount: usdAmount.value,
       currency: selectedCurrency.value,
       local_amount: convertedAmount.value,
       platform_id: platform.value,
-      platform_user_id : platformUserId.value,
-      expected_amount:convertedAmount.value,
+      platform_user_id: platformUserId.value,
+      expected_amount:convertedAmount.value
     }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('user_token')}`
@@ -231,14 +241,14 @@ const submit = async () => {
 const history = ref([])
 
 const fetchHistory = async () => {
-  try {
+  try { 
     const token = localStorage.getItem('user_token')
     const lang = localStorage.getItem('lang') || 'ko'
     const res = await axios.get(`/users/me/transactions?type=charge&lang=${lang}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     history.value = (Array.isArray(res.data) ? res.data : res.data.transactions || [])
-  .filter(tx => tx.type === 'charge')
+  .filter(tx => tx.type === 'platform_charge')
   } catch (e) {
     console.error('충전 이력 불러오기 실패:', e)
   }

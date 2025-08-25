@@ -24,7 +24,8 @@ const form = reactive({
   phone: '',
   referral_id: '',
   money_password: '', 
-  platforms: [{ platform_id: '', platform_user_id: '' }]
+  platforms: [{ platform_id: '', platform_user_id: '' }],
+    language: localStorage.getItem('lang') || 'en'
 })
 
 const confirmPassword = ref('')
@@ -54,7 +55,7 @@ const sendVerificationCode = async () => {
   }
 
   try {
-    await axios.post('/api/auth/send-email-code', { 
+    await axios.post('/auth/send-email-code', { 
       email: form.email,
     lang: localStorage.getItem('lang') || 'en'
    })
@@ -84,7 +85,7 @@ const verifyEmailCode = async () => {
   }
 
   try {
-    const res = await axios.post('/api/auth/verify-email-code', {
+    const res = await axios.post('/auth/verify-email-code', {
       email: form.email,
       code: verificationCode.value
     })
@@ -124,6 +125,8 @@ const removePlatform = (index) => {
 
 
  const handleRegister = async () => {
+  form.language = localStorage.getItem('lang') || 'en'
+
   // ✅ 기본 필수 항목 입력 확인
   if (!form.username || !form.password || !confirmPassword.value || !form.money_password || !form.phone || !form.email) {
     alert(t('register.alert.fillAllRequiredFields')) // 다국어 메시지로 "모든 필수 항목을 입력해 주세요"
@@ -161,6 +164,8 @@ const payload = {
   ...form,
   platforms: cleanPlatforms
 }
+console.log('회원가입 payload:', payload) 
+
   try {
     await axios.post('/users/register', payload)
     alert(t('register.alert.registrationSuccess'))
@@ -361,7 +366,6 @@ const goToLogin = () => {
 
 <style scoped>
 .button-group {
-  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
@@ -387,15 +391,15 @@ const goToLogin = () => {
 }
 .btn-primary.full,
 .btn-secondary.full {
-  width: 100%;
-  max-width: 300px; /* 필요하면 조정 가능 */
+  width: 48%;
+  /*max-width: 300px;  필요하면 조정 가능 */
   padding: 12px 0;
   font-size: 16px;
   border-radius: 6px;
   text-align: center;
 }
 .register-container {
-  max-width: 400px;
+  max-width: 420px;
   margin: 40px auto;
   padding: 30px;
   background: #f4f6ff;

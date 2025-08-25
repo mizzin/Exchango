@@ -2,16 +2,22 @@
   <div :key="isMember">
     <div class="user-layout">
       <!-- 헤더 -->
-      <header class="header">
+      <header class="user-header">
         <div class="container header-flex">
           <router-link to="/" class="logo-link">
             <h1 class="logo">TranAsia</h1>
           </router-link>
-
+  <!-- 💰 보유금액 박스: 햄버거/로고와 같은 라인, PC만 노출 -->
+  <div v-if="isMember && userInfo && userInfo.balance != null && !isMobile" class="user-balance">
+    💰 <strong>{{ Math.floor(userInfo.balance).toLocaleString() }} USD</strong>
+  </div>
           <!-- 햄버거 버튼 (우측 상단) -->
           <button class="hamburger" @click="toggleMenu">☰</button>
         </div>
-
+<!-- 모바일에서는 메뉴 바로 아래 보유금액 -->
+<div v-if="isMember && userInfo && userInfo.balance != null && isMobile" class="user-balance-mobile">
+  💰 <strong>{{ Math.floor(userInfo.balance).toLocaleString() }} USD</strong>
+</div>
         <!-- 네비게이션 메뉴 (PC에서는 항상 보이도록 위치 수정) -->
         <div class="nav-wrapper" :class="{ open: isOpen || !isMobile }">
           <nav :class="['nav', { open: isOpen || !isMobile }]">
@@ -26,24 +32,28 @@
               </span>
               <div v-if="dropdown === 'trade' || !isMobile" class="dropdown-menu">
                 
-                <!-- 💰 내 지갑 -->
-                <div class="dropdown-item"><strong>💰 내 지갑</strong></div>
-                <router-link to="/wallet/charge" class="dropdown-item">충전하기</router-link>
-                <router-link to="/wallet/withdraw" class="dropdown-item">출금하기</router-link>
-                <router-link to="/wallet/history" class="dropdown-item">이력 보기</router-link>
+                <!-- 내 지갑 -->
+                <div class="dropdown-item"><strong>{{ $t('wallet.title') }}</strong></div>
+                <router-link to="/wallet/charge" class="dropdown-item">{{ $t('nav.recharge') }}</router-link>
+                <router-link to="/wallet/withdraw" class="dropdown-item">{{ $t('nav.withdraw') }}</router-link>
+                <router-link to="/wallet/history" class="dropdown-item">{{ $t('nav.history') }}</router-link>
 
-                <!-- 🎮 외부 플랫폼 -->
-                <div class="dropdown-item" style="margin-top: 0.5rem;"><strong>🎮 외부 플랫폼</strong></div>
+                <!--외부 플랫폼 -->
+                <div class="dropdown-item" style="margin-top: 0.5rem;"><strong>{{ $t('platform.title') }}</strong></div>
                 <router-link to="/trade/recharge" class="dropdown-item">{{ $t('nav.recharge') }}</router-link>
                 <router-link to="/trade/withdraw" class="dropdown-item">{{ $t('nav.withdraw') }}</router-link>
                 <router-link to="/trade/history" class="dropdown-item">{{ $t('nav.history') }}</router-link>
 
-                <!-- 🔁 머니 이동 -->
-                <div class="dropdown-item" style="margin-top: 0.5rem;"><strong>🔁 머니 이동 신청</strong></div>
-                <router-link to="/wallet/transfer" class="dropdown-item">머니 이동 신청</router-link>
-                <router-link to="/wallet/transfer/history" class="dropdown-item">머니 이동 이력</router-link>
+                <!-- 머니 이동 -->
+                <div class="dropdown-item" style="margin-top: 0.5rem;"><strong>{{ $t('transfer.title') }}</strong></div>
+                  <router-link to="/wallet/transfer" class="dropdown-item">{{ $t('transfer.request') }}</router-link>
+                  <router-link to="/wallet/transfer/history" class="dropdown-item">{{ $t('transfer.history') }}</router-link>
+
               </div>
             </div>
+
+
+
 
             <!-- Support 드롭다운 -->
             <div class="dropdown nav-item">
@@ -107,7 +117,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
-
+const userInfo = ref(null)
 const isOpen = ref(false)
 const dropdown = ref(null)
 const isMobile = ref(false)
@@ -131,7 +141,18 @@ const checkLoginStatus = () => {
   const role = localStorage.getItem('role')
   isMember.value = !!token && role  === 'user'
 }
-
+const fetchUserInfo = async () => {
+  try {
+    const token = localStorage.getItem('user_token')
+    if (!token) return
+    const res = await axios.get('/users/info', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    userInfo.value = res.data
+  } catch (e) {
+    userInfo.value = null
+  }
+}
 const getRates = async () => {
   try {
     const res = await axios.get(`/exchange-rate`);
@@ -161,6 +182,7 @@ const formatDate = (isoString) => {
 onMounted(() => {
   checkLoginStatus()
   getRates()
+  fetchUserInfo()
   const checkWidth = () => {
     isMobile.value = window.innerWidth <= 768
   }
@@ -192,17 +214,20 @@ const toggleMenu = () => {
   flex-direction: column;
   min-height: 100vh;
 }
-.header {
+
+.user-header {
   background-color: white;
   border-bottom: 1px solid #ddd;
-  padding: 0.5rem 6rem;
-  
+  padding: 1rem; /* ← 충분한 높이 확보 */
+  position: relative; /* ← 햄버거 기준점으로 작용 */
+  min-height: 60px; /* ← 명시적으로 최소 높이 지정 */
 }
+
 .logo {
   font-size: 2rem;
   font-weight: 800;
-  color: #2563eb; /* 좀 더 강한 파란색 */
-  letter-spacing:0.5px; 
+  color: #2563eb;
+  letter-spacing: 0.5px;
   font-family: 'Segoe UI', 'Pretendard', sans-serif;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
@@ -211,6 +236,7 @@ const toggleMenu = () => {
 .logo-link {
   text-decoration: none;
 }
+
 .nav {
   display: flex;
   flex-wrap: wrap;
@@ -218,8 +244,7 @@ const toggleMenu = () => {
   align-items: center;
   padding: 0 1.5rem;
   max-width: 1024px;
-      margin: 0 auto;
-
+  margin: 0 auto;
 }
 
 .nav-item {
@@ -233,6 +258,7 @@ const toggleMenu = () => {
 .nav-item:hover {
   color: #5a75f0;
 }
+
 .dropdown {
   position: relative;
 }
@@ -242,7 +268,7 @@ const toggleMenu = () => {
   left: 0;
   background: white;
   border: 1px solid #ddd;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   display: none;
   flex-direction: column;
   z-index: 10;
@@ -260,11 +286,13 @@ const toggleMenu = () => {
 .dropdown-item:hover {
   background-color: #f0f4ff;
 }
+
 .main {
   flex: 1;
   background: #f9f9f9;
   padding: 2rem 0;
 }
+
 .footer {
   background-color: #f4f4f4;
   text-align: center;
@@ -273,35 +301,40 @@ const toggleMenu = () => {
   padding: 1rem 0;
   border-top: 1px solid #ddd;
 }
+
 .container {
   max-width: 1024px;
   margin: 0 auto;
   padding: 0 1rem;
 }
+
 .lang-select {
   border: 1px solid #ccc;
   padding: 4px 8px;
   font-size: 0.9rem;
   background-color: white;
   cursor: pointer;
-
-  width: auto;           
-  min-width: 80px;       
-  max-width: 120px;      
-  margin-left: auto; 
-  display: inline-block; 
+  width: auto;
+  min-width: 80px;
+  max-width: 120px;
+  margin-left: auto;
+  display: inline-block;
 }
+
 .hamburger {
-  display: none;
+  display: none; /* PC에서는 숨김 */
   font-size: 2rem;
-  background: none;
-  border: none;
-  color: #2563eb;
+  background: none !important; /* Tabler 스타일 무효화 */
+  border: none !important;
+  color: #2563eb !important; /* 원하는 파란색 아이콘 */
   position: absolute;
   right: 1rem;
-  top: 0.75rem;
+         top: 0.1rem;
   z-index: 1001;
+  padding: 0;
+  line-height: 1;
 }
+
 .rate-box {
   text-align: left;
   margin-bottom: 1rem;
@@ -317,13 +350,50 @@ const toggleMenu = () => {
   font-size: 0.75rem;
   color: #aaa;
 }
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+.user-balance {
+  margin-left: auto;
+  font-weight: 600;
+  color: #2563eb;
+  font-size: 1.08rem;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+}
+.user-balance-mobile {
+  padding: 8px 1.1rem 0.5rem 1.1rem;
+  font-size: 1.03rem;
+  color: #2563eb;
+  font-weight: 600;
+}
+@media (max-width: 768px) {
+  .user-balance {
+    display: none; /* PC 전용 */
+  }
+  .user-balance-mobile {
+    display: block; /* 모바일 전용 */
+  }
+}
+@media (min-width: 769px) {
+  .user-balance-mobile {
+    display: none;
+  }
+}
 
 @media screen and (max-width: 768px) {
   .header {
-  padding: 0.1rem 1rem;
-}
-   .hamburger {
-    display: block;
+    padding: 1rem 1rem; /* 충분한 높이를 주자 */
+    min-height: 56px;     /* 높이 부족시 명시적으로 설정 */
+  }
+  .hamburger {
+    display: block; 
+            top: 0.1rem;
+    right: 1rem;
   }
   .nav {
     display: none;
@@ -334,7 +404,8 @@ const toggleMenu = () => {
   .nav.open {
     display: flex;
   }
-  .nav-item, .lang-select {
+  .nav-item,
+  .lang-select {
     width: 100%;
     margin-bottom: 0.8rem;
     text-align: left;
@@ -353,6 +424,4 @@ const toggleMenu = () => {
     position: relative;
   }
 }
-
-
 </style>

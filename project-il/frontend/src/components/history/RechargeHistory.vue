@@ -54,6 +54,8 @@
 import { ref, onMounted,computed } from 'vue'
 import axios from '@/axiosUser'
 import '@/assets/style.css'
+import dayjs from 'dayjs'
+
 
 const history = ref([])
 const currentPage = ref(1)
@@ -63,9 +65,8 @@ const platformOptions = ref([])
 const fetchPlatformOptions = async () => {
   const lang = localStorage.getItem('lang') || 'ko'
   try {
-    const res = await axios.get(`/api/platforms?lang=${lang}`)
+    const res = await axios.get(`/platforms?lang=${lang}`)
     platformOptions.value = res.data // ex) [{ id: '001', name: 'A플랫폼' }, ...]
-    
   } catch (err) {
     console.error('플랫폼 목록 불러오기 실패:', err)
   }
@@ -117,7 +118,7 @@ const changePage = (page) => {
 }
 
 const formatDate = (str) => {
-  return new Date(str).toLocaleString()
+   return dayjs(str).format('YYYY.MM.DD HH:mm:ss')
 }
 
 const formatStatus = (status) => {

@@ -15,11 +15,11 @@
       <label>{{ $t('withdraw.selectPlatform') }}</label>
       <select v-model="platform" @change="updateExchangeRate">
       <option disabled value="">{{ $t('withdraw.selectPlaceholder') }}</option>
-      <option
-        v-for="item in filteredPlatforms"
-        :key="item.id"
-        :value="item.id"
-      >
+        <option
+          v-for="item in filteredPlatforms"
+          :key="item.platform_id"
+          :value="item.platform_id"
+        >
         {{ item.name }}
       </option>
     </select>
@@ -162,14 +162,22 @@ const selectedCurrency = computed(() => form.currency || '')
 
 const fetchPlatformOptions = async () => {
   const lang = localStorage.getItem('lang') || 'ko'
-  const res = await axios.get(`/api/platforms?lang=${lang}`)
+  const res = await axios.get(`/platforms?lang=${lang}`)
   platforms.value = res.data
 }
 const filteredPlatforms = computed(() => {
-  const blockedIds = ['x-poker', 'pokernex']
-  return platforms.value.filter(p => !blockedIds.includes(p.id.toLowerCase()))
-})
+  const blockedIds = ['x-poker', 'pokernex'];
 
+  // platforms.value가 배열이 아니면 빈 배열 반환
+  if (!Array.isArray(platforms.value)) return [];
+
+  return platforms.value.filter(p => {
+    // id가 없으면 '' 로 대체
+    const rawId = p.id ?? p.platform_id ?? '';
+    const id   = String(rawId).toLowerCase();
+    return !blockedIds.includes(id);
+  });
+});
 const fetchUserPlatformIds = async () => {
   const res = await axios.get('/users/me/withdraws', {
     headers: {
@@ -178,7 +186,6 @@ const fetchUserPlatformIds = async () => {
   })
   userPlatformIds.value = res.data.platform_ids || {}
 }
-
 //출금불러오기
 const fetchHistory = async () => {
   const token = localStorage.getItem('user_token')
@@ -263,6 +270,7 @@ const convertedAmountDisplay = computed(() => {
   const result = Math.round(form.amount * exchangeRate.value * 0.98)
   return `${result.toLocaleString()} ${selectedCurrency.value}`
 })
+
 const convertedAmountNet = computed(() => {
   if (!form.amount || !exchangeRate.value || !selectedCurrency.value) return 0
   return Math.round(form.amount * exchangeRate.value * 0.98)
@@ -279,7 +287,7 @@ const submitWithdraw = async () => {
   }
 if (form.amount < 40) return alert(t('withdraw.alert.minimumAmount'))
   try {
-    await axios.post('/api/transactions/withdraw', {
+    await axios.post('/transactions/withdraw', {
       amount: form.amount,
       currency: selectedCurrency.value,
       local_amount: convertedAmount.value,

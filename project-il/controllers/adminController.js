@@ -110,18 +110,22 @@ exports.getAllUsers = async (req, res) => {
 
   try {
     const [users] = await db.query(
-      `SELECT u.*, COALESCE(wcnt.warning_count, 0) as warning_count
-       FROM users u
-       LEFT JOIN (
-         SELECT user_id, COUNT(*) as warning_count
-         FROM warnings
-         GROUP BY user_id
-       ) wcnt ON u.id = wcnt.user_id
-       ${whereClause}
-       ORDER BY u.created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...values, Number(limit), Number(offset)]
-    );
+  `SELECT 
+     u.*, 
+     COALESCE(wcnt.warning_count, 0) as warning_count,
+     COALESCE(ub.balance, 0) as balance        -- 💰 여기서 잔액도 같이!
+   FROM users u
+   LEFT JOIN (
+     SELECT user_id, COUNT(*) as warning_count
+     FROM warnings
+     GROUP BY user_id
+   ) wcnt ON u.id = wcnt.user_id
+   LEFT JOIN user_balances ub ON u.id = ub.user_id    -- 💰 잔액 조인!
+   ${whereClause}
+   ORDER BY u.created_at DESC
+   LIMIT ? OFFSET ?`,
+  [...values, Number(limit), Number(offset)]
+);
 
     const [[{ count }]] = await db.query(
       `SELECT COUNT(DISTINCT u.id) as count
@@ -201,7 +205,6 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ message: '사용자 조회에 실패했습니다.' });
   }
 };
-
 // 관리자 메모 저장
 exports.updateNote = async (req, res) => {
   const { id } = req.params;
@@ -379,19 +382,24 @@ exports.getWarnings = async (req, res) => {
 exports.getSentMessages = async (req, res) => {
   try {
     const [rows] = await db.query(`
-        SELECT m.*, u.username AS to_username
-  FROM messages m
-  JOIN users u ON m.to_user_id = u.id
-  WHERE m.from_user_id = ?
-  ORDER BY m.created_at DESC
-    `, [req.user.id])
+      SELECT 
+        m.*,
+        u.username AS to_username,
+        sender.username AS from_username
+      FROM messages m
+      JOIN users u       ON m.to_user_id   = u.id
+      JOIN users sender  ON m.from_user_id = sender.id
+      ORDER BY m.created_at DESC
+    `);
 
-    res.json({ messages: rows })
+    res.json({ messages: rows });
   } catch (err) {
-    console.error('❌ 보낸 쪽지 조회 오류:', err)
-    res.status(500).json({ message: '보낸 쪽지 불러오기 실패' })
+    console.error('❌ 보낸 쪽지 조회 오류:', err);
+    res.status(500).json({ message: '보낸 쪽지 불러오기 실패' });
   }
-}
+};
+
+
 // 쪽지관리
 exports.getMessageTemplates = async (req, res) => {
   const [rows] = await db.query('SELECT * FROM message_templates')

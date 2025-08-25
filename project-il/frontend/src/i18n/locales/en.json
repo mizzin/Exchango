@@ -4,6 +4,43 @@
   "server_error": "A server error has occurred.",
   "password_mismatch": "New passwords do not match.",
   "unknown": "An unknown error has occurred."
+},
+"alert": {
+  "pendingMoneyRequest": "You have a pending money-related request.",
+  "pendingRequestWithAction": "You have a pending request. Please check status before submitting a new one.",
+  "checkStatus": "Check status"
+},
+"transfer": { "request1": {
+    "title": "Money Transfer Request",
+    "moveType": "Select Transfer Type",
+    "walletToPlatform": "Wallet → Platform",
+    "walletToPlatformDesc": "Send money from your wallet to an external platform",
+    "platformToOther": "Platform → Platform / Wallet",
+    "platformToOtherDesc": "Transfer between platforms or from a platform to your wallet",
+    "fromPlatform": "Source Platform",
+    "fromPlatformId": "Source Platform ID",
+    "toPlatform": "Destination Platform",
+    "toPlatformId": "Destination Platform ID",
+    "myWallet": "My Wallet",
+    "amount": "Transfer Amount",
+    "expectedAmount": "Expected Received Amount",
+    "rateNote": "Applied rate: 1 {from} → {rate} {to} (2% fee)",
+    "moneyPassword": "Withdrawal Password",
+    "submit": "Submit Request",    "alert": {
+      "rateFetchFailed": "Failed to retrieve exchange rate.",
+      "rateNotReady": "Exchange rate calculation is not complete.",
+      "failed": "Submission failed."
+    }
+  },
+  "title": "Money Transfer",
+  "request": "Money Transfer Request",
+  "history": "Money Transfer History"
+},
+"wallet": {
+  "title": "My Wallet"
+},
+"platform": {
+  "title": "External Platform"
 }
 ,
   "nav": {
@@ -28,7 +65,22 @@
     "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
 
   },
-  "charge": { "inputAmount": "Input Amount",
+  "charge": { 
+      "wallet": {
+    "title": "Recharge to Wallet",
+    "method": "Recharge Method",
+    "selectCurrency": "Select Currency",
+    "krw": "KRW",
+    "php": "PHP",
+    "usdt": "USDT",
+    "inputUsdAmount": "USD to Recharge",
+    "totalSendWithFee": "Total Amount to Send (with fee)",
+    "submit": "Submit Recharge",
+     "fetchRateFailed": "Failed to fetch exchange rate.",
+    "success": "Recharge request submitted successfully.",
+    "failed": "Recharge request failed."
+  },
+    "inputAmount": "Input Amount",
     "amountKrw": "Entered Amount",
     "usdPlatform": "USD Platform",
     "krwPlatform": "KRW Platform",
@@ -75,7 +127,42 @@
     "rejected": "Rejected"
   }
 },
-"history": {
+"history": { "transfer": {
+    "title": "Money Transfer History",
+    "description": "You can view your money transfer request history.",
+    "date": "Request Date",
+    "from": "From",
+    "to": "To",
+    "wallet": "Wallet",
+    "amount": "Transfer Amount",
+    "converted": "Converted Amount",
+    "status": "Status",
+    "detailTitle": "Transfer Details",
+    "type": "Transfer Type",
+    "rate": "Exchange Rate",
+    "memo": "User Memo",
+    "adminMemo": "Admin Memo",
+    "startedAt": "Requested At",
+    "processedAt": "Processed At",
+    "expected_amount": "Received Amount",
+       "direction": {
+      "walletToPlatform": "Wallet → Platform",
+      "platformToWallet": "Platform → Wallet",
+      "platformToPlatform": "Platform → Platform"
+    }
+  },
+   "wallet": {
+    "title": "Wallet Recharge/Withdrawal History",
+    "description": "You can view your recharge/withdrawal request history for your internal wallet.",
+    "date": "Request Date",
+    "type": "Type",
+    "currency": "Requested Currency",
+    "amountUsd": "Requested Amount (USD)",
+    "convertedAmount": "Converted Amount",
+    "status": "Status",
+    "approvedAt": "Approval Date",
+    "noHistory": "No recharge or withdrawal history found."
+  },
   "title": "My History",
   "rechargeTab": "Recharge History",
   "withdrawTab": "Withdraw History",
@@ -94,6 +181,11 @@
   "status": "Status",
   "requestDate": "Request Date",
   "approveDate": "Approve Date"
+},"status": {
+  "pending": "Pending",
+  "completed": "Completed",
+  "rejected": "Rejected",
+  "cancelled": "Cancelled"
 },
 "home": {
   "title": "Welcome to MyPoint",
@@ -270,7 +362,8 @@
         "subject": "Subject",
         "category": "Category",
         "status": "Status",
-        "createdAt": "Created At"
+        "createdAt": "Created At",
+        "close": "Close"
       },
       "category": {
         "money": "Deposit/Withdrawal & Fund Transfer",
@@ -291,6 +384,14 @@
        "fetch_failed": "An error occurred while loading your inquiries."
   }
     },"withdraw": {
+        "wallet": {
+    "title": "Withdraw from Wallet",
+    "selectError": "※ Please select a currency.",
+    "minAmountError": "※ Minimum withdrawal amount is 40 USD.",
+    "balanceExceeded": "※ Exceeds your available balance.",
+    "passwordError": "※ Please enter a 6-digit numeric password.",
+    "agreeError": "※ You must agree to the withdrawal terms."
+  },
       "amountUsd":"amountUsd",
       "viewDetails":"Detail",
       "platformId":"platform ID",

@@ -33,6 +33,7 @@
 import AdminLayout from '@/components/AdminLayout.vue'
 import { ref, onMounted } from 'vue'
 import axios from '@/axiosAdmin'
+import '@/assets/style.css' 
 
 const totalUsers = ref(0)
 const pendingUsers = ref(0)
