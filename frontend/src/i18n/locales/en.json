@@ -1,0 +1,250 @@
+{
+  "nav": {
+    "home": "Home",
+    "trade": "Trade",
+    "recharge": "Recharge",
+    "withdraw": "Withdraw",
+    "history": "History",
+    "support": "Support",
+    "notice": "Notice",
+    "inquiry": "1:1 Inquiry",
+    "mypage": "My Page",
+    "messages": "Messages",
+    "guide": "Join Guide",
+    "login": "Login / Sign Up",
+    "logout": "Logout"
+  },
+    "footer": {
+    "exchangeLabel": "Live exchange rates (Base: USD)",
+    "dateLabel": "Date",
+    "inquiry": "Inquiry: 1:1 Board"
+  },
+  "charge": {
+  "title": "Recharge Request",
+  "selectCurrency": "Select Currency",
+  "selectPlatform": "Select Platform",
+  "selectPlaceholder": "-- Please select --",
+  "koreanWon": "Korean Won",
+  "philippinePeso": "Philippine Peso",
+  "usdt": "Tether (USDT)",
+  "platformId": "Platform ID",
+  "inputUsd": "Enter USD Amount",
+  "inputPlaceholder": "Enter $",
+  "totalSend": "Total Amount to Send",
+  "feeNote": "* Includes transaction fee.",
+  "viewDetails": "View Details",
+  "rate": "Exchange Rate (2% fee applied)",
+  "amountUsd": "$ Amount",
+  "totalConverted": "Total Transferred Amount",
+  "submit": "Submit Recharge",
+  "recentHistory": "Recent Recharge History",
+  "viewMore": "View More",
+  "date": "Date",
+  "currency": "Currency",
+  "amount": "Amount",
+  "statusth": "Status",
+  "noHistory": "No recent recharge history found.",
+  "alert": {
+    "fillAll": "Please fill out all fields.",
+    "minimumAmount": "The minimum charge amount is $40.",
+    "success": "Your charge request has been submitted.",
+    "error": "An error occurred during submission.",
+    "noExchange": "No exchange rate available for the selected currency.",
+    "rateFail": "Failed to retrieve exchange rate:",
+    "historyFail": "Failed to load charge history:"
+  },
+  "status": {
+    "pending": "Pending",
+    "completed": "Completed",
+    "rejected": "Rejected"
+  }
+},
+"history": {
+  "title": "My History",
+  "rechargeTab": "Recharge History",
+  "withdrawTab": "Withdraw History",
+    "platform": "Platform",
+  "platformId": "Platform ID",
+  "currency": "Currency",
+  "amount": "Amount",
+  "status": "Status",
+  "requestDate": "Requested At",
+  "approveDate": "Approved At",
+  "noRecharge": "No recharge history found.",
+  "wiHistory": "No withdrawal history found."
+},
+"home": {
+  "title": "Welcome to MyPoint",
+  "login": "Login",
+  "register": "Sign Up",
+  "logout": "Logout",
+  "notice": "Notices",
+  "exchangeRate": "Exchange Rate",
+  "date": "Date", "external": {
+    "pokerbros": "PokerBros",
+    "xpoker": "X-Poker",
+    "ggclub": "GG Club"
+  }
+},
+"guide": {
+  "title": "Sign-up Guide",
+  "section": {
+    "required": "✅ Important Notes",
+    "warning": "⚠️ Warning Policy",
+    "withdraw": "💳 Withdrawal Info",
+    "rules": "🔒 Account Rules"
+  },
+  "approval": "🧾 Admin approval is required after sign-up.",
+  "platformLimit": "🛠️ Minimum 1, up to 4 platform IDs required.",
+  "realNamePhone": "📱 Real name and valid phone number required.",
+  "referral": "👥 Referral ID is required.",
+  "warningBlock": "🚫 3 accumulated warnings result in account blocking.",
+  "warningMsg": "📬 Warning messages are sent via your message inbox.",
+  "withdrawMessage": "🏦 A message with a virtual account is sent upon withdrawal request.",
+  "adminEditable": "🛠️ Admin may update this info at any time.",
+  "oneAccount": "One account per person.",
+  "falseInfo": "False information may lead to restrictions."
+},
+"login": {
+  "title": "Login",
+  "username": "ID",
+  "password": "Password",
+  "loginButton": "Login",
+  "registerButton": "Sign Up"
+},
+"messages": {
+  "title": "My Messages",
+  "subject": "Subject",
+  "date": "Date",
+  "status": "Status",
+  "read": "Read",
+  "unread": "Unread",
+  "noMessages": "You have no messages yet."
+},
+"mypage": {
+  "title": "My Page",
+  "myInfo": "My Information",
+  "username": "Username",
+  "realName": "Name",
+  "referral": "Referral ID",
+  "warningCount": "Warning Count",
+  "language": "Language",
+  "bankName": "Bank Name",
+  "bankAccount": "Bank Account",
+  "linkedPlatforms": "Linked Platforms",
+  "platformName": "Platform Name",
+  "platformId": "Platform ID"
+},"notice": {
+"backToList":"List"
+},
+"register": {
+  "title": "Sign Up",
+  "username": "Username *",
+  "usernamePlaceholder": "5–20 characters, letters and numbers only",
+  "checkAvailability": "Check Availability",
+  "password": "Password *",
+  "confirmPassword": "Confirm Password *",
+  "passwordPlaceholder": "At least 8 characters, must include both letters and numbers",
+  "passwordMismatch": "Passwords do not match.",
+  "realName": "Full Name *",
+  "phone": "Mobile Number *",
+  "verifyCode": "Verify Code",
+  "codePlaceholder": "Enter verification code",
+  "codeInvalid": "Verification code is incorrect.",
+  "referral": "Referral ID",
+  "bankName": "Bank Name",
+  "bankAccount": "Bank Account Number",
+  "platform": "Platform ID *",
+  "addPlatform": "+",
+  "removePlatform": "X",
+  "submit": "Sign Up",
+  "login": "Log In",
+  "alert": {
+    "usernameAvailable": "Username is available.",
+    "usernameTaken": "Username is already taken.",
+    "checkError": "Error while checking username.",
+    "emptyUsername": "Please enter a username.",
+    "passwordMismatch": "Passwords do not match.",
+     "selectPlatformFirst": "Please select a platform first.",
+    "noDuplicatePlatform": "You cannot select the same platform more than once.",
+    "enterAllPlatformInfo": "Please enter all platform information.",
+    "registrationSuccess": "Registration completed. Please wait for admin approval.",
+    "registrationFail": "Registration failed.",
+    "enterUsername": "Please enter a username.",
+    "success": "Registration complete. Please wait for admin approval.",
+    "fail": "Registration failed."
+  }
+},"inquiry": {
+      "list": {
+        "title": "1:1 Inquiry List",
+        "newInquiry": "New Inquiry",
+        "noInquiry": "No 1:1 inquiry history available."
+      },
+      "detail": {
+        "title": "1:1 Inquiry Details",
+        "content": "Inquiry Content:",
+        "adminAnswerTitle": "📬 Admin Response",
+        "noAnswer": "No response has been posted yet."
+      },
+      "write": {
+        "title": "Submit Inquiry",
+        "select": "Select",
+        "submit": "Submit Inquiry",
+        "success": "Your inquiry has been submitted.",
+        "placeholder": "Please enter your inquiry details",
+        "fail": "Failed to submit your inquiry."
+        }
+        ,
+      "common": {
+        "subject": "Subject",
+        "category": "Category",
+        "status": "Status",
+        "createdAt": "Created At"
+      },
+      "category": {
+        "charge": "Recharge",
+        "withdraw": "Withdraw",
+        "account": "Account",
+        "etc": "Others"
+      },
+      "status": {
+        "answered": "Answered",
+        "pending": "Pending"
+      }
+    },"withdraw": {
+    "title": "💸 Withdrawal Request",
+    "selectCurrency": "Select Currency",
+    "selectPlatform": "Select Platform",
+    "platformId": "Platform ID",
+    "amountInput": "$ Amount",
+    "expectedReceive": "Estimated Receive Amount ({currency})",
+    "viewDetails": "View Details",
+    "rateWithFee": "Exchange Rate (with 2% fee)",
+    "amountUsd": "Amount in USD",
+    "estimatedReceive": "Estimated Receive Amount",
+    "bankName": "Bank Name",
+    "bankAccount": "Bank Account Number",
+    "memoLabel": "Wallet Address / Memo",
+    "memoPlaceholder": "e.g., Enter wallet address or memo",
+    "onlyOwnAccount": "Only accounts under your name are allowed for deposits/withdrawals.",
+    "agreeCheck": "I have reviewed the information and confirm its accuracy.",
+    "submit": "Submit Withdrawal",
+    "recentWithdraw": "📋 Recent Withdrawals",
+    "noHistory": "No withdrawal history found."
+  },
+  "common": {
+    "select": "-- Select --",
+    "selectPrompt": "-- Please select --",
+    "date": "Date",
+    "currency": "Currency",
+    "status": "Status",
+    "more": "More"
+  },
+  "currency": {
+    "krw": "KRW",
+    "php": "PHP",
+    "usdt": "USDT"
+  }
+
+}
+ 
