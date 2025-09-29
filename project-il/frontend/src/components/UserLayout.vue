@@ -38,11 +38,11 @@
                 <router-link to="/wallet/withdraw" class="dropdown-item">{{ $t('nav.withdraw') }}</router-link>
                 <router-link to="/wallet/history" class="dropdown-item">{{ $t('nav.history') }}</router-link>
 
-                <!--외부 플랫폼 -->
+                <!--외부 플랫폼
                 <div class="dropdown-item" style="margin-top: 0.5rem;"><strong>{{ $t('platform.title') }}</strong></div>
                 <router-link to="/trade/recharge" class="dropdown-item">{{ $t('nav.recharge') }}</router-link>
                 <router-link to="/trade/withdraw" class="dropdown-item">{{ $t('nav.withdraw') }}</router-link>
-                <router-link to="/trade/history" class="dropdown-item">{{ $t('nav.history') }}</router-link>
+                <router-link to="/trade/history" class="dropdown-item">{{ $t('nav.history') }}</router-link> -->
 
                 <!-- 머니 이동 -->
                 <div class="dropdown-item" style="margin-top: 0.5rem;"><strong>{{ $t('transfer.title') }}</strong></div>

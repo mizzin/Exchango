@@ -103,29 +103,7 @@ function closeOverlay() {
 <template>
   <UserLayout>
 <!-- home.vue -->
-  <!-- 오픈 전 안내 오버레이 -->
-<!-- 퍼블리싱 오버레이 -->
-<div v-if="showOverlay" class="prelaunch-overlay">
-  <div class="bg-aurora"></div>
-  <div class="particle-bg">
-    <div class="particle" v-for="n in 30" :key="n" :style="{ '--i': Math.random() }"></div>
-  </div>
-  <div class="prelaunch-modal">
-    <div class="pulse-title">T R A N A S I A</div>
-    <h2>🎉 Official Launch: August 20 🎉</h2>
-    <p class="tagline"></p>
-    <p>We're coming soon — and we're coming strong. 💫</p>
-  </div>
-      <button
-      v-if="canClose"
-      class="close-btn"
-      @click="closeOverlay"
-    >✕</button>
-
-</div>
-
-
-    <div class="home">
+     <div class="home">
 
       <!-- 🔹 외부 링크 카드 영역 -->
       <section class="section-grid external-links">
@@ -144,7 +122,7 @@ function closeOverlay() {
       </section>
 
       <!-- 기존 공지사항 / 환율 -->
-      <section class="section-grid">
+      <section class="section-two-grid">
       <div class="card notice-card">
         <h2>📢 {{ $t('home.notice') }}</h2>
         <ul class="notice-list">
@@ -182,10 +160,16 @@ function closeOverlay() {
 /* 카드 그리드 정리 */
 .section-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
+.section-two-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 
 /* 카드 */
 .card {
@@ -295,18 +279,12 @@ function closeOverlay() {
   white-space: nowrap;
 }
 
-.notice-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
 
 .notice-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #eee;
   text-decoration: none;
   color: #333;
   transition: background 0.2s;
@@ -349,12 +327,90 @@ function closeOverlay() {
   margin-top: 1rem;
 }
 
+.notice-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+      padding: 0.4rem 1rem;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.2s;
+  font-size: 14px;
+}
+
+.notice-row .title {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 0.5rem;
+}
+
+.notice-row .date {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #888;
+}
+.notice-card {
+  padding: 1.5rem !important;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eee;
+}
+.notice-list{
+  padding: 0 !important;
+}
+.notice-list li {
+   white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #333;
+}
+.notice-list li:last-child {
+    border-bottom: none;
+  }
 @media screen and (max-width: 768px) {
-  .home {
+
+  .main {
   padding: 0.2rem;
 }
-  .card {
+.notice-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+      padding: 0.4rem 1rem;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.2s;
+  font-size: 14px;
+}
+.notice-list ul{
+  padding: 0 !important;
+  margin: 0 !important;
+}
+ .notice-list li {
     padding: 0 !important;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 14px;
+  }
+/* 카드 그리드 정리 */
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.section-two-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+  .section-two-grid .card {
+    padding: 1rem !important;
   }
 
   .card-img {
@@ -368,188 +424,41 @@ function closeOverlay() {
   .card-body {
     padding: 0.3rem 0.7rem;
   }
+  .notice-row:last-child {
+  border-bottom: none;
 }
-/* 오픈 전 안내 오버레이 */
-/* 전체 오버레이 */
-.prelaunch-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(10, 10, 20, 0.85);
-  backdrop-filter: blur(2px);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-
-@keyframes shineText {
-  0% { background-position: 0% }
-  100% { background-position: 200% }
-}
-
-/* 꽃가루 입자 애니메이션 */
-.particle-bg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.particle {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0));
-  border-radius: 50%;
-  opacity: 0.6;
-  animation: floatParticle 10s linear infinite;
-  top: 100%;
-  left: calc(100% * var(--i, 0.5));
-}
-
-.particle:nth-child(odd) {
-  background: radial-gradient(circle, #f5c542, rgba(255, 255, 255, 0));
-}
-.particle:nth-child(even) {
-  background: radial-gradient(circle, #ff84d4, rgba(255, 255, 255, 0));
-}
-
-.particle:nth-child(n) {
-  --i: calc(var(--random, 0.1) * 1.0);
-  animation-delay: calc(var(--i) * -10s);
-}
-
-/* 애니메이션 */
-@keyframes floatParticle {
-  0% {
-    transform: translateY(0) scale(0.5);
-    opacity: 0.8;
+  .notice-row {
+    padding: 0.5rem 1rem;
   }
-  50% {
-    opacity: 0.3;
+
+  .notice-row .title {
+    font-size: 1rem;
   }
-  100% {
-    transform: translateY(-120vh) scale(1.2);
-    opacity: 0;
+
+  .notice-row .date {
+    font-size: 12px;
+  }
+    .notice-card {
+    padding: 1rem !important;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid #eee;
+    background: #fff;
+  }
+    .notice-list li {
+        white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f2f2f2;
+    font-size: 14px;
+  }
+
+  .notice-list li:last-child {
+    border-bottom: none;
   }
 }
-@keyframes riseZoom {
-  0% {
-    transform: scale(0.9) translateY(30px);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
-}
-
-.prelaunch-modal {
-  animation: riseZoom 0.8s ease-out;
-}
-
-/* 중앙 모달 */
-.prelaunch-modal {
-  position: relative;
-  background: white;
-  padding: 2rem 2.5rem;
-  border-radius: 1.5rem;
-  z-index: 2;
-  text-align: center;
-  max-width: 450px;
-  width: 90%;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
-  animation: slideUpFade 1s ease-out;
-}
-
-/* 트렌디한 타이틀 */
-.pulse-title {
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: 1px;
-  margin-bottom: 1rem;
-  background: linear-gradient(90deg, #3c5ef0, #a5b8ff, #3c5ef0);
-  background-size: 200%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: shineText 3s linear infinite,  2s ease-in-out infinite;
-}
-
-
-.bg-aurora {
-  position: absolute;
-  width: 120%;
-  height: 120%;
-  background: radial-gradient(circle at 30% 30%, #3c5ef0 0%, transparent 60%),
-              radial-gradient(circle at 70% 70%, #ff4081 0%, transparent 60%);
-  animation: auroraMove 15s ease-in-out infinite;
-  z-index: 0;
-  opacity: 0.25;
-  filter: blur(80px);
-}
-
-@keyframes auroraMove {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-10%, -10%) rotate(30deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
-
-
-
-.drumroll {
-  font-family: monospace;
-  animation: drumrollWiggle 1s infinite;
-  color: #ff4081;
-  font-weight: bold;
-}
-
-@keyframes drumrollWiggle {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  50% { transform: translateX(2px); }
-  75% { transform: translateX(-1px); }
-  100% { transform: translateX(0); }
-}
-
-@keyframes slideUpFade {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* 반응형 */
-@media screen and (max-width: 480px) {
-  .prelaunch-modal {
-    padding: 1.5rem 1rem;
-  }
-  .pulse-title {
-    font-size: 1.4rem;
-  }
-}
-.close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(0,0,0,0.6);
-  border: none;
-  color: #fff;
-  font-size: 1.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  z-index: 1000;
+.rate-list-block{
+  margin: 0 !important;
 }
 </style>
