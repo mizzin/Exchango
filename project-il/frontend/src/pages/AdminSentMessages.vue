@@ -1,46 +1,52 @@
-
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from '@/axiosAdmin'
-import '@/assets/style.css' 
 import AdminLayout from '@/components/AdminLayout.vue'
+import '@/assets/style.css'
+
 const messages = ref([])
 const selected = ref(null)
 const searchUsername = ref('')
-const readFilter = ref('') // '', 'true', 'false'
+const readFilter = ref('') 
+
+const currentPage = ref(1)
+const totalPages = ref(1)
+const pageSize = 15
 
 const fetchMessages = async () => {
   const token = localStorage.getItem('admin_token')
-  const res = await axios.get('/admin/messages/sent', { 
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  messages.value = res.data.messages
+  try {
+    const res = await axios.get('/admin/messages/sent', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        page: currentPage.value,
+        limit: pageSize,
+        username: searchUsername.value,
+        readFilter: readFilter.value
+      }
+    })
+    messages.value = res.data.messages
+    totalPages.value = res.data.totalPages
+  } catch (err) {
+    console.error('❌ 메시지 불러오기 실패:', err)
+  }
 }
 
 const formatDate = date => new Date(date).toLocaleString()
 
-const filteredMessages = computed(() => {
-  return messages.value.filter(msg => {
-    const usernameMatch = msg.to_username.includes(searchUsername.value)
-    const readMatch =
-      readFilter.value === '' ||
-      (readFilter.value === 'true' && msg.is_read === 1) ||
-      (readFilter.value === 'false' && msg.is_read === 0)
-
-    return usernameMatch && readMatch
-  })
-})
+const changePage = (page) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  fetchMessages()
+}
 
 const viewMessage = (msg) => {
   selected.value = msg
 }
-onMounted(fetchMessages)
 
 const deleteMessage = async (id) => {
   if (!confirm('삭제하시겠습니까?')) return
-
-  const token = localStorage.getItem('admin_token') 
-
+  const token = localStorage.getItem('admin_token')
   try {
     await axios.delete(`/admin/messages/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -51,6 +57,8 @@ const deleteMessage = async (id) => {
     alert(err.response?.data?.message || '삭제 실패')
   }
 }
+
+onMounted(fetchMessages)
 </script>
 
 <template>
@@ -64,7 +72,9 @@ const deleteMessage = async (id) => {
           <option value="false">읽지 않음</option>
           <option value="true">읽음</option>
         </select>
+        <button @click="fetchMessages">검색</button>
       </div>
+
       <table>
         <thead>
           <tr>
@@ -78,20 +88,27 @@ const deleteMessage = async (id) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="msg in filteredMessages" :key="msg.id">
+          <tr v-for="msg in messages" :key="msg.id">
             <td>{{ msg.to_username }}</td>
             <td>{{ msg.subject }}</td>
             <td>{{ msg.language }}</td>
             <td>{{ formatDate(msg.created_at) }}</td>
             <td><button @click="viewMessage(msg)">보기</button></td>
             <td>{{ msg.is_read ? '읽음' : '읽지 않음' }}</td>
-            <td>
-              <button @click="deleteMessage(msg.id)">삭제</button>
-            </td>
+            <td><button @click="deleteMessage(msg.id)">삭제</button></td>
           </tr>
         </tbody>
       </table>
-  
+
+      <!-- 페이지네이션 -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">이전</button>
+        <span v-for="page in totalPages" :key="page">
+          <button :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
+        </span>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
+      </div>
+
       <div v-if="selected" class="popup">
         <h3>{{ selected.subject }}</h3>
         <p>{{ selected.content }}</p>
@@ -99,10 +116,51 @@ const deleteMessage = async (id) => {
       </div>
     </div>
   </AdminLayout>
-  </template>
+</template>
+
   
   <style scoped>
-  
+  .pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+.pagination button {
+  margin: 0 5px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #011257;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pagination button:hover {
+  background: #011257;
+}
+.pagination button.active {
+  font-weight: bold;
+  background-color: #4a6cf7;
+  color: #fff;
+  border: none;
+}
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+  .pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+.pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+}
+.pagination .active {
+  font-weight: bold;
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
   table {
     width: 100%;
     margin-top: 20px;

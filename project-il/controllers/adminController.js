@@ -381,6 +381,18 @@ exports.getWarnings = async (req, res) => {
 // 쪽지조회
 exports.getSentMessages = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 15
+    const offset = (page - 1) * limit
+
+    // 전체 개수
+    const [countRows] = await db.query(`
+      SELECT COUNT(*) AS total FROM messages
+    `)
+    const total = countRows[0].total
+    const totalPages = Math.ceil(total / limit)
+
+    // 데이터 조회
     const [rows] = await db.query(`
       SELECT 
         m.*,
@@ -390,15 +402,20 @@ exports.getSentMessages = async (req, res) => {
       JOIN users u       ON m.to_user_id   = u.id
       JOIN users sender  ON m.from_user_id = sender.id
       ORDER BY m.created_at DESC
-    `);
+      LIMIT ? OFFSET ?
+    `, [limit, offset])
 
-    res.json({ messages: rows });
+    res.json({
+      messages: rows,
+      total,
+      totalPages,
+      currentPage: page
+    })
   } catch (err) {
-    console.error('❌ 보낸 쪽지 조회 오류:', err);
-    res.status(500).json({ message: '보낸 쪽지 불러오기 실패' });
+    console.error('❌ 보낸 쪽지 조회 오류:', err)
+    res.status(500).json({ message: '보낸 쪽지 불러오기 실패' })
   }
-};
-
+}
 
 // 쪽지관리
 exports.getMessageTemplates = async (req, res) => {
@@ -454,9 +471,9 @@ exports.createNotice = async (req, res) => {
   }
 }
 
-//공지사항 조회
+// 공지사항 조회
 exports.getAllNotices = async (req, res) => {
-  const limit = parseInt(req.query.limit) || 20
+  const limit = parseInt(req.query.limit) || 15
   const page = parseInt(req.query.page) || 1
   const offset = (page - 1) * limit
 
@@ -468,13 +485,21 @@ exports.getAllNotices = async (req, res) => {
 
     const [countResult] = await db.query('SELECT COUNT(*) AS total FROM notices')
     const total = countResult[0].total
+    const totalPages = Math.ceil(total / limit)   // ✅ 계산
 
-    res.json({ success: true, notices, total })
+    res.json({ 
+      success: true, 
+      notices, 
+      total, 
+      totalPages: Math.ceil(total / limit), 
+      currentPage: page // 있으면 프론트에서 편함
+    })
   } catch (err) {
     console.error('❌ 공지 목록 조회 실패:', err)
     res.status(500).json({ success: false, message: '공지 목록 조회 실패' })
   }
 }
+
 exports.deleteNotice = async (req, res) => {
   const noticeId = req.params.id
   try {
