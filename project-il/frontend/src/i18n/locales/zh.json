@@ -16,8 +16,26 @@
   },"alert": {
   "pendingMoneyRequest": "您有尚未处理的资金相关申请。",
   "pendingRequestWithAction": "您有正在处理中申请。请在提交新申请前查看状态。",
-  "checkStatus": "查看状态"
+  "checkStatus": "查看状态",
+   "emptyFields": "请输入用户名和邮箱。",
+    "linkSent": "重置链接已发送到您的邮箱。",
+    "requestFailed": "请求失败"
+},"reset": {
+  "invalidAccess": "无效的访问。",
+  "minLength": "密码长度必须至少 8 位。",
+  "mismatch": "两次输入的密码不一致。",
+  "success": "密码已重置，请重新登录。",
+  "failed": "重置失败",
+  "verifying": "验证中...",
+  "tokenExpired": "令牌无效或已过期。",
+  "backToLogin": "← 返回登录",
+  "newPassword": "新密码",
+  "confirmPassword": "确认新密码",
+  "placeholderMin": "至少 8 位",
+  "placeholderConfirm": "再次输入",
+  "changeButton": "更改密码"
 }
+
 ,"transfer": { 
     "request1": {
     "title": "资金转移申请",
@@ -363,7 +381,8 @@
     "pending_exists": "您已有未回复的提问，请等待回复后再提交新的提问。",
     "create_failed": "提交提问时发生错误。"
   }
-    },  "withdraw": {  "wallet": {
+    },  "withdraw": {  
+      "wallet": {
     "title": "钱包提现",
     "selectError": "※ 请选择货币。",
     "minAmountError": "※ 最低提现金额为40美元。",
@@ -419,7 +438,9 @@
     "date": "日期",
     "currency": "货币",
     "status": "状态",
-    "more": "更多"
+    "more": "更多",
+        "sending": "发送中...",
+    "cancel": "取消"
   },
   "currency": {
     "krw": "韩元",

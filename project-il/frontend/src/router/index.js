@@ -20,7 +20,11 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('@/pages/Login.vue')
-  },
+  },{
+  path: '/reset-password',
+  name: 'ResetPassword',
+  component: () => import('@/pages/ResetPassword.vue')
+},
   {
     path: '/',
     name: 'Home',

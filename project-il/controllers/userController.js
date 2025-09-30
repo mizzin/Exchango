@@ -4,6 +4,7 @@ const userModel = require('../models/userModel');
 const messageModel = require('../models/messageModel');
 const jwt = require('jsonwebtoken');
 console.log('📦 userController 시작');
+
 const sendTelegramMessage = require('../utils/telegram')
 const db = require('../db');
 

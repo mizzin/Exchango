@@ -31,6 +31,7 @@ app.use((req, res, next) => {
 // ✅ 정적 파일 서빙 (딱 한 번만!)
 app.use(express.static(distPath));
 
+
 // ✅ API 경로는 /api 하위로만!
 app.use('/api/users', require('./routes/user'));
 app.use('/api/platforms', require('./routes/platformRoutes'));
@@ -43,6 +44,9 @@ app.use('/api/exchange-rate', exchangeRateRouter);
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/auth', require('./routes/auth'));
+
+app.use('/api', require('./routes/passwordReset'))
+
 // ✅ 업로드 파일 서빙
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use((req, res, next) => {

@@ -5022,3 +5022,107 @@
 [2025-09-30 04:05:11] [info] ➡️ GET /admin/notice 요청 from ::1
 [2025-09-30 04:05:11] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
 [2025-09-30 04:05:12] [info] ➡️ GET /api/admin/notices?page=1&limit=15 요청 from ::1
+[2025-09-30 04:06:44] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 04:06:48] [info] ➡️ GET /admin/notice 요청 from ::1
+[2025-09-30 04:06:48] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 04:06:48] [info] ➡️ GET /api/admin/notices?page=1&limit=15 요청 from ::1
+[2025-09-30 04:06:52] [info] ➡️ GET /api/admin/notices?page=2&limit=15 요청 from ::1
+[2025-09-30 04:06:53] [info] ➡️ GET /api/admin/notices?page=1&limit=15 요청 from ::1
+[2025-09-30 04:07:34] [info] ➡️ GET /admin/notice 요청 from ::1
+[2025-09-30 04:07:34] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 04:07:35] [info] ➡️ GET /api/admin/notices?page=1&limit=15 요청 from ::1
+[2025-09-30 04:47:50] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 04:47:53] [info] ➡️ GET / 요청 from ::1
+[2025-09-30 04:47:53] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 04:47:55] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 04:47:55] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 04:47:55] [info] ➡️ GET /api/users/notices?limit=3&lang=ko 요청 from ::1
+[2025-09-30 04:47:58] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 04:48:10] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 04:48:10] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 04:48:11] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 04:52:49] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 04:52:49] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 04:52:49] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 04:54:16] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:00:14] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:00:14] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:00:16] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:00:30] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:04:11] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:04:11] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:04:11] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:04:22] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:04:54] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:04:58] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:04:58] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:04:59] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:05:09] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:11:03] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:11:10] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:11:10] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:11:11] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:11:29] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:13:55] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:13:55] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:13:56] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:14:04] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:15:57] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:16:04] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:16:04] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:16:05] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:16:13] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:20:09] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:20:09] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:20:10] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:20:31] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:23:55] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:23:55] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:23:56] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:24:08] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:24:44] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:24:46] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:24:46] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:24:46] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:25:07] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:25:09] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:25:10] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:25:11] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:25:17] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:25:17] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:25:18] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:25:54] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:25:54] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:25:55] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:26:03] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:27:57] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:28:06] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:28:06] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:28:07] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:28:22] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:29:26] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:29:26] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:29:26] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:29:27] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:29:39] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:30:33] [info] ➡️ GET /reset-password?token=9c236f8279eec4c13f8ed81c98c2b149d15b330b885ad8c98d55f24f7a75acca 요청 from ::1
+[2025-09-30 05:30:33] [info] ➡️ GET /api/auth/reset?token=9c236f8279eec4c13f8ed81c98c2b149d15b330b885ad8c98d55f24f7a75acca 요청 from ::1
+[2025-09-30 05:30:49] [info] ➡️ POST /api/auth/reset 요청 from ::1
+[2025-09-30 05:30:50] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:30:56] [info] ➡️ POST /api/users/login 요청 from ::1
+[2025-09-30 05:30:56] [info] ➡️ GET /api/users/info 요청 from ::1
+[2025-09-30 05:30:56] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:30:56] [info] ➡️ GET /api/users/notices?limit=3&lang=ko 요청 from ::1
+[2025-09-30 05:30:57] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:33:38] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:33:38] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:33:38] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:33:38] [info] ➡️ GET /api/users/info 요청 from ::1
+[2025-09-30 05:36:28] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 05:36:35] [info] ➡️ GET /login 요청 from ::1
+[2025-09-30 05:36:35] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 05:36:37] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 05:36:37] [info] ➡️ GET /api/users/info 요청 from ::1
+[2025-09-30 05:36:51] [info] ➡️ POST /api/auth/forgot 요청 from ::1
+[2025-09-30 05:37:08] [info] ➡️ GET /reset-password?token=e3f6824a1692dbc40e58a618091c9cf39de53cc29378a765670fad4b8276484c 요청 from ::1
+[2025-09-30 05:37:08] [info] ➡️ GET /api/auth/reset?token=e3f6824a1692dbc40e58a618091c9cf39de53cc29378a765670fad4b8276484c 요청 from ::1

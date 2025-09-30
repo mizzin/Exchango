@@ -7,7 +7,24 @@
 },"alert": {
   "pendingMoneyRequest": "未処理のマネー関連申請があります。",
   "pendingRequestWithAction": "申請が保留中です。新しい申請の前にステータスを確認してください。",
-  "checkStatus": "ステータス確認"
+  "checkStatus": "ステータス確認", "emptyFields": "ユーザーIDとメールアドレスを入力してください。",
+    "linkSent": "再設定リンクをメールで送信しました。",
+    "requestFailed": "リクエストに失敗しました"
+}
+,"reset": {
+  "invalidAccess": "不正なアクセスです。",
+  "minLength": "パスワードは8文字以上で入力してください。",
+  "mismatch": "パスワードが一致しません。",
+  "success": "パスワードが再設定されました。再度ログインしてください。",
+  "failed": "再設定に失敗しました",
+  "verifying": "検証中...",
+  "tokenExpired": "トークンが無効または期限切れです。",
+  "backToLogin": "← ログインに戻る",
+  "newPassword": "新しいパスワード",
+  "confirmPassword": "新しいパスワード（確認）",
+  "placeholderMin": "8文字以上",
+  "placeholderConfirm": "再入力",
+  "changeButton": "パスワードを変更"
 }
 ,"transfer": {
   "request1": {
@@ -218,8 +235,15 @@
   "username": "ID",
   "password": "パスワード",
   "loginButton": "ログイン",
-  "registerButton": "新規登録"
-},"notice": {
+  "registerButton": "新規登録",
+  "forgotPassword": "パスワードを忘れた場合"
+},
+  "forgot": {
+    "title": "パスワード再設定",
+    "desc": "ユーザーIDとメールアドレスを入力すると、再設定リンクをメールで送信します。",
+    "sendLink": "再設定リンクを送信",
+    "hint": "本人確認のためメール認証を完了してください。"
+  },"notice": {
 "backToList":"一覧に戻る"
 },
 "messages": {
@@ -355,7 +379,9 @@
         "subject": "件名",
         "category": "カテゴリー",
         "status": "ステータス",
-        "createdAt": "作成日"
+        "createdAt": "作成日",
+            "sending": "送信中...",
+    "cancel": "キャンセル"
       },
       "category": {
             "money": "入出金／資金移動",

@@ -220,3 +220,27 @@ CREATE TABLE notifications (
   is_read BOOLEAN DEFAULT FALSE,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  token_hash CHAR(64) NOT NULL,         -- sha256 해시
+  expires_at DATETIME NOT NULL,         -- NOW() + INTERVAL 15 MINUTE
+  used_at DATETIME DEFAULT NULL,
+  ip VARCHAR(45),
+  ua VARCHAR(255),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX (user_id),
+  INDEX (token_hash),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  event ENUM('request','verify_ok','verify_fail','reset_ok','reset_fail') NOT NULL,
+  ip VARCHAR(45),
+  ua VARCHAR(255),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX (user_id)
+);

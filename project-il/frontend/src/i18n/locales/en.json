@@ -8,8 +8,27 @@
 "alert": {
   "pendingMoneyRequest": "You have a pending money-related request.",
   "pendingRequestWithAction": "You have a pending request. Please check status before submitting a new one.",
-  "checkStatus": "Check status"
-},
+  "checkStatus": "Check status",
+      "emptyFields": "Please enter your username and email.",
+    "linkSent": "A reset link has been sent to your email.",
+    "requestFailed": "Request failed"
+
+},"reset": {
+  "invalidAccess": "Invalid access.",
+  "minLength": "Password must be at least 8 characters.",
+  "mismatch": "Passwords do not match.",
+  "success": "Your password has been reset. Please log in again.",
+  "failed": "Reset failed",
+  "verifying": "Verifying...",
+  "tokenExpired": "The token is invalid or has expired.",
+  "backToLogin": "← Back to login",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm New Password",
+  "placeholderMin": "At least 8 characters",
+  "placeholderConfirm": "Re-enter",
+  "changeButton": "Change Password"
+}
+,
 "transfer": { "request1": {
     "title": "Money Transfer Request",
     "moveType": "Select Transfer Type",
@@ -226,8 +245,15 @@
   "username": "ID",
   "password": "Password",
   "loginButton": "Login",
-  "registerButton": "Sign Up"
-},
+  "registerButton": "Sign Up",
+  "forgotPassword": "Forgot Password?"
+}, 
+ "forgot": {
+    "title": "Forgot Password",
+    "desc": "Enter your username and email, and we'll send you a reset link.",
+    "sendLink": "Send Reset Link",
+    "hint": "You must verify your email to confirm your identity."
+  },
 "messages": {
   "title": "My Messages",
   "subject": "Subject",
@@ -444,7 +470,6 @@
     "agree": "Please confirm the accuracy of your withdrawal information.",
     "fillAll": "Please fill out all required fields.",
     "minimumAmount": "The minimum withdrawal amount is $40.",
-    "success": "Your withdrawal request has been submitted.",
     "error": "An error occurred while submitting your request.",
     "noExchange": "No exchange rate available for the selected currency.",
     "rateFail": "Failed to retrieve exchange rate:",
@@ -461,5 +486,9 @@
     "completed": "Completed",
     "rejected": "Rejected"
   }
-    }
+    },
+      "common": {
+    "sending": "Sending...",
+    "cancel": "Cancel"
+  }
   }
