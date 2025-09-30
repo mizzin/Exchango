@@ -1,20 +1,47 @@
 <template>
-   <div class="mypage-info" v-if="user">
+  <div class="mypage-info" v-if="user">
+    <!-- 잔액 -->
     <div class="balance-box">
-      💰 <p v-if="user">{{ $t('mypage.balance') }}: {{ user.balance ?? 0 }} USD</p>
+      <div class="balance-icon">💰</div>
+      <div class="balance-text">
+        <p class="label">{{ $t('mypage.balance') }}</p>
+        <p class="amount">{{ user.balance ?? 0 }} USD</p>
+      </div>
     </div>
 
+    <!-- 회원정보 -->
     <div class="info-box">
       <h3>{{ $t('mypage.userInfo') }}</h3>
-      <ul>
-        <li><span>{{ $t('mypage.username') }}</span> {{ user.username }}</li>
-        <li><span>{{ $t('mypage.realName') }}</span> {{ user.real_name || '-' }}</li>
-        <li><span>{{ $t('mypage.recommender') }}</span> {{ user.recommender || '-' }}</li>
-        <li><span>{{ $t('mypage.warningCount') }}</span> {{ user.warning_count }}</li>
-        <li><span>{{ $t('mypage.language') }}</span> {{ user.language }}</li>
-        <li><span>{{ $t('mypage.bankName') }}</span> {{ user.bank_name || '-' }}</li>
-        <li><span>{{ $t('mypage.bankAccount') }}</span> {{ user.bank_account || '-' }}</li>
-      </ul>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">{{ $t('mypage.username') }}</span>
+          <span class="value">{{ user.username }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">{{ $t('mypage.realName') }}</span>
+          <span class="value">{{ user.real_name || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">{{ $t('mypage.recommender') }}</span>
+          <span class="value">{{ user.recommender || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">{{ $t('mypage.warningCount') }}</span>
+          <span class="value">{{ user.warning_count }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">{{ $t('mypage.language') }}</span>
+          <span class="value">{{ user.language }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">{{ $t('mypage.bankName') }}</span>
+          <span class="value">{{ user.bank_name || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">{{ $t('mypage.bankAccount') }}</span>
+          <span class="value">{{ user.bank_account || '-' }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -24,37 +51,76 @@ defineProps({ user: Object })
 </script>
 
 <style scoped>
-
+/* 💰 보유 금액 */
 .balance-box {
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  background: #f4f6ff;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.05);
+}
+
+.balance-icon {
+  font-size: 2rem;
+  margin-right: 0.8rem;
+}
+
+.balance-text .label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.balance-text .amount {
+  font-size: 1.3rem;
   font-weight: bold;
   color: #3b49df;
-  margin-bottom: 20px;
-  background: #f4f6ff;
-  padding: 10px 16px;
-  border-left: 4px solid #3b49df;
 }
 
+/* 🧑 회원정보 */
 .info-box h3 {
-  font-size: 16px;
-  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
 }
 
-.info-box ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.info-box li {
-  padding: 6px 0;
-  border-bottom: 1px solid #eee;
+.info-item {
   display: flex;
   justify-content: space-between;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.info-box li span {
+.info-item:last-child{
+  border-bottom: none;
+}
+
+.info-item .label {
   font-weight: 500;
-  color: #333;
+  color: #555;
+}
+
+.info-item .value {
+  font-weight: 600;
+  color: #222;
+}
+
+/* 📱 모바일 */
+@media (max-width: 768px) {
+  .balance-text .amount {
+    font-size: 1.1rem;
+  }
+  .info-item {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.6rem;
+  }
 }
 </style>

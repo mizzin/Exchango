@@ -1,17 +1,46 @@
 <template>
   <div class="mypage-section">
-    <h3>🔒{{ $t('mypage.changePassword') }}</h3>
-    <form @submit.prevent="submit">
-    <input type="password" v-model="currentPassword" :placeholder="$t('mypage.currentPassword')" />
-    <input type="password" v-model="newPassword" :placeholder="$t('mypage.newPassword')" />
-    <input type="password" v-model="confirmNewPassword" :placeholder="$t('mypage.confirmNewPassword')" />
-    <button @click="changePassword">{{ $t('mypage.common.save') }}</button>
+
+    <form @submit.prevent="changePassword">
+      <div class="form-group">
+        <label>{{ $t('mypage.currentPassword') }}</label>
+        <input
+          type="password"
+          v-model="currentPassword"
+          :placeholder="$t('mypage.currentPassword')"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>{{ $t('mypage.newPassword') }}</label>
+        <input
+          type="password"
+          v-model="newPassword"
+          :placeholder="$t('mypage.newPassword')"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>{{ $t('mypage.confirmNewPassword') }}</label>
+        <input
+          type="password"
+          v-model="confirmNewPassword"
+          :placeholder="$t('mypage.confirmNewPassword')"
+        />
+      </div>
+
+      <button type="submit" :disabled="loading">
+        {{ loading ? $t('common.saving') : $t('mypage.common.save') }}
+      </button>
     </form>
+
     <!-- 안내 문구 -->
-  <p class="notice-text">{{ $t('mypage.moneyPasswordHelp') }}</p>
+    <div class="notice-box">
+      ⚠️ {{ $t('mypage.moneyPasswordHelp') }}
+    </div>
   </div>
-  
 </template>
+
 <script setup>
 import { ref } from 'vue'
 import axios from '@/axiosUser'
@@ -21,88 +50,87 @@ const { t } = useI18n()
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmNewPassword = ref('')
+const loading = ref(false)
 
-const token = localStorage.getItem('token') // 예시로 추가 (token 필요 시)
+const token = localStorage.getItem('token')
 
 const changePassword = async () => {
   if (newPassword.value !== confirmNewPassword.value) {
     alert(t('mypage.passwordMismatch'))
     return
   }
-
+  loading.value = true
   try {
-    await axios.patch('/users/password', {
-      currentPassword: currentPassword.value,
-      newPassword: newPassword.value
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    await axios.patch(
+      '/users/password',
+      {
+        currentPassword: currentPassword.value,
+        newPassword: newPassword.value
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
     alert(t('mypage.passwordChanged'))
     currentPassword.value = ''
     newPassword.value = ''
     confirmNewPassword.value = ''
   } catch (err) {
     alert(err.response?.data?.message || t('mypage.passwordChangeFailed'))
+  } finally {
+    loading.value = false
   }
 }
 </script>
 
-
 <style scoped>
-.mypage-section {
-  max-width: 460px;
-  margin: 0 auto;
-  padding: 10px 20px;
-  background-color: #fff;
-  border-radius: 12px;
-}
 
-.mypage-section h3 {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-.mypage-section form {
+.form-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  color: #555;
 }
 
 .mypage-section input {
-  padding: 12px;
-  border: 1px solid #ccc;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 14px;
-  width: 100%;
+  font-size: 0.95rem;
 }
 
 .mypage-section button {
-  background-color: #007BFF;
+  width: 100%;
+  background-color: #007bff;
   color: white;
   border: none;
   padding: 12px;
   border-radius: 6px;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 0.95rem;
   transition: background-color 0.2s ease;
-  margin-top: 10px;
   cursor: pointer;
 }
 
-.mypage-section button:hover {
+.mypage-section button:hover:not(:disabled) {
   background-color: #0056c7;
 }
-.notice-text{
-  font-size: 14px;
-  color: crimson;
-}
-button.disabled {
+
+.mypage-section button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-  opacity: 0.6;
+}
+
+.notice-box {
+  margin-top: 1.2rem;
+  padding: 0.75rem 1rem;
+  background: #fff5f5;
+  color: #c53030;
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 </style>
