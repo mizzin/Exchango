@@ -81,7 +81,7 @@
     <button class="btn btn-dark w-100 mt-3" @click="selected = null">닫기</button>
   </div>
 </div>
-
+ 
     </div>
   </AdminLayout>
 </template>
