@@ -24,7 +24,11 @@ exports.sendEmailCode = async (req, res) => {
     await db.query(`
       INSERT INTO email_verifications (email, code, expires_at)
       VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE code = VALUES(code), expires_at = VALUES(expires_at)
+      ON DUPLICATE KEY UPDATE 
+      code = VALUES(code), 
+      expires_at = VALUES(expires_at),
+          created_at = CURRENT_TIMESTAMP
+
     `, [email, code, expiry]);
   await sendVerificationEmail(email, code, lang); //
     // 메일 발송은 추후에, 지금은 콘솔 출력
@@ -47,7 +51,7 @@ exports.verifyEmailCode = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT code, expires_at FROM email_verifications WHERE email = ?', [email]);
     if (rows.length === 0) {
-      return res.status(400).json({ message: 'Verification info not found.' });
+      return res.status(400).json({ message: 'Verification info not found. LIMIT 1' });
     }
 
     const { code: storedCode, expires_at } = rows[0];
@@ -59,6 +63,9 @@ exports.verifyEmailCode = async (req, res) => {
     if (code !== storedCode) {
       return res.status(400).json({ message: 'Incorrect code.' });
     }
+
+// ✅ 인증 성공 시 row 삭제 먼저
+await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);
 
     return res.status(200).json({ message: 'Email verified successfully.' });
   } catch (err) {

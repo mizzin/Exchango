@@ -5126,3 +5126,32 @@
 [2025-09-30 05:36:51] [info] ➡️ POST /api/auth/forgot 요청 from ::1
 [2025-09-30 05:37:08] [info] ➡️ GET /reset-password?token=e3f6824a1692dbc40e58a618091c9cf39de53cc29378a765670fad4b8276484c 요청 from ::1
 [2025-09-30 05:37:08] [info] ➡️ GET /api/auth/reset?token=e3f6824a1692dbc40e58a618091c9cf39de53cc29378a765670fad4b8276484c 요청 from ::1
+[2025-09-30 19:24:36] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 19:24:51] [info] ➡️ GET / 요청 from ::1
+[2025-09-30 19:24:51] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:24:51] [info] ➡️ GET /api/users/notices?limit=3&lang=ko 요청 from ::1
+[2025-09-30 19:24:52] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:25:00] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 19:25:07] [info] ➡️ GET / 요청 from ::1
+[2025-09-30 19:25:07] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:25:07] [info] ➡️ GET /api/users/notices?limit=3&lang=ko 요청 from ::1
+[2025-09-30 19:25:08] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:25:09] [info] ➡️ GET / 요청 from ::1
+[2025-09-30 19:25:09] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:25:09] [info] ➡️ GET /api/users/notices?limit=3&lang=ko 요청 from ::1
+[2025-09-30 19:25:09] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:25:38] [info] 🚀 서버 실행 중: http://localhost:3000
+[2025-09-30 19:25:40] [info] ➡️ GET / 요청 from ::1
+[2025-09-30 19:25:40] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:25:40] [info] ➡️ GET /api/users/notices?limit=3&lang=ko 요청 from ::1
+[2025-09-30 19:25:41] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:25:46] [info] ➡️ GET /.well-known/appspecific/com.chrome.devtools.json 요청 from ::1
+[2025-09-30 19:35:58] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:35:59] [info] ➡️ GET /api/platforms?lang=ko 요청 from ::1
+[2025-09-30 19:35:59] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:36:15] [info] ➡️ POST /api/auth/send-email-code 요청 from ::1
+[2025-09-30 19:36:27] [info] ➡️ POST /api/auth/send-email-code 요청 from ::1
+[2025-09-30 19:37:55] [info] ➡️ GET /register 요청 from ::1
+[2025-09-30 19:37:58] [info] ➡️ GET /api/exchange-rate 요청 from ::1
+[2025-09-30 19:37:58] [info] ➡️ GET /api/platforms?lang=ko 요청 from ::1
+[2025-09-30 19:38:09] [info] ➡️ POST /api/auth/send-email-code 요청 from ::1
