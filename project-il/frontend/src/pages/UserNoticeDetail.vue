@@ -72,72 +72,85 @@ onMounted(fetchNotice)
 .notice-detail {
   max-width: 720px;
   margin: auto;
-  padding: 1rem;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .notice-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-  color: #333;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
+
 .notice-meta {
-  font-size: 0.85rem;
-  color: #888;
-  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1.2rem;
   border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.6rem;
 }
 
 .notice-content {
   font-size: 1rem;
-  line-height: 1.6;
-  color: #444;
-  padding-bottom: 2rem;
-  white-space: pre-wrap;
+  line-height: 1.7;
+  color: #333;
+  
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
 }
 
 .notice-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.6rem;
   border-top: 1px solid #eee;
   padding-top: 1rem;
 }
 
 .nav-item {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   background: #f8f9fb;
-  padding: 0.8rem;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
   text-decoration: none;
   color: #333;
-  transition: background 0.2s ease;
+  font-size: 0.95rem;
+  transition: 0.2s;
 }
+
 .nav-item:hover {
-  background: #eef1f4;
+  background: #eef3ff;
+  border-left: 4px solid #5a75f0;
 }
 .nav-item .date {
   font-size: 0.8rem;
-  color: #777;
-  margin-top: 0.3rem;
+  color: #888;
 }
-
 .btn-back {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: #007BFF;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: 1px solid #5a75f0;
+  color: #5a75f0;
   font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
   cursor: pointer;
-  margin-top: 0.8rem;
-  padding: 0;
+  transition: 0.2s;
 }
 .btn-back:hover {
-  text-decoration: underline;
+  background: #eef3ff;
 }
 
 @media (max-width: 600px) {

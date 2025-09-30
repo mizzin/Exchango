@@ -372,6 +372,9 @@ const toggleMenu = () => {
   font-weight: 600;
 }
 @media (max-width: 768px) {
+   .main {
+    padding: 0.5rem 0; /* 모바일에선 여백 줄이기 */
+  }
   .user-balance {
     display: none; /* PC 전용 */
   }

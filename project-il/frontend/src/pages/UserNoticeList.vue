@@ -63,7 +63,6 @@ onMounted(fetchNotices)
 .title {
   font-size: 1.4rem;
   font-weight: bold;
-  text-align: center;
   margin-bottom: 1rem;
 }
 
@@ -101,13 +100,33 @@ onMounted(fetchNotices)
 
 .date {
   font-size: 0.85rem;
-  color: #777;
+  color: #666;
 }
 
-@media (max-width: 600px) {
-  .card {
-    padding: 0.8rem;
+@media (max-width: 768px) {
+  .date{
+  margin: 0 !important;
   }
+  .container {
+        padding: 1rem 0;
+    }
+  .notice-list-container{
+    padding: 0 !important;
+  }
+  .title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.4rem;
+    margin-top: 0.5rem;
+    color: #333;
+  }
+  .card {
+    padding: 1rem;
+  }
+  
+  }
+@media (max-width: 600px) {
+  
   .card-title {
     font-size: 1rem;
   }

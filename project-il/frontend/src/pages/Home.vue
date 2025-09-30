@@ -375,9 +375,6 @@ function closeOverlay() {
   }
 @media screen and (max-width: 768px) {
 
-  .main {
-  padding: 0.2rem;
-}
 .notice-row {
   display: flex;
   justify-content: space-between;
