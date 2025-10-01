@@ -112,7 +112,7 @@ const submit = async () => {
     currency.value = ''
     localAmount.value = 0
     usdAmount.value = 0
-    alert(t('withdraw.alert.success'))
+    alert(t('withdraw.alert.success')) 
     window.location.reload() 
   } catch (e) {
     console.error(e)
