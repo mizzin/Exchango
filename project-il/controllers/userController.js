@@ -237,11 +237,14 @@ exports.register = async (req, res) => {
     if (Array.isArray(platforms) && platforms.length > 0) {
       await userModel.insertUserPlatforms(userId, platforms);
     }
-
-    // 📢 텔레그램 알림 보내기 (여기 추가!)
-    await sendTelegramMessage(
-      `[회원가입]\n아이디: ${username}\n이메일: ${email}\n전화번호: ${phone}\n언어국가${language}`
-    );
+    // 📢 텔레그램 알림 보내기
+    try {
+      await sendTelegramMessage(
+        `[회원가입]\n아이디: ${username}\n이메일: ${email}\n전화번호: ${phone}\n언어국가 ${language}`
+      );
+    } catch (notifyErr) {
+      console.error("⚠️ Telegram 전송 실패:", notifyErr.message);
+    }
 
     // 9. 인증 기록 삭제 (선택)
     await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);

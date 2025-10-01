@@ -140,8 +140,6 @@ const removePlatform = (index) => {
 
 
  const handleRegister = async () => {
-    console.log("🚀 handleRegister 시작")
-  console.log("emailVerified 상태:", emailVerified.value)
 
   if (!emailVerified.value) {
     alert(t('register.alert.verifyEmailFirst'))
@@ -190,7 +188,7 @@ const payload = {
   platforms: cleanPlatforms,
   referral_id: form.referral_id || null 
 }
-console.log("📦 최종 회원가입 payload:", payload)
+
 
   try {
     await axios.post('/users/register', payload)
