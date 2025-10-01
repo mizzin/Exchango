@@ -101,8 +101,6 @@ onMounted(fetchNotice)
   font-size: 1rem;
   line-height: 1.7;
   color: #333;
-  
-  padding: 1rem;
   border-radius: 8px;
   margin-bottom: 2rem;
 }

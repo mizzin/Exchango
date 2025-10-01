@@ -51,6 +51,54 @@ onMounted(() => {
   const quill = document.querySelector('.ql-editor')?.__quill
   if (!quill) return
 
+onMounted(() => {
+  const quill = document.querySelector('.ql-editor')?.__quill
+  if (!quill) return
+
+  const toolbar = quill.getModule('toolbar')
+
+  // 🔗 링크 핸들러 (기본 동작 대신 prompt 띄우기)
+  toolbar.handlers['link'] = function () {
+    const value = prompt('Enter the URL')
+    if (value) {
+      const range = quill.getSelection()
+      if (range) {
+        quill.format('link', value)
+      }
+    }
+  }
+
+  // 🖼️ 이미지 핸들러 (Base64 막고 서버 업로드 → URL 삽입)
+  toolbar.handlers['image'] = function () {
+    const input = document.createElement('input')
+    input.setAttribute('type', 'file')
+    input.setAttribute('accept', 'image/*')
+    input.click()
+
+    input.onchange = async () => {
+      const file = input.files[0]
+      if (!file) return
+
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const res = await axios.post('/api/upload/image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        const url = `${location.origin}${res.data.url}`
+
+        const range = quill.getSelection(true)
+        quill.insertEmbed(range.index, 'image', url, 'user')
+      } catch (err) {
+        alert('이미지 업로드 실패')
+      }
+    }
+  }
+})
+
+
+  // 🖼️ 이미지 핸들러
   quill.getModule('toolbar').addHandler('image', () => {
     const input = document.createElement('input')
     input.setAttribute('type', 'file')
@@ -59,21 +107,32 @@ onMounted(() => {
 
     input.onchange = async () => {
       const file = input.files[0]
+      if (!file) return
+
       const formData = new FormData()
       formData.append('file', file)
 
       try {
-        const res = await axios.post('/api/upload/image', formData)
+        const res = await axios.post('/api/upload/image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
         const url = `${location.origin}${res.data.url}`
-        const range = quill.getSelection()
-        quill.insertEmbed(range.index, 'image', url)
+
+        const range = quill.getSelection(true)
+
+        // ✅ URL 삽입만
+        quill.insertEmbed(range.index, 'image', url, 'user')
+
+        // ✅ Base64 기본 동작 막기
+        return false
       } catch (err) {
         alert('이미지 업로드 실패')
       }
     }
   })
-})
+}) // ✅ onMounted 닫기
 
+// 📌 공지 등록
 const submitNotice = async () => {
   if (!title.value.trim()) return alert('제목을 입력해주세요.')
   if (!content.value.trim()) return alert('내용을 입력해주세요.')
@@ -84,26 +143,11 @@ const submitNotice = async () => {
     language: language.value
   }
 
-  // 요청 크기 체크 (150KB 제한)
-  const size = new Blob([JSON.stringify(payload)]).size
-  const maxSize = 150 * 1024 // 150KB
-
-  if (size > maxSize) {
-    alert(`공지사항 크기가 너무 큽니다. 최대 ${maxSize / 1024}KB 이하로 작성해주세요. 현재 크기: ${(size / 1024).toFixed(2)}KB`)
-    return
-  }
-
-  console.log('Request payload size:', size);
-
   try {
     const token = localStorage.getItem('admin_token')
-    await axios.post(
-      '/admin/notices',
-      payload,
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    )
+    await axios.post('/admin/notices', payload, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
 
     alert('공지사항이 등록되었습니다.')
     router.push('/admin/notice')
@@ -113,6 +157,7 @@ const submitNotice = async () => {
   }
 }
 </script>
+
 
 <style scoped>
 .notice-input {

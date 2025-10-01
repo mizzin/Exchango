@@ -14,7 +14,12 @@ require('dotenv').config({ path: '.env.production.local' });
 // });
 
 const app = express();
-app.use(express.json());
+
+// ✅ Body 크기 제한 늘리기 (공지 + 이미지용)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+
 
 // ✅ Vue 빌드 디렉토리
 const distPath = path.resolve(__dirname, 'frontend', 'dist');
