@@ -252,7 +252,7 @@ const fetchExchangeRate = async () => {
   } else if (selectedCurrency.value === 'KRW') {
     exchangeRate.value = usdToKrw
   } else if (selectedCurrency.value === 'USDT') {
-    exchangeRate.value = 1// 1 USD → 0.98 USDT
+    exchangeRate.value = 1// 1 USD → 0.97 USDT
   }
 }
 
@@ -267,13 +267,13 @@ watch(() => [form.amount, form.currency], () => {
 
 const convertedAmountDisplay = computed(() => {
   if (!form.amount || !exchangeRate.value || !selectedCurrency.value) return ''
-  const result = Math.round(form.amount * exchangeRate.value * 0.98)
+  const result = Math.round(form.amount * exchangeRate.value * 0.97)
   return `${result.toLocaleString()} ${selectedCurrency.value}`
 })
 
 const convertedAmountNet = computed(() => {
   if (!form.amount || !exchangeRate.value || !selectedCurrency.value) return 0
-  return Math.round(form.amount * exchangeRate.value * 0.98)
+  return Math.round(form.amount * exchangeRate.value * 0.97)
 })
 
 const exchangeRateDisplay = computed(() => {

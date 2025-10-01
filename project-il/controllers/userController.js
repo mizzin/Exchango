@@ -61,8 +61,8 @@ exports.checkUsername = async (req, res) => {
 //로그인 API
 exports.login = async (req, res) => {
   const { username, password } = req.body; 
-if (!username || !password || !email || !phone) {
-  console.log("❌ 필수값 누락:", { username, password, email, phone });
+if (!username || !password ) {
+  console.log("❌ 필수값 누락:", { username, password });
   return res.status(400).json({ message: 'Required field missing' });
 }
 

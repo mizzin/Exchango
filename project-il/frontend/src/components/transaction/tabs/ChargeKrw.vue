@@ -152,7 +152,7 @@ const totalWithFeeDisplay = computed(() =>
 
 const calculateTotal = () => {
   if (!krwAmount.value || !exchangeRate.value) return
-totalWithFee.value = Math.round(krwAmount.value * exchangeRate.value * 1.02)
+totalWithFee.value = Math.round(krwAmount.value * exchangeRate.value * 1.03)
 }
 
 watch([krwAmount, exchangeRate], () => {

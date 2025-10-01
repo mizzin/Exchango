@@ -277,7 +277,7 @@ watch(
 
 const convertedAmountDisplay = computed(() => {
   if (!form.amount || !exchangeRate.value || !form.currency) return ''
-  const result = Math.round(form.amount * exchangeRate.value * 0.98)  // ← 0.98 곱하기 추가!
+  const result = Math.round(form.amount * exchangeRate.value * 0.97)  // ← 0.97 곱하기 추가!
   return `${result.toLocaleString()} ${form.currency}`
 })
 

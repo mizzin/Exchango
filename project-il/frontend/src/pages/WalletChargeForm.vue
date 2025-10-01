@@ -78,7 +78,7 @@ const fetchExchangeRate = async () => {
 
 const calculateUsd = () => {
   if (!localAmount.value || !exchangeRate.value) return
-  usdAmount.value = (localAmount.value * exchangeRate.value * 0.98).toFixed(2) // 수수료 2%
+  usdAmount.value = (localAmount.value * exchangeRate.value * 0.97).toFixed(2) // 수수료 3%
 }
 
 const usdAmountDisplay = computed(() =>
@@ -94,7 +94,7 @@ const amountUsd = ref(0) // 사용자가 입력할 USD
 const sendAmountWithFee = computed(() => {
   if (!amountUsd.value || !exchangeRate.value) return 0
 
-  const rawUsd = amountUsd.value / (1 - 0.02)
+  const rawUsd = amountUsd.value / (1 - 0.03)
   const local = rawUsd * exchangeRate.value
 
   return Math.round(local)

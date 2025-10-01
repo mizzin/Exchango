@@ -138,13 +138,13 @@ const isValidWithdraw = computed(() => {
 
 const convertedAmountDisplay = computed(() => {
   if (!amountUsd.value || !exchangeRate.value || !currency.value) return ''
-  const result = Math.round(amountUsd.value * exchangeRate.value * 0.98)
+  const result = Math.round(amountUsd.value * exchangeRate.value * 0.97)
   return `${result.toLocaleString()} ${currency.value}`
 })
 
 const convertedAmountValue = computed(() => {
   if (!amountUsd.value || !exchangeRate.value || !currency.value) return 0
-  return Math.round(amountUsd.value * exchangeRate.value * 0.98)
+  return Math.round(amountUsd.value * exchangeRate.value * 0.97)
 })
 
 const fetchUserInfo = async () => {
@@ -200,7 +200,7 @@ watch([amountUsd, exchangeRate], () => {
 
 const calculateConvertedAmount = () => {
   if (!amountUsd.value || !exchangeRate.value) return
-  const rawAmount = amountUsd.value * exchangeRate.value * 0.98
+  const rawAmount = amountUsd.value * exchangeRate.value * 0.97
   convertedAmount.value = Math.round(rawAmount)
 }
 

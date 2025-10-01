@@ -175,7 +175,7 @@ const updateExchangeRate = () => {
 }
 const calculateConvertedAmount = () => {
   if (!usdAmount.value || !exchangeRate.value) return
-  const result = Math.round(usdAmount.value * exchangeRate.value * 1.02)
+  const result = Math.round(usdAmount.value * exchangeRate.value * 1.03)
   convertedAmount.value = result // ✅ 이 줄 추가
   totalAmount.value = result
 }
@@ -184,7 +184,7 @@ watch([usdAmount, selectedCurrency], calculateConvertedAmount)
 
 const convertedAmountDisplay = computed(() => {
   if (!usdAmount.value || !exchangeRate.value || !selectedCurrency.value) return ''
-  const result = Math.round(usdAmount.value * exchangeRate.value * 1.02)
+  const result = Math.round(usdAmount.value * exchangeRate.value * 1.03)
   return `${result.toLocaleString()} ${selectedCurrency.value}`
 })
 
