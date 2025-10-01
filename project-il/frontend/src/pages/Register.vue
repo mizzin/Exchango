@@ -92,13 +92,13 @@ const verifyEmailCode = async () => {
       code: verificationCode.value
     })
 
-    console.log("✅ verifyEmailCode response:", res.data)
+    
 
     // success 필드가 없으니 message로 판정
     if (res.data.message?.includes("success")) {
       alert(t('register.alert.emailVerified'))
       emailVerified.value = true
-      console.log("👉 emailVerified 변경됨:", emailVerified.value)
+      
       clearInterval(timer.value)
     } else {
       emailVerified.value = false
