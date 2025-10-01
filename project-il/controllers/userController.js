@@ -61,10 +61,10 @@ exports.checkUsername = async (req, res) => {
 //로그인 API
 exports.login = async (req, res) => {
   const { username, password } = req.body; 
- // 필수 입력 체크
-  if (!username || !password) {
-    return res.status(400).json({ message: '아이디와 비밀번호를 입력해주세요.' });
-  }
+if (!username || !password || !email || !phone) {
+  console.log("❌ 필수값 누락:", { username, password, email, phone });
+  return res.status(400).json({ message: 'Required field missing' });
+}
 
   const user = await userModel.findUserByUsernameWithPassword(username);
  
@@ -179,20 +179,29 @@ exports.register = async (req, res) => {
     return res.status(409).json({ message: 'This email address has already been registered.' });
   }
 
-  // 4. 이메일 인증 여부 확인
-  const [verification] = await db.query(
-    'SELECT code, expires_at FROM email_verifications WHERE email = ?',
-    [email]
-  );
+    // 4. 이메일 인증 여부 확인
+    const [rows] = await db.query(
+      'SELECT verified, expires_at FROM email_verifications WHERE email = ?',
+      [email]
+    );
 
-  if (verification.length === 0) {
-    return res.status(400).json({ message: 'Email verification is required.' });
-  }
+    console.log("🔍 이메일 인증 조회 rows:", rows);
 
-  const { expires_at } = verification[0];
-  if (new Date() > new Date(expires_at)) {
-    return res.status(400).json({ message: 'Email verification has expired.' });
-  }
+    // row 자체가 없거나 아직 verified=1이 아니면 막음
+    if (rows.length === 0 || rows[0].verified !== 1) {
+      console.log("❌ 인증 실패 - rows 상태:", rows[0]);
+      return res.status(400).json({ message: 'Email verification is required.' });
+    }
+
+    // 만료된 경우도 막음
+    if (new Date() > new Date(rows[0].expires_at)) {
+      console.log("❌ 인증 만료:", rows[0].expires_at);
+      return res.status(400).json({ message: 'Email verification has expired.' });
+    }
+
+    // ✅ 여기까지 통과했으면 인증 성공
+    await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);
+
 
   // 5. 추천인 유효성 확인 (선택)
   if (referral_id) {

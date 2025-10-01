@@ -78,6 +78,8 @@ const sendVerificationCode = async () => {
     alert(t('register.alert.sendEmailFailed'))
   }
 }
+const emailVerified = ref(false) 
+
 const verifyEmailCode = async () => {
   if (!verificationCode.value) {
     alert(t('register.alert.enterCode'))
@@ -90,12 +92,25 @@ const verifyEmailCode = async () => {
       code: verificationCode.value
     })
 
-    alert(t('register.alert.emailVerified'))
-    clearInterval(timer.value)
+    console.log("✅ verifyEmailCode response:", res.data)
+
+    // success 필드가 없으니 message로 판정
+    if (res.data.message?.includes("success")) {
+      alert(t('register.alert.emailVerified'))
+      emailVerified.value = true
+      console.log("👉 emailVerified 변경됨:", emailVerified.value)
+      clearInterval(timer.value)
+    } else {
+      emailVerified.value = false
+      alert(res.data.message || t('register.alert.verificationFailed'))
+    }
   } catch (err) {
+    console.error("❌ verifyEmailCode error:", err.response?.data || err)
+    emailVerified.value = false
     alert(err.response?.data?.message || t('register.alert.verificationFailed'))
   }
 }
+
 
 const addPlatform = () => {
   const lastIndex = form.platforms.length - 1
@@ -125,6 +140,13 @@ const removePlatform = (index) => {
 
 
  const handleRegister = async () => {
+    console.log("🚀 handleRegister 시작")
+  console.log("emailVerified 상태:", emailVerified.value)
+
+  if (!emailVerified.value) {
+    alert(t('register.alert.verifyEmailFirst'))
+    return
+  }
   form.language = localStorage.getItem('lang') || 'en'
 
   // ✅ 기본 필수 항목 입력 확인
@@ -142,7 +164,10 @@ const removePlatform = (index) => {
     alert(t('register.alert.passwordMismatch'))
     return
   }
-
+if (!emailVerified.value) {
+  alert(t('register.alert.verifyEmailFirst')) // "이메일 인증을 먼저 완료해 주세요"
+  return
+}
   if (!/^\d{6}$/.test(form.money_password)) {
     alert(t('register.alert.invalidMoneyPassword'))
     return
@@ -162,9 +187,10 @@ const cleanPlatforms = form.platforms.filter(
   // 변환된 플랫폼을 포함한 새 객체로 전송
 const payload = {
   ...form,
-  platforms: cleanPlatforms
+  platforms: cleanPlatforms,
+  referral_id: form.referral_id || null 
 }
-console.log('회원가입 payload:', payload) 
+console.log("📦 최종 회원가입 payload:", payload)
 
   try {
     await axios.post('/users/register', payload)
@@ -316,14 +342,14 @@ const goToLogin = () => {
       </button>
     </div>
 
-      <!-- Referral -->
+      <!-- Referral 
       <label>{{ $t('register.referral') }}</label>
       <input
         v-model="form.referral_id"
         @input="form.referral_id = form.referral_id.replace(/[^a-zA-Z0-9]/g, '')"
         :placeholder="$t('register.referral')"
       />
-
+-->
 
       <!-- Platform -->
       <label>{{ $t('register.platform') }}</label>

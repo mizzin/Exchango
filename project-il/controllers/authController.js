@@ -63,9 +63,11 @@ exports.verifyEmailCode = async (req, res) => {
     if (code !== storedCode) {
       return res.status(400).json({ message: 'Incorrect code.' });
     }
-
-// ✅ 인증 성공 시 row 삭제 먼저
-await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);
+    // ✅ 인증 성공 시 삭제 대신 verified=1로 업데이트
+    await db.query(
+      'UPDATE email_verifications SET verified = 1 WHERE email = ?',
+      [email]
+    );
 
     return res.status(200).json({ message: 'Email verified successfully.' });
   } catch (err) {
