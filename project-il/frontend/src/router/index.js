@@ -5,6 +5,7 @@ import AdminMessageTemplates from '../pages/AdminMessageTemplates.vue'
 import AdminInquiries from '../pages/AdminInquiries.vue'
 import AdminInquiryDetail from '../pages/AdminInquiryDetail.vue'
 import UserInquiryWrite from '../pages/UserInquiryWrite.vue';
+
 //0721
 const routes = [
   {

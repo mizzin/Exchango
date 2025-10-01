@@ -16,7 +16,7 @@
           <tr
             v-for="msg in paginatedMessages"
             :key="msg.id"
-            @click="readMessage(msg)"
+            @click="$router.push(`/messages/${msg.id}`)"
             class="clickable"
           >
             <td>{{ msg.subject }}</td>
@@ -36,7 +36,7 @@
           v-for="msg in paginatedMessages"
           :key="msg.id"
           class="message-card"
-          @click="readMessage(msg)"
+            @click="$router.push(`/messages/${msg.id}`)"
         >
           <div class="message-header">
             <span class="message-title">{{ msg.subject }}</span>
