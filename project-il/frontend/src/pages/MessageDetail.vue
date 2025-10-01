@@ -114,6 +114,8 @@ const formatDate = (dateStr) => {
     font-size: 0.95rem;
     line-height: 1.65;
     color: #444;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .btn-back {
