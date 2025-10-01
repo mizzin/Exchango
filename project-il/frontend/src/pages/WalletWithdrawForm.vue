@@ -134,17 +134,21 @@ const isValidWithdraw = computed(() => {
     agree.value
   )
 })
-
-
+// 통화별 수수료율
+const getFeeRate = (cur) => {
+  if (cur === 'KRW') return 0.03
+  return 0.02
+}
 const convertedAmountDisplay = computed(() => {
   if (!amountUsd.value || !exchangeRate.value || !currency.value) return ''
-  const result = Math.round(amountUsd.value * exchangeRate.value * 0.97)
+  const feeRate = getFeeRate(currency.value)
+  const result = Math.round(amountUsd.value * exchangeRate.value * (1 - feeRate))
   return `${result.toLocaleString()} ${currency.value}`
 })
-
 const convertedAmountValue = computed(() => {
   if (!amountUsd.value || !exchangeRate.value || !currency.value) return 0
-  return Math.round(amountUsd.value * exchangeRate.value * 0.97)
+  const feeRate = getFeeRate(currency.value)
+  return Math.round(amountUsd.value * exchangeRate.value * (1 - feeRate))
 })
 
 const fetchUserInfo = async () => {
@@ -200,7 +204,8 @@ watch([amountUsd, exchangeRate], () => {
 
 const calculateConvertedAmount = () => {
   if (!amountUsd.value || !exchangeRate.value) return
-  const rawAmount = amountUsd.value * exchangeRate.value * 0.97
+  const feeRate = getFeeRate(currency.value)
+  const rawAmount = amountUsd.value * exchangeRate.value * (1 - feeRate)
   convertedAmount.value = Math.round(rawAmount)
 }
 

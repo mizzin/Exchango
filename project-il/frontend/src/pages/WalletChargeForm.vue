@@ -75,12 +75,16 @@ const fetchExchangeRate = async () => {
     alert(t('charge.wallet.fetchRateFailed'))
   }
 }
-
+const getFeeRate = (cur) => {
+  if (cur === 'KRW') return 0.03
+  if (cur === 'PHP' || cur === 'USDT') return 0.02
+  return 0.02  // 기본값
+}
 const calculateUsd = () => {
   if (!localAmount.value || !exchangeRate.value) return
-  usdAmount.value = (localAmount.value * exchangeRate.value * 0.97).toFixed(2) // 수수료 3%
+  const feeRate = getFeeRate(currency.value)
+  usdAmount.value = (localAmount.value * exchangeRate.value * (1 - feeRate)).toFixed(2)
 }
-
 const usdAmountDisplay = computed(() =>
   usdAmount.value > 0 ? `${usdAmount.value} USD` : ''
 )
@@ -93,10 +97,9 @@ const amountUsd = ref(0) // 사용자가 입력할 USD
 
 const sendAmountWithFee = computed(() => {
   if (!amountUsd.value || !exchangeRate.value) return 0
-
-  const rawUsd = amountUsd.value / (1 - 0.03)
+  const feeRate = getFeeRate(currency.value)
+  const rawUsd = amountUsd.value / (1 - feeRate)   // 입력값을 수수료 반영
   const local = rawUsd * exchangeRate.value
-
   return Math.round(local)
 })
 
