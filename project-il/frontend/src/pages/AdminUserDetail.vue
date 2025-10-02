@@ -62,6 +62,7 @@
         </Modal>
         <hr />
             <h3>등록된 플랫폼</h3>
+            <p>그 플랫폼 삭제 원하시는 경우 개발자에게 요청하세요~</p>
             <table class="platform-table" v-if="platforms.length > 0">
                 <thead>
                     <tr>
