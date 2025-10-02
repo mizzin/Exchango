@@ -38,6 +38,8 @@ const fetchPlatformOptions = async () => {
     const lang = localStorage.getItem('lang') || 'en'
     const res = await axios.get(`/platforms?lang=${lang}`)
     platformOptions.value = res.data // [{ id: '001', name: 'A플랫폼' }, ...]
+    
+
   } catch (err) {
     console.error('플랫폼 목록 로딩 실패:', err)
   }
@@ -111,6 +113,9 @@ const verifyEmailCode = async () => {
   }
 }
 
+const onPlatformChange = (index) => {
+  
+}
 
 const addPlatform = () => {
   const lastIndex = form.platforms.length - 1
@@ -182,6 +187,7 @@ if (!emailVerified.value) {
 const cleanPlatforms = form.platforms.filter(
   p => p.platform_id && p.platform_user_id
 )
+
   // 변환된 플랫폼을 포함한 새 객체로 전송
 const payload = {
   ...form,
@@ -192,6 +198,7 @@ const payload = {
 
   try {
     await axios.post('/users/register', payload)
+    console.log("payload"+payload)
     alert(t('register.alert.registrationSuccess'))
     router.push('/')
   } catch (err) {
@@ -352,17 +359,22 @@ const goToLogin = () => {
       <!-- Platform -->
       <label>{{ $t('register.platform') }}</label>
       <div v-for="(platform, index) in form.platforms" :key="index" class="platform-row">
-        <select v-model="platform.platform_id">
+      
+        <select v-model="platform.platform_id" @change="onPlatformChange(index)">
           <option disabled value="">{{ $t('register.platform') }}</option>
-          <option v-for="opt in platformOptions" :key="opt.id" :value="opt.id">
+          <option v-for="opt in platformOptions" :key="opt.platform_id" :value="opt.platform_id">
             {{ opt.name }}
           </option>
+        <!--<option v-for="opt in platformOptions" :key="opt.id" :value="opt.id">
+           {{ opt.name }}
+          </option>-->
         </select>
         <input
           v-model="platform.platform_user_id"
           @input="platform.platform_user_id = platform.platform_user_id.replace(/[^a-zA-Z0-9]/g, '')"
           :placeholder="$t('register.usernamePlaceholder')"
         />
+      
         <button
           v-if="index === form.platforms.length - 1"
           type="button"

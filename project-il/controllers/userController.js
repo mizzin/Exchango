@@ -162,100 +162,116 @@ exports.register = async (req, res) => {
     platforms, money_password   
   } = req.body;
 
-// 1. 필수값 확인
+  console.log("➡️ 회원가입 요청:", req.body);
+
+  // 1. 필수값 확인
   if (!username || !password || !email || !phone) {
     return res.status(400).json({ message: 'Required field missing' });
   }
 
- // 2. 아이디 중복 체크
-  const existingUser = await userModel.findUserByUsername(username);
-  if (existingUser) {
-    return res.status(409).json({ message: 'This ID is already in use.' });
-  }
+  try {
+    // 2. 아이디 중복 체크
+    const existingUser = await userModel.findUserByUsername(username);
+    if (existingUser) {
+      return res.status(409).json({ message: 'This ID is already in use.' });
+    }
 
-   // 3. 이메일 중복 체크
-  const [existingEmail] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
-  if (existingEmail.length > 0) {
-    return res.status(409).json({ message: 'This email address has already been registered.' });
-  }
+    // 3. 이메일 중복 체크
+    const [existingEmail] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    if (existingEmail.length > 0) {
+      return res.status(409).json({ message: 'This email address has already been registered.' });
+    }
 
     // 4. 이메일 인증 여부 확인
     const [rows] = await db.query(
       'SELECT verified, expires_at FROM email_verifications WHERE email = ?',
       [email]
     );
-
-    console.log("🔍 이메일 인증 조회 rows:", rows);
-
-    // row 자체가 없거나 아직 verified=1이 아니면 막음
     if (rows.length === 0 || rows[0].verified !== 1) {
-      console.log("❌ 인증 실패 - rows 상태:", rows[0]);
       return res.status(400).json({ message: 'Email verification is required.' });
     }
-
-    // 만료된 경우도 막음
     if (new Date() > new Date(rows[0].expires_at)) {
-      console.log("❌ 인증 만료:", rows[0].expires_at);
       return res.status(400).json({ message: 'Email verification has expired.' });
     }
 
-    // ✅ 여기까지 통과했으면 인증 성공
-    await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);
-
-
-  // 5. 추천인 유효성 확인 (선택)
-  if (referral_id) {
-    const refUser = await userModel.findUserByUsername(referral_id);
-    if (!refUser) {
-      return res.status(400).json({ message: 'Invalid referral ID.' });
+    // 5. 추천인 유효성 확인 (선택)
+    if (referral_id) {
+      const refUser = await userModel.findUserByUsername(referral_id);
+      if (!refUser) {
+        return res.status(400).json({ message: 'Invalid referral ID.' });
+      }
     }
-  }
-  // ✅ ② 머니 비밀번호 필수 체크 (6자리 숫자)
-  if (!/^\d{6}$/.test(money_password)) {
-    return res.status(400).json({ message: 'Money password must be exactly 6 digits.' });
-  }
-  // 6. 비밀번호 해싱
-  const hashed = await bcrypt.hash(password, 10);
 
-  // ✅ ③ 머니 비밀번호도 해싱
-  const hashedMoneyPassword = await bcrypt.hash(money_password, 10);
-  try {
-    // 7. 사용자 생성
-    const userId = await userModel.createUser({
-      username,
-      password: hashed,
-      email,
-      phone,
-      country_code,
-      real_name: real_name || null,
-      referral_id: referral_id || null,
-      language,
-      money_password: hashedMoneyPassword
-    });
+    // 6. 비밀번호 해싱
+    const hashed = await bcrypt.hash(password, 10);
+    const hashedMoneyPassword = await bcrypt.hash(money_password, 10);
 
-    // 8. 플랫폼 정보 저장 (platforms가 있을 때만)
-    if (Array.isArray(platforms) && platforms.length > 0) {
-      await userModel.insertUserPlatforms(userId, platforms);
-    }
+    // ✅ 트랜잭션 시작
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // 7. 사용자 생성
+      const [result] = await conn.execute(
+        `INSERT INTO users (
+          username, password, email, phone, country_code,
+          real_name, referral_id, language, money_password
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          username,
+          hashed,
+          email,
+          phone,
+          country_code || null,
+          real_name || null,
+          referral_id || null,
+          language || 'en',
+          hashedMoneyPassword
+        ]
+      );
+      const userId = result.insertId;
+
+      // 8. 플랫폼 정보 저장
+      if (Array.isArray(platforms) && platforms.length > 0) {
+        for (const p of platforms) {
+          await conn.execute(
+            `INSERT INTO user_platforms (user_id, platform_id, platform_user_id)
+             VALUES (?, ?, ?)`,
+            [userId, p.platform_id, p.platform_user_id]
+          );
+        }
+      }
+
+      // 9. 이메일 인증 기록 삭제
+      await conn.execute('DELETE FROM email_verifications WHERE email = ?', [email]);
+
+      // ✅ 커밋
+      await conn.commit();
+      res.status(201).json({ message: 'Membership registration successful!' });
+
     // 📢 텔레그램 알림 보내기
     try {
       await sendTelegramMessage(
-        `[회원가입]\n아이디: ${username}\n이메일: ${email}\n전화번호: ${phone}\n언어국가 ${language}`
+       `[회원가입]\n아이디: ${username}\n이메일: ${email}\n전화번호: ${phone}\n언어국가 ${language}`
       );
-    } catch (notifyErr) {
-      console.error("⚠️ Telegram 전송 실패:", notifyErr.message);
+      } catch (notifyErr) {
+        console.error("⚠️ Telegram 전송 실패:", notifyErr.message);
+      }
+
+
+    } catch (txErr) {
+      await conn.rollback(); // 실패 시 롤백
+      console.error("❌ 트랜잭션 에러:", txErr);
+      res.status(500).json({ message: 'Server error', error: txErr.message });
+    } finally {
+      conn.release(); // 연결 반환
     }
 
-    // 9. 인증 기록 삭제 (선택)
-    await db.query('DELETE FROM email_verifications WHERE email = ?', [email]);
-
-    res.status(201).json({ message: 'Membership registration successful! This is an emergency measure.' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'server error', error: err.message });
+    console.error("❌ 회원가입 처리 에러:", err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
-
 // 비밀번호 변경
 exports.changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;

@@ -79,17 +79,22 @@ const createUser = async (data) => {
 };
 // 플랫폼 ID 저장
 // ✅ 수정된 플랫폼 저장
+// 플랫폼 ID 저장
 const insertUserPlatforms = async (userId, platforms) => {
-  const values = platforms
-    .filter(p => p.platform_id && p.platform_user_id) // 둘 다 채워진 항목만 남기기
-    .map(p => [userId, p.platform_id, p.platform_user_id]);
+  const validPlatforms = platforms.filter(
+    p => p.platform_id && p.platform_user_id
+  );
 
-  if (values.length === 0) return; // 유효한 항목이 없으면 insert 생략
+  if (validPlatforms.length === 0) return; // 유효한 항목 없으면 생략
 
-  await db.query(`
-    INSERT INTO user_platforms (user_id, platform_id, platform_user_id)
-    VALUES ?
-  `, [values]);
+  for (const p of validPlatforms) {
+    console.log("플랫폼 저장:", userId, p.platform_id, p.platform_user_id);
+    await db.execute(
+      `INSERT INTO user_platforms (user_id, platform_id, platform_user_id)
+       VALUES (?, ?, ?)`,
+      [userId, p.platform_id, p.platform_user_id]
+    );
+  }
 };
 
 
