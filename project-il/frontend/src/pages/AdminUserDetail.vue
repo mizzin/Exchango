@@ -102,7 +102,7 @@
         <div class="platform-add-row">
             <select v-model="newPlatform.platform_id">
               <option value="">플랫폼 선택</option>
-              <option v-for="p in platformOptions" :key="p.id" :value="p.id">
+              <option v-for="p in platformOptions" :key="p.platform_id" :value="p.platform_id">
                 {{ p.name }}
               </option>
             </select>
@@ -220,6 +220,8 @@ const fetchPlatformOptions = async () => {
   try {
     const lang = localStorage.getItem('lang') || 'ko'
     const res = await axios.get('/platforms?lang=ko')
+        console.log("📥 플랫폼 옵션 API 응답:", res.data)
+
      platformOptions.value = res.data
   } catch (err) {
     console.error('플랫폼 목록 로딩 실패:', err)
@@ -278,9 +280,16 @@ const saveNote = async () => {
 const addPlatform = async () => {
   const token = localStorage.getItem('admin_token')
   try {
+        console.log("📤 보내는 데이터:", {
+      platform_id: newPlatform.platform_id,
+      platform_user_id: newPlatform.platform_user_id
+    })
     const res = await axios.post(
       `/admin/users/${route.params.id}/platforms`,
-      { ...newPlatform },
+       {
+        platform_id: newPlatform.platform_id,
+        platform_user_id: newPlatform.platform_user_id
+      },
       { headers: { Authorization: `Bearer ${token}` } }
     )
 
