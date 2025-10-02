@@ -78,6 +78,30 @@
       </table>
     </div>
   </div>
+  
+    <!-- 페이지네이션 -->
+    <div v-if="totalPages > 1" class="pagination text-center my-3">
+     <!-- 페이지네이션 -->
+<ul v-if="totalPages > 1" class="pagination justify-content-center mt-3">
+  <li class="page-item" :class="{ disabled: page === 1 }">
+    <button class="page-link" @click="changePage(page - 1)">이전</button>
+  </li>
+
+  <li
+    v-for="p in totalPages"
+    :key="p"
+    class="page-item"
+    :class="{ active: page === p }"
+  >
+    <button class="page-link" @click="changePage(p)">{{ p }}</button>
+  </li>dfdfdf
+
+  <li class="page-item" :class="{ disabled: page === totalPages }">
+    <button class="page-link" @click="changePage(page + 1)">다음</button>
+  </li>
+</ul>
+
+    </div>
   </AdminLayout>
 </template>
 
@@ -94,6 +118,8 @@ const filters = ref({
   endDate: '',
 })
 const page = ref(1)
+const totalPages = ref(1)   // ✅ 추가
+const limit = 50   
 
 const fetchHistory = async () => {
   const res = await axios.get('/admin/requests', {
@@ -104,6 +130,8 @@ const fetchHistory = async () => {
     },
   })
   history.value = res.data.data
+    totalPages.value = res.data.totalPages || 1   // ✅ 서버 totalPages 받기
+
 }
 
 const resetFilters = () => {
