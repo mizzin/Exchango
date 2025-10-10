@@ -18,8 +18,10 @@
     <th>신청금액</th>
     <th>이동방식</th>
     <th>출발 플랫폼</th>
+    <th>출플폼 ID</th>
     <th>도착 플랫폼</th>
-    <th>환율</th>
+    <th>도플폼 ID</th>
+    
     <th>환산금액(충전원함)</th>
     
     <th>상태</th>
@@ -35,8 +37,11 @@
     <td>{{ item.amount.toLocaleString() }} {{ item.currency }}</td>
     <td>{{ formatType(item) }}</td>
     <td>{{ item.from_platform_id || '-' }}</td>
+    <td>{{ item.from_platform_user_id || '-' }}</td>
     <td>{{ item.to_platform_id || '-' }}</td>
-    <td>{{ item.exchange_rate || '-' }}</td>
+    <td>{{ item.to_platform_user_id || '-' }}</td>
+    
+    
     <td>{{ item.expected_amount ? item.expected_amount.toLocaleString() : '-' }}</td>
     
     <td>
@@ -62,6 +67,21 @@
             </table>
           </div>
         </div>
+        <!-- 페이지네이션 -->
+        <ul v-if="totalPages > 1" class="pagination justify-content-center mt-3">
+          <li class="page-item" :class="{ disabled: page === 1 }">
+            <button class="page-link" @click="changePage(page - 1)">이전</button>
+          </li>
+
+          <li v-for="p in totalPages" :key="p" class="page-item" :class="{ active: page === p }">
+            <button class="page-link" @click="changePage(p)">{{ p }}</button>
+          </li>
+
+          <li class="page-item" :class="{ disabled: page === totalPages }">
+            <button class="page-link" @click="changePage(page + 1)">다음</button>
+          </li>
+        </ul>
+
       </div>
       
       <div v-if="selected" class="modal-overlay" @click.self="selected = null">
@@ -73,7 +93,7 @@
       <li><strong>환산금액:</strong> {{ selected.expected_amount || '-' }}</li>
       <li><strong>환율:</strong> {{ selected.exchange_rate || '-' }}</li>
       <li><strong>출발:</strong> {{ selected.from_type }} / {{ selected.from_platform_id || '-' }}</li>
-      <li><strong>도착:</strong> {{ selected.to_platform_id || '-' }}</li>
+      <li><strong>도착:</strong> {{ selected.to_platform_id || '-' }} / {{ selected.to_platform_id || '-' }}</li>
       <li><strong>메모:</strong> {{ selected.user_memo || '-' }}</li>
       <li><strong>처리자:</strong> {{ selected.confirmed_by_admin || '-' }}</li>
       <li><strong>처리메모:</strong> {{ selected.admin_note || '-' }}</li>
@@ -91,40 +111,48 @@ import { ref, onMounted } from 'vue'
 import axios from '@/axiosAdmin'
 import AdminLayout from '@/components/AdminLayout.vue'
 
- const requests = ref([])
- const selected = ref(null)
+const requests = ref([])
+const selected = ref(null)
+const page = ref(1)
+const totalPages = ref(1)
+const limit = 15
 
 const fetchRequests = async () => {
-  const res = await axios.get('/admin/wallet/transfer')
+  const res = await axios.get('/admin/wallet/transfer', {
+    params: { page: page.value, limit }
+  })
+
+
   requests.value = res.data.data
+  totalPages.value = res.data.totalPages
+
+}
+
+const fetchHistory = async () => {
+  const res = await axios.get('/user/wallet/move-history', {
+    params: {
+      page: currentPage.value,
+      limit: 15,
+      status: selectedStatus.value,
+    },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  history.value = res.data.data
+  totalPages.value = res.data.totalPages
+}
+
+const changePage = (p) => {
+  if (p < 1 || p > totalPages.value) return
+  page.value = p
+  fetchRequests()
 }
 
 const formatType = (item) => {
-  // 1) 지갑 → 플랫폼
-  if (item.from_type === 'wallet' && item.to_platform_id) {
-    return '지갑 → 외부'
-  }
-
-  // 2) 플랫폼 → 지갑  (to_platform_id가 null인 경우)
-  if (
-    item.from_type === 'platform' &&
-    (item.to_platform_id == null || item.to_platform_id === 'wallet')
-  ) {
-    return '외부 → 지갑'
-  }
-
-  // 3) 플랫폼 → 플랫폼
-  if (
-    item.from_type === 'platform' &&
-    item.to_platform_id != null && 
-    item.to_platform_id !== 'wallet'
-  ) {
-    return '외부 → 외부'
-  }
-
+  if (item.from_type === 'wallet' && item.to_platform_id) return '지갑 → 외부'
+  if (item.from_type === 'platform' && (!item.to_platform_id || item.to_platform_id === 'wallet')) return '외부 → 지갑'
+  if (item.from_type === 'platform' && item.to_platform_id && item.to_platform_id !== 'wallet') return '외부 → 외부'
   return '기타'
 }
-
 
 const formatStatus = (status) => {
   if (status === 'pending') return '대기중'
@@ -143,7 +171,6 @@ const statusClass = (status) => {
 }
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleString()
-
 
 const approve = async (id) => {
   if (!confirm('정말 승인하시겠습니까?')) return

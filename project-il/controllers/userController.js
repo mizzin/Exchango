@@ -96,7 +96,7 @@ if (user.status !== 'approved') {
   const token = jwt.sign(
     { id: user.id, username: user.username, role: user.role},
     process.env.JWT_SECRET,
-    { expiresIn: '2h' }
+    { expiresIn: '1h' }
   );
 
   // 로그인 성공 시
@@ -162,7 +162,7 @@ exports.register = async (req, res) => {
     platforms, money_password   
   } = req.body;
 
-  console.log("➡️ 회원가입 요청:", req.body);
+  console.log("➡️ 회원가입 요청 수정수정:", req.body);
 
   // 1. 필수값 확인
   if (!username || !password || !email || !phone) {

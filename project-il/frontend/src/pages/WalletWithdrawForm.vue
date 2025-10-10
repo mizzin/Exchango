@@ -244,6 +244,9 @@ const submitWithdraw = async () => {
     alert(err.response?.data?.message || '출금 중 오류 발생')
   }
 }
+onMounted(async () => {
+  await axiosUser.get('/users/info')
+})
 
 onMounted(() => {
   fetchUserInfo()

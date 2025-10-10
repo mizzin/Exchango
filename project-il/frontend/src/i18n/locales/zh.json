@@ -19,7 +19,9 @@
   "checkStatus": "查看状态",
    "emptyFields": "请输入用户名和邮箱。",
     "linkSent": "重置链接已发送到您的邮箱。",
-    "requestFailed": "请求失败"
+    "requestFailed": "请求失败",
+       "sessionExpiredTitle": "會話已過期",
+    "sessionExpiredText": "請重新登入。"
 },"reset": {
   "invalidAccess": "无效的访问。",
   "minLength": "密码长度必须至少 8 位。",

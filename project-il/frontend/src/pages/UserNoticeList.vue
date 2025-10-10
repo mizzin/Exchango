@@ -51,6 +51,10 @@ const goToDetail = (id) => {
 }
 
 onMounted(fetchNotices)
+onMounted(async () => {
+  await axiosUser.get('/users/info')
+})
+
 </script>
 
 <style scoped>

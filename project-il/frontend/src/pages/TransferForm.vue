@@ -211,6 +211,9 @@ onMounted(() => {
   fetchPlatformOptions()
   checkPending() // ✅ 페이지 진입 시 체크
 })
+onMounted(async () => {
+  const res = await axiosUser.get('/users/info')
+})
 </script>
 
 

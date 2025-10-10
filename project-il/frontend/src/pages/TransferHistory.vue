@@ -188,7 +188,9 @@ onMounted(() => {
   fetchPlatformOptions()
   fetchHistory()
 })
-
+onMounted(async () => {
+  const res = await axiosUser.get('/users/info')
+})
 </script>
 
 <style scoped>

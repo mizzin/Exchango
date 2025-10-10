@@ -16,4 +16,4 @@ RUN npm install && npm install cors
 # CMD ["node", "app.js"]
 
 # 변경
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run"]

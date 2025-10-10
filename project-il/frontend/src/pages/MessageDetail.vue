@@ -20,15 +20,22 @@ import UserLayout from '@/components/UserLayout.vue'
 
 const route = useRoute()
 const message = ref({})
-
 onMounted(async () => {
   try {
-    const res = await axios.get(`/users/messages/${route.params.id}`)
-    message.value = res.data.message
+    const userRes = await axios.get('/users/info')
+    console.log('👤 사용자 정보:', userRes.data)
   } catch (err) {
-    console.error('❌ Failed to load message detail:', err)
+    console.error('사용자 정보 로드 실패:', err)
+  }
+
+  try {
+    const msgRes = await axios.get(`/users/messages/${route.params.id}`)
+    message.value = msgRes.data.message
+  } catch (err) {
+    console.error('❌ 메시지 상세 로드 실패:', err)
   }
 })
+
 
 const formatDate = (dateStr) => {
   const d = new Date(dateStr)

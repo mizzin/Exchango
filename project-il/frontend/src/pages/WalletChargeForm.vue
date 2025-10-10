@@ -47,25 +47,26 @@ import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
 
 const hasPending = ref(false)
-
 const { t } = useI18n()
 
 const currency = ref('')
 const localAmount = ref(0)
 const exchangeRate = ref(0)
 const usdAmount = ref(0)
+const amountUsd = ref(0) // 사용자가 입력할 USD
 
+// 🔹 환율 불러오기
 const fetchExchangeRate = async () => {
   try {
     const res = await axios.get('/exchange-rate')
     const rates = res.data.rates
 
     if (currency.value === 'KRW') {
-      exchangeRate.value = rates['KRW'] // 1 USD = ? KRW
+      exchangeRate.value = rates['KRW']
     } else if (currency.value === 'PHP') {
       exchangeRate.value = rates['PHP']
     } else if (currency.value === 'USDT') {
-      exchangeRate.value = 1  // 1 USDT = 1 USD
+      exchangeRate.value = 1
     } else {
       exchangeRate.value = 0
     }
@@ -75,16 +76,13 @@ const fetchExchangeRate = async () => {
     alert(t('charge.wallet.fetchRateFailed'))
   }
 }
-const getFeeRate = (cur) => {
-  if (cur === 'KRW') return 0.03
-  if (cur === 'PHP' || cur === 'USDT') return 0.02
-  return 0.02  // 기본값
-}
+
+// 🔹 USD 계산 (수수료 제거)
 const calculateUsd = () => {
   if (!localAmount.value || !exchangeRate.value) return
-  const feeRate = getFeeRate(currency.value)
-  usdAmount.value = (localAmount.value * exchangeRate.value * (1 - feeRate)).toFixed(2)
+  usdAmount.value = (localAmount.value * exchangeRate.value).toFixed(2)
 }
+
 const usdAmountDisplay = computed(() =>
   usdAmount.value > 0 ? `${usdAmount.value} USD` : ''
 )
@@ -93,44 +91,39 @@ const canSubmit = computed(() =>
   currency.value && amountUsd.value >= 40
 )
 
-const amountUsd = ref(0) // 사용자가 입력할 USD
-
+// 🔹 수수료 없는 송금액 계산
 const sendAmountWithFee = computed(() => {
   if (!amountUsd.value || !exchangeRate.value) return 0
-  const feeRate = getFeeRate(currency.value)
-  const rawUsd = amountUsd.value / (1 - feeRate)   // 입력값을 수수료 반영
-  const local = rawUsd * exchangeRate.value
+  const local = amountUsd.value * exchangeRate.value
   return Math.round(local)
 })
 
+// 🔹 충전 요청
 const submit = async () => {
   try {
-      await axios.post('/transactions/wallet/charge', {
+    await axios.post('/transactions/wallet/charge', {
       currency: currency.value,
       local_amount: sendAmountWithFee.value,
       amount_usd: amountUsd.value,
-       expected_amount: sendAmountWithFee.value,
-    }) 
-     alert(t('charge.wallet.success'))
+      expected_amount: sendAmountWithFee.value,
+    })
+    alert(t('charge.wallet.success'))
     currency.value = ''
     localAmount.value = 0
     usdAmount.value = 0
-    alert(t('withdraw.alert.success')) 
-    window.location.reload() 
+    alert(t('withdraw.alert.success'))
+    window.location.reload()
   } catch (e) {
     console.error(e)
-     alert(t('charge.wallet.failed'))
+    alert(t('charge.wallet.failed'))
   }
 }
 
+// 🔹 진행중 신청 확인
 const checkPending = async () => {
   try {
-    const res = await axios.get('/users/me/transactions/pending-check?status=pending');
-
-    console.log('📦 raw res.data:', res.data)
-
+    const res = await axios.get('/users/me/transactions/pending-check?status=pending')
     const arr = Array.isArray(res.data.transactions) ? res.data.transactions : []
-    
 
     const pendingTypes = [
       'charge', 'withdraw',
@@ -138,21 +131,14 @@ const checkPending = async () => {
       'platform_charge', 'wallet_charge', 'platform_withdraw', 'wallet_withdraw'
     ]
 
-    arr.forEach(tx => {
-      console.log(`[TX] id: ${tx.id}, type: ${tx.type}, status: ${tx.status}`)
-    })
     hasPending.value = arr.some(
       tx => tx.status === 'pending' && pendingTypes.includes(tx.type)
     )
-
-    console.log('🚨 hasPending.value:', hasPending.value)
-
   } catch (e) {
     console.log('❌ 에러:', e)
     hasPending.value = false
   }
 }
-
 
 onMounted(checkPending)
 </script>

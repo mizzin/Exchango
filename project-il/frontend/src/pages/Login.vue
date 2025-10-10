@@ -17,6 +17,11 @@ const handleLogin = async () => {
     })
     const token = res.data.token
     const role = res.data.role
+
+        // ✅ 토큰 저장 + exp 저장
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    localStorage.setItem('exp', payload.exp)
+
     if (role === 'admin') {
       localStorage.setItem('admin_token', token)
       router.push('/admin/dashboard')

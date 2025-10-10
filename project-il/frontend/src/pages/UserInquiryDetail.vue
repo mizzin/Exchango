@@ -59,6 +59,9 @@ const fetchInquiry = async () => {
 const formatDate = (str) => new Date(str).toLocaleString()
 
 onMounted(fetchInquiry)
+onMounted(async () => {
+  const res = await axiosUser.get('/users/info')
+})
 </script>
 
 <style scoped>

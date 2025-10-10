@@ -155,6 +155,9 @@ const formatStatus = (status) => {
     default: return status
   }
 }
+onMounted(async () => {
+  await axiosUser.get('/users/info')
+})
 
 </script>
 

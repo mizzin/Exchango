@@ -266,7 +266,7 @@ const goToHandler = (item) => {
     wallet_withdraw: '/admin/trade/wallet-transfer',
     platform_withdraw: '/admin/trade/withdraw',
         platform_withdraw: '/admin/trade/withdraw',
- wallet_to_platform:'admin/trade/wallet-transfer',
+ wallet_to_platform:'/admin/trade/wallet-transfer',
     transfer: '/admin/trade/wallet-transfer',
   }
 

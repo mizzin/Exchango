@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted} from 'vue';
 import { useRouter } from 'vue-router';
 import axios from '@/axiosUser'
 import UserLayout from '@/components/UserLayout.vue';
@@ -77,6 +77,10 @@ const submitInquiry = async () => {
     alert(t('inquiry.write.fail')); // ✅ 다국어 알림
   }
 }
+onMounted(async () => {
+  await axiosUser.get('/users/info')
+})
+
 </script>
 
 <style scoped>

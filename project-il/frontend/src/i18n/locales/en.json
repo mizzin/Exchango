@@ -11,7 +11,9 @@
   "checkStatus": "Check status",
       "emptyFields": "Please enter your username and email.",
     "linkSent": "A reset link has been sent to your email.",
-    "requestFailed": "Request failed"
+    "requestFailed": "Request failed",
+       "sessionExpiredTitle": "Session expired",
+    "sessionExpiredText": "Please log in again."
 
 },"reset": {
   "invalidAccess": "Invalid access.",

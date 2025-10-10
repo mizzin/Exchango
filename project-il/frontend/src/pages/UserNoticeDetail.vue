@@ -66,6 +66,10 @@ const formatDate = (dateStr) => {
 const goToList = () => router.push('/support/notice')
 
 onMounted(fetchNotice)
+onMounted(async () => {
+  await axiosUser.get('/users/info')
+})
+
 </script>
 
 <style scoped>

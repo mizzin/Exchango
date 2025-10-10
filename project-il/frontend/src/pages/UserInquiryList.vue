@@ -75,6 +75,9 @@ const formatDate = (d) => new Date(d).toLocaleString();
 const goToDetail = (id) => router.push(`/support/inquiry/${id}`);
 
 onMounted(fetchInquiries);
+onMounted(async () => {
+  const res = await axiosUser.get('/users/info')
+})
 </script>
 
 

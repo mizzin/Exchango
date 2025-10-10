@@ -597,9 +597,6 @@ const countQuery = `
 // ⚠️ 여기! LIMIT/OFFSET은 쿼리에 직접 들어가 있으니, params에 넣지 말 것!
 const [rows] = await db.execute(listQuery, params);
 const [countRows] = await db.execute(countQuery, params.slice(0, params.length));
-console.log('✅ 최종 baseQuery:', baseQuery);
-console.log('✅ 최종 params:', params);
-
     res.json({ data: rows, total: countRows[0].total });
   } catch (err) {
     console.error('❌ getWalletChargeList error:', err);
@@ -708,13 +705,12 @@ content: `We regret to inform you that your deposit request for ${tx.amount} ${t
   }
 };
 
-//사이트 내 출금 신청 목록 API 0721 관리자 wallet_withdraw
-
+// 사이트 내 출금 신청 목록 API 0721 관리자 wallet_withdraw
 exports.getWalletWithdrawList = async (req, res) => {
   try {
-    // limiit 오탈자도 수용
-    const rawLimit = req.query.limit ?? req.query.limiit ?? 20
-    const limit = Math.max(1, Number(rawLimit) || 20)
+    // limit 오탈자도 수용
+    const rawLimit = req.query.limit ?? req.query.limiit ?? 15
+    const limit = Math.max(1, Number(rawLimit) || 15)
 
     const { page = 1, status = '', currency = '', startDate = '', endDate = '' } = req.query
     const username = (req.query.username ?? '').trim()
@@ -758,15 +754,31 @@ exports.getWalletWithdrawList = async (req, res) => {
     )
 
     const [[cnt]] = await db.query(`SELECT COUNT(*) AS total ${sqlBase}`, params)
+    const total = cnt.total
+    const totalPages = Math.ceil(total / limit)  // ✅ 페이지 수 계산 추가
 
-    console.log('[CTL-OUT]', { rows: rows.length, total: cnt.total })
+    console.log('[CTL-OUT]', { rows: rows.length, total, totalPages })
+console.log('📤 [API 응답 데이터 확인]', {
+  page,
+  limit,
+  total: cnt.total,
+  totalPages,
+  rows: rows.length
+})
     // ✅ 프론트가 기대하는 포맷으로 반환
-    return res.json({ data: rows, total: cnt.total })
+    return res.json({
+      data: rows,
+      total,
+      totalPages,      // ✅ 반드시 추가
+      page: Number(page),
+      limit: Number(limit)
+    })
   } catch (e) {
     console.error('[CTL-ERR getWalletWithdrawList]', e)
     return res.status(500).json({ message: 'Failed to load list' })
   }
 }
+
 
 //사이트 내 출금 신청 승인/거절API 0721 관리자
 exports.approveWithdrawTransaction = async (req, res) => {
@@ -1047,74 +1059,87 @@ await sendTelegramMessage(
     return res.status(500).json({ message: 'server errer' });
   }
 };
-//머니이동 사용자 신청 이력조회 0724 
+// 머니이동 사용자 신청 이력조회 (0724)
 exports.getPlatformMoveHistory = async (req, res) => {
-  const userId = req.user.id;
-  console.log('[getPlatformMoveHistory] req.user:', req.user);
+  const userId = req.user?.id;
+  console.log('📥 [getPlatformMoveHistory] 요청 도착');
+  console.log('👤 userId:', userId);
 
-  const { status, from_type, to_platform_id } = req.query; // ❗ 필터 대비 쿼리 파라미터
+  const { status, from_type, to_platform_id, page = 1, limit = 10 } = req.query;
+  const offset = (page - 1) * limit;
+
+  console.log('🔍 query params:', { status, from_type, to_platform_id, page, limit, offset });
 
   try {
-    let sql = `
-  SELECT 
-    id,
-    amount,
-    type,
-    currency,
-    to_platform_id,
-    to_platform_user_id,
-    expected_amount,
-    exchange_rate,
-    from_type,
-    from_platform_id,
-    from_platform_user_id,
-    user_memo AS memo,
-    status,
-    confirmed_by_admin,
-    admin_note,
-    created_at,
-    updated_at
-  FROM transactions
-  WHERE user_id = ? AND type IN (
-      'wallet_to_platform',
-  'platform_to_wallet',
-  'platform_to_platform',
-  'transfer'
-  )
-`;
-
+    let baseSql = `
+      FROM transactions
+      WHERE user_id = ? 
+        AND type IN ('wallet_to_platform', 'platform_to_wallet', 'platform_to_platform', 'transfer')
+    `;
 
     const params = [userId];
 
-    // 필터 조건 동적 구성
-    if (status) {
-      sql += ` AND status = ?`;
-      params.push(status);
-    }
+    if (status) { baseSql += ` AND status = ?`; params.push(status); }
+    if (from_type) { baseSql += ` AND from_type = ?`; params.push(from_type); }
+    if (to_platform_id) { baseSql += ` AND to_platform_id = ?`; params.push(to_platform_id); }
 
-    if (from_type) {
-  sql += ` AND from_type = ?`;
-  params.push(from_type);
-}
+    const dataSql = `
+      SELECT 
+        id,
+        amount,
+        type,
+        currency,
+        to_platform_id,
+        to_platform_user_id,
+        expected_amount,
+        exchange_rate,
+        from_type,
+        from_platform_id,
+        from_platform_user_id,
+        user_memo AS memo,
+        status,
+        confirmed_by_admin,
+        admin_note,
+        created_at,
+        updated_at
+      ${baseSql}
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `;
 
-if (to_platform_id) {
-  sql += ` AND to_platform_id = ?`; 
-  params.push(to_platform_id);
-}
+    console.log('📄 dataSql 실행');
+    const [data] = await db.query(dataSql, [...params, parseInt(limit), parseInt(offset)]);
+    console.log('✅ data length:', data.length);
 
-    sql += ` ORDER BY created_at DESC`;
+    const countSql = `SELECT COUNT(*) AS total ${baseSql}`;
+    console.log('📄 countSql 실행');
+    const [count] = await db.query(countSql, params);
 
-    const [rows] = await db.query(sql, params);
-    res.status(200).json({ success: true, data: rows });
+    const total = count[0]?.total || 0;
+    const totalPages = Math.ceil(total / limit);
+    console.log('📊 total:', total, '➡️ totalPages:', totalPages);
+
+    res.status(200).json({
+      success: true,
+      data,
+      total,
+      totalPages,
+      currentPage: parseInt(page),
+      limit: parseInt(limit),
+    });
+    console.log('✅ 응답 전송 완료');
   } catch (error) {
-    console.error('getPlatformMoveHistory error:', error);
+    console.error('❌ getPlatformMoveHistory error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch move history.' });
   }
 };
 
 
-//머니이동 관리자승인/거절 0724  승인시 transactions에서 상태 승인으로 바뀌고 user_blance 테이블 업데이트 되고 site_transactions 여기에 따로 기록 남는 구조 
-// 거절 시 transactions에서 상태 거절로 바뀌고 user_blance, site_transactions 아무 영향없음.
+
+// 머니이동 관리자 승인/거절
+// 승인 시: transactions 상태 'completed'로 변경, user_balances 업데이트, site_transactions 기록 남김
+// 거절 시: transactions 상태 'rejected'로 변경, user_balances / site_transactions 변화 없음
+
 exports.approvePlatformMove = async (req, res) => {
   const { id } = req.params;
   if (!req.user?.id) return res.status(401).json({ message: 'Unauthenticated' });
@@ -1122,41 +1147,90 @@ exports.approvePlatformMove = async (req, res) => {
 
   const connection = await db.getConnection();
   try {
+    console.log('📥 승인 요청 ID:', id);
     const [txRows] = await connection.query(
-      `SELECT id,user_id,amount,from_type,to_platform_id,to_platform_user_id,status
+      `SELECT id, user_id, amount, from_type, to_platform_id, to_platform_user_id, status, type
        FROM transactions
-       WHERE id=? AND type IN ('wallet_to_platform','platform_to_platform','platform_to_wallet') AND status='pending'`,
+       WHERE id=? 
+         AND type IN ('wallet_to_platform','platform_to_platform','platform_to_wallet') 
+         AND status='pending'`,
       [id]
     );
+
     const tx = txRows[0];
     if (!tx) return res.status(404).json({ message: 'Transfer request not found or already processed.' });
 
     await connection.beginTransaction();
 
+    // ✅ transactions 상태 'completed'로 변경
     await connection.execute(
-      `UPDATE transactions SET status='completed', confirmed_by_admin=1, admin_id=?, updated_at=NOW() WHERE id=?`,
+      `UPDATE transactions 
+         SET status='completed', confirmed_by_admin=1, admin_id=?, updated_at=NOW() 
+       WHERE id=? AND status='pending'`,
       [adminId, id]
     );
+    console.log('🟢 transactions 상태 업데이트 완료');
 
-    if (tx.from_type === 'wallet') {
-      const [balRows] = await connection.execute('SELECT balance FROM user_balances WHERE user_id=?', [tx.user_id]);
-      if (!balRows.length) { await connection.rollback(); return res.status(400).json({ message: 'Wallet balance not found.' }); }
-      if (balRows[0].balance < tx.amount) { await connection.rollback(); return res.status(400).json({ message: 'Insufficient wallet balance.' }); }
-      await connection.execute('UPDATE user_balances SET balance = balance - ? WHERE user_id=?', [tx.amount, tx.user_id]);
+    // 💸 지갑 → 플랫폼 (출금)
+    if (tx.type.trim() === 'wallet_to_platform') {
+      const [balRows] = await connection.execute(
+        'SELECT balance FROM user_balances WHERE user_id=?',
+        [tx.user_id]
+      );
+
+      const currentBalance = Number(balRows[0]?.balance ?? 0);
+      const amount = Number(tx.amount);
+
+      if (currentBalance < amount) {
+        await connection.rollback();
+        console.log('❌ 잔액 부족. current:', currentBalance, '요청금액:', amount);
+        return res.status(400).json({ message: 'Insufficient wallet balance.' });
+      }
+
+      await connection.execute(
+        'UPDATE user_balances SET balance = balance - ? WHERE user_id=?',
+        [amount, tx.user_id]
+      );
+      console.log('💳 wallet_to_platform 출금 완료');
     }
 
+    // 💰 플랫폼 → 지갑 (입금)
+    if (tx.type === 'platform_to_wallet') {
+      const amount = Number(tx.amount);
+      await connection.execute(
+        `INSERT INTO user_balances (user_id, balance)
+         VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE balance = balance + VALUES(balance)`,
+        [tx.user_id, amount]
+      );
+      console.log('💰 platform_to_wallet 입금 완료');
+    }
+
+    // site_transactions 기록
     await connection.execute(
       `INSERT INTO site_transactions
-       (user_id,type,amount,reason,from_type,to_platform_id,to_platform_user_id,status,approved_by_admin,admin_id,created_at,updated_at)
-       VALUES (?,?,?,?,?,?,?,'approved',1,?,NOW(),NOW())`,
-      [tx.user_id, 'platform_move', tx.amount, '머니이동 승인', tx.from_type, tx.to_platform_id, tx.to_platform_user_id, adminId]
+         (user_id, type, amount, reason, from_type, to_platform_id, to_platform_user_id, 
+          status, approved_by_admin, admin_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'approved', 1, ?, NOW(), NOW())`,
+      [
+        tx.user_id,
+        'platform_move',
+        tx.amount,
+        '머니이동 승인',
+        tx.from_type,
+        tx.to_platform_id,
+        tx.to_platform_user_id,
+        adminId,
+      ]
     );
 
     await connection.commit();
     return res.json({ message: 'Transfer approved successfully.' });
   } catch (err) {
-    try { await connection.rollback(); } catch {}
-    console.error('approvePlatformMove error:', err);
+    try {
+      await connection.rollback();
+    } catch {}
+    console.error('❌ approvePlatformMove error:', err);
     return res.status(500).json({ message: 'Internal Server Error', error: err.message });
   } finally {
     connection.release();
@@ -1219,10 +1293,18 @@ exports.rejectPlatformMove = async (req, res) => {
 
 //머니이동 관리자  요청 조회 0724
 //머니이동 관리자 요청 조회 (수정됨)
+// 관리자 - 머니 이동 신청 목록 (페이징 포함)
 exports.getAllMoveRequests = async (req, res) => {
+  console.log('📥 [getAllMoveRequests] 요청 도착');
+
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 15;
+  const offset = (page - 1) * limit;
+
   try {
-    const [rows] = await db.query(
-      `SELECT 
+    // ✅ 데이터 조회 쿼리
+    const dataSql = `
+      SELECT 
         t.id,
         t.user_id,
         u.username,
@@ -1249,13 +1331,44 @@ exports.getAllMoveRequests = async (req, res) => {
         'platform_to_platform',
         'transfer'
       )
-      ORDER BY t.created_at DESC`
-    );
+      ORDER BY t.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
 
-    res.status(200).json({ success: true, data: rows });
+    const [rows] = await db.query(dataSql, [limit, offset]);
+
+    // ✅ 전체 개수 조회 쿼리
+    const [countResult] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM transactions t
+      JOIN users u ON t.user_id = u.id
+      WHERE t.type IN (
+        'wallet_to_platform',
+        'platform_to_wallet',
+        'platform_to_platform',
+        'transfer'
+      )
+    `);
+
+    const total = countResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+
+    console.log('📊 총 개수:', total, '| 총 페이지:', totalPages);
+
+    res.status(200).json({
+      success: true,
+      data: rows,
+      total,
+      totalPages,
+      currentPage: page,
+      limit,
+    });
   } catch (error) {
-    console.error('getAllMoveRequests error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch move requests.' });
+    console.error('❌ getAllMoveRequests error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch move requests.',
+    });
   }
 };
 

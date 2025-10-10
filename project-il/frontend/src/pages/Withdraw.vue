@@ -68,6 +68,9 @@ hasPending.value = arr.some(tx => tx.status === 'pending' && pendingTypes.includ
     hasPending.value = false
   }
 }
+onMounted(async () => {
+  await axiosUser.get('/users/info')
+})
 
 onMounted(checkPending)
 </script>

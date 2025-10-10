@@ -2,12 +2,14 @@
 import UserLayout from '@/components/UserLayout.vue'
 import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from '@/axiosUser'
+import axiosUser  from '@/axiosUser'
 import '@/assets/style.css'
 import home001 from '@/assets/img/home001.jpg';
 import home002 from '@/assets/img/home002.jpg';
 import home003 from '@/assets/img/home003.jpg';
-import home004 from '@/assets/img/home004.png';
+
+
+
 
 
 const externalSites = [
@@ -22,12 +24,6 @@ const externalSites = [
     image: home002,
   },
   {
-    name: 'pokernex',
-    url: 'https://pokernex.net/',
-    image: home004 ,
-
-  },
-  {
     name: 'pokerbros',
     url: 'https://pokerbroskorea.net/',
     image: home001,
@@ -40,9 +36,9 @@ const router = useRouter()
 
 const logout = () => {
   localStorage.removeItem('user_token')
-  alert('You have been logged out.')
   router.push('/home')
 }
+
 
 const rates = ref({})
 const date = ref('')
@@ -50,7 +46,7 @@ const notices = ref([])
 
 const getRates = async () => {
   try {
-    const res = await axios.get(`/exchange-rate`);
+    const res = await axiosUser.get(`/exchange-rate`);
 
     if (typeof res.data === 'string' && res.data.includes('<!doctype html')) {
       console.error('❌ API 대신 HTML이 응답됨: 잘못된 API 요청 경로 또는 프록시 오류');
@@ -68,16 +64,29 @@ const getRates = async () => {
 const getNotices = async () => {
   try {
     const lang = localStorage.getItem('lang') || 'en'
-    const res = await axios.get(`/users/notices?limit=3&lang=${lang}`)
+    const res = await axiosUser.get(`/users/notices?limit=3&lang=${lang}`)
     notices.value = res.data.notices
   } catch (err) {
     console.error('공지사항 실패:', err)
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    // 🔹 사용자 정보 (토큰 만료 자동 처리)
+    const res = await axiosUser.get('/users/info')
+  } catch (err) {
+    console.error('사용자 정보 로드 실패:', err)
+  }
+
+  // 🔹 기존 기능
   getRates()
   getNotices()
+
+  // 🔹 오버레이 처리
+  if (sessionStorage.getItem('overlayClosed') === '1') {
+    showOverlay.value = false
+  }
 })
 
 const formatRate = val => Number(val).toFixed(2)
@@ -87,12 +96,6 @@ const showOverlay = ref(true)
 // URL에 preview=true 있으면 닫기 버튼 보이고 오버레이 닫기 가능
 const canClose = new URLSearchParams(window.location.search).has('preview')
 
-onMounted(() => {
-  // 만약 이전에 닫았었다면 (세션 스토리지에 기록), 아예 보이지 않게
-  if (sessionStorage.getItem('overlayClosed') === '1') {
-    showOverlay.value = false
-  }
-})
 
 function closeOverlay() {
   showOverlay.value = false
@@ -160,7 +163,7 @@ function closeOverlay() {
 /* 카드 그리드 정리 */
 .section-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 .section-two-grid {
@@ -373,87 +376,165 @@ function closeOverlay() {
 .notice-list li:last-child {
     border-bottom: none;
   }
+
 @media screen and (max-width: 768px) {
 
-.notice-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-      padding: 0.4rem 1rem;
-  text-decoration: none;
-  color: #333;
-  transition: background 0.2s;
-  font-size: 14px;
-}
-.notice-list ul{
-  padding: 0 !important;
-  margin: 0 !important;
-}
- .notice-list li {
-    padding: 0 !important;
-    border-bottom: 1px solid #f2f2f2;
-    font-size: 14px;
+  .home {
+    background: linear-gradient(180deg, #f5f8ff 0%, #f9fbff 100%) !important;
+    padding: 1rem 0.8rem 2rem;
   }
-/* 카드 그리드 정리 */
-.section-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.section-two-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1rem;
-  margin-top: 1rem;
-}
-  .section-two-grid .card {
-    padding: 1rem !important;
+  /* 🔹 카드 레이아웃 정리 */
+  .section-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-top: 1rem;
   }
-
-  .card-img {
-    height: 120px;
+  /* 🔹 외부 링크 카드 (앱 느낌) */
+  .external-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+    border-radius: 18px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    text-align: center;
+    border: 1px solid #e8edff;
+    transition: all 0.25s ease;
   }
+  .external-card:active {
+    transform: scale(0.96);
+  }
+.card-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+.card-body {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 0 0 12px 12px;
+}
 
   .card-title {
+    color: #ffffff;
     font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.3rem;
+    white-space: nowrap;
   }
 
-  .card-body {
-    padding: 0.3rem 0.7rem;
+  /* 🔹 공지사항 / 환율 카드 */
+  .section-two-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-top: 1.3rem;
   }
-  .notice-row:last-child {
-  border-bottom: none;
-}
+  .section-two-grid .card {
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #edf1ff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 1.3rem !important;
+  }
+  .card h2 {
+    font-size: 1rem;
+    color: #3c5ef0;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+  }
+
+  .notice-card {
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #edf1ff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 1rem 1.1rem !important;
+  }
+    .notice-card h2 {
+    font-size: 1rem;
+    color: #3c5ef0;
+    margin-bottom: 0.7rem;
+    font-weight: 700;
+  }
+   .notice-list {
+    padding: 0;
+    margin: 0;
+  }
+  /* 🔹 리스트 영역 간격 조정 */
+  .notice-list li {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid #f0f3fa;
+  }
+  .notice-list li:last-child {
+    border-bottom: none;
+  }
+
+
   .notice-row {
-    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.2s;
+  }
+    .notice-row .date {
+    display: none;
+  }
+  .notice-row:hover {
+    background: #f7f9ff;
   }
 
   .notice-row .title {
-    font-size: 1rem;
-  }
-
-  .notice-row .date {
-    font-size: 12px;
-  }
-    .notice-card {
-    padding: 1rem !important;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    border: 1px solid #eee;
-    background: #fff;
-  }
-    .notice-list li {
-        white-space: nowrap;
+    font-size: 0.9rem;
+    color: #333;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f2f2f2;
-    font-size: 14px;
+    white-space: nowrap;
+  }
+  .notice-row:hover {
+    background: #f7f9ff;
   }
 
-  .notice-list li:last-child {
-    border-bottom: none;
+  /* 🔹 환율 블록 */
+  .rate-card {
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #edf1ff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 1.1rem 1.2rem !important;
+  }
+
+  .rate-list-block {
+    background: #f9faff;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+  }
+  .rate-date {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 0.8rem;
+  }
+
+  /* 🔹 약간의 애니메이션 */
+  .card {
+    animation: fadeInUp 0.4s ease both;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 .rate-list-block{

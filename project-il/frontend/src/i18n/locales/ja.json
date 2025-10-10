@@ -4,12 +4,16 @@
   "server_error": "サーバーエラーが発生しました。",
   "password_mismatch": "新しいパスワードが一致しません。",
   "unknown": "不明なエラーが発生しました。"
-},"alert": {
+},
+"alert": {
   "pendingMoneyRequest": "未処理のマネー関連申請があります。",
   "pendingRequestWithAction": "申請が保留中です。新しい申請の前にステータスを確認してください。",
-  "checkStatus": "ステータス確認", "emptyFields": "ユーザーIDとメールアドレスを入力してください。",
+  "checkStatus": "ステータス確認",
+   "emptyFields": "ユーザーIDとメールアドレスを入力してください。",
     "linkSent": "再設定リンクをメールで送信しました。",
-    "requestFailed": "リクエストに失敗しました"
+    "requestFailed": "リクエストに失敗しました",
+      "sessionExpiredTitle": "セッションの有効期限が切れました",
+    "sessionExpiredText": "再度ログインしてください。"
 }
 ,"reset": {
   "invalidAccess": "不正なアクセスです。",

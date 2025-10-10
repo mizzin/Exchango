@@ -15,7 +15,9 @@ exports.verifyToken = (req, res, next) => {
     //console.log('[DEBUG] 디코딩된 사용자:', decoded);
     next()  
   } catch (err) {
-    console.error('[ERROR] 토큰 오류:', err)
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: '토큰이 만료되었습니다.' })
+    }
     return res.status(403).json({ message: '유효하지 않은 토큰입니다.' })
   }
 }
