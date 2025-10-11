@@ -263,7 +263,7 @@ const goToHandler = (item) => {
   const map = {
     wallet_charge: '/admin/trade/wallet-charge',
     platform_charge: '/admin/trade/recharge',
-    wallet_withdraw: '/admin/trade/wallet-transfer',
+    wallet_withdraw: '/admin/trade/wallet-withdraw',
     platform_withdraw: '/admin/trade/withdraw',
         platform_withdraw: '/admin/trade/withdraw',
  wallet_to_platform:'/admin/trade/wallet-transfer',
