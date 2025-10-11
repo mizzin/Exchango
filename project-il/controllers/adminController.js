@@ -5,6 +5,8 @@ const warningModel = require('../models/warningModel');
 const db = require('../db');
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const toManilaTime = require('../utils/formatDate')
+
 
 // 통계 API
 exports.getSummary = async (req, res) => {
@@ -127,6 +129,11 @@ exports.getAllUsers = async (req, res) => {
   [...values, Number(limit), Number(offset)]
 );
 
+const formattedUsers = users.map(u => ({
+  ...u,
+  created_at: toManilaTime(u.created_at),
+  updated_at: toManilaTime(u.updated_at)
+}))
     const [[{ count }]] = await db.query(
       `SELECT COUNT(DISTINCT u.id) as count
        FROM users u
@@ -140,7 +147,7 @@ exports.getAllUsers = async (req, res) => {
     );
 
     res.json({
-      users,
+      users : formattedUsers,
       totalPages: Math.ceil(count / limit)
     });
   } catch (err) {
@@ -405,8 +412,12 @@ exports.getSentMessages = async (req, res) => {
       LIMIT ? OFFSET ?
     `, [limit, offset])
 
+    const formattedMessages = rows.map(m => ({
+      ...m,
+      created_at: toManilaTime(m.created_at)
+    }))
     res.json({
-      messages: rows,
+      messages: formattedMessages,
       total,
       totalPages,
       currentPage: page
@@ -487,12 +498,16 @@ exports.getAllNotices = async (req, res) => {
     const total = countResult[0].total
     const totalPages = Math.ceil(total / limit)   // ✅ 계산
 
+    const formattedNotices = notices.map(n => ({
+      ...n,
+      created_at: toManilaTime(n.created_at)
+    }))
     res.json({ 
-      success: true, 
-      notices, 
-      total, 
-      totalPages: Math.ceil(total / limit), 
-      currentPage: page // 있으면 프론트에서 편함
+      success: true,
+      notices: formattedNotices,
+      total,
+      totalPages,
+      currentPage: page
     })
   } catch (err) {
     console.error('❌ 공지 목록 조회 실패:', err)

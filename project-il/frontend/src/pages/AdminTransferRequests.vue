@@ -50,7 +50,7 @@
       </span>
     </td>
  <td>{{ item.confirmed_by_admin || '-' }}</td>  
- <td>{{ formatDate(item.created_at) }}</td>
+ <td>{{ item.created_at}}</td>
     <td>
       <template v-if="item.status === 'pending'">
      <button class="btn btn-success btn-sm" @click="approve(item.id)" :disabled="item.status !== 'pending'">승인</button>

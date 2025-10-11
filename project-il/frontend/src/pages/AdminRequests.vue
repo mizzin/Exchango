@@ -74,7 +74,7 @@
                     @click="openDetail(item)"
                     class="cursor-pointer"
                     >
-                <td>{{ formatDate(item.created_at) }}</td>
+                <td>{{ item.created_at }}</td>
                 <td>
                 {{ formatType(item) }}
                 <div v-if="item.type === 'wallet_transfer'" class="text-muted small">
@@ -323,4 +323,9 @@ onMounted(() => {
 .modal {
   background-color: rgba(0, 0, 0, 0.5);
 }
+.bg-secondary {
+  background-color: #d0d4ff !important; /* 연한 블루톤 */
+  color: #1b1f5f !important;            /* 진한 남색 텍스트 */
+}
+
 </style>

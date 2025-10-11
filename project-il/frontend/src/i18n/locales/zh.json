@@ -21,7 +21,10 @@
     "linkSent": "重置链接已发送到您的邮箱。",
     "requestFailed": "请求失败",
        "sessionExpiredTitle": "會話已過期",
-    "sessionExpiredText": "請重新登入。"
+    "sessionExpiredText": "請重新登入。",
+      "transferSuccess": "轉帳申請已成功提交。",
+    "rateNotReady": "匯率尚未準備好。",
+    "transferFailed": "轉帳申請失敗。"
 },"reset": {
   "invalidAccess": "无效的访问。",
   "minLength": "密码长度必须至少 8 位。",

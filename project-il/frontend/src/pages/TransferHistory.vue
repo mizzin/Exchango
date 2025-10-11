@@ -4,43 +4,59 @@
   <h2>{{ $t('history.transfer.title') }}</h2>
   <p>{{ $t('history.transfer.description') }}</p>
 
-      <table v-if="paginatedHistory.length">
-        <thead>
-          <tr>
-            <th>{{ $t('history.transfer.date') }}</th>
-            <th>{{ $t('history.transfer.from') }}</th>
-            <th>{{ $t('history.transfer.to') }}</th>
-            <th>{{ $t('history.transfer.amount') }}</th>
-            <th>{{ $t('history.transfer.converted') }}</th>
-            <th>{{ $t('history.transfer.status') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in paginatedHistory" :key="item.id" class="clickable-row" @click="openDetail(item)">
-            <td>{{ formatDate(item.created_at) }}</td>
+     <table v-if="paginatedHistory.length">
+  <thead>
+    <tr>
+      <th>{{ $t('history.transfer.date') }}</th>
+      <th>{{ $t('history.transfer.from') }}</th>
+      <th>{{ $t('history.transfer.to') }}</th>
+      <th>{{ $t('history.transfer.amount') }}</th>
+      <th>{{ $t('history.transfer.converted') }}</th>
+      <th>{{ $t('history.transfer.status') }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr
+      v-for="item in paginatedHistory"
+      :key="item.id"
+      class="clickable-row"
+      @click="openDetail(item)"
+    >
+      <td :data-label="$t('history.transfer.date')">{{ formatDate(item.created_at) }}</td>
 
-            <td>
-              {{ item.from_type === 'wallet' ? $t('history.transfer.wallet') : getPlatformName(item.from_platform_id) }}
-            </td>
-            <td>
-              {{ item.to_platform_id === null ? $t('history.transfer.wallet') : getPlatformName(item.to_platform_id) }}
-            </td>
-            <td>{{ formatAmount(item.amount, item.currency) }}</td>
+<td :data-label="$t('history.transfer.from')">
+  {{ item.from_type === 'wallet'
+    ? $t('history.transfer.wallet')
+    : getPlatformName(item.from_platform_id) }}
+</td>
 
-           <td>
-            <span v-if="item.expected_amount">
-              {{ formatAmount(item.expected_amount, getCurrencyByPlatformId(item.to_platform_id)) }}
-            </span>
-            <span v-else>-</span>
-          </td>
-            <td>
-              <span :class="'badge status-' + item.status">
-                {{ formatStatus(item.status) }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+<td :data-label="$t('history.transfer.to')">
+  {{ item.to_platform_id === null
+    ? $t('history.transfer.wallet')
+    : getPlatformName(item.to_platform_id) }}
+</td>
+
+<td :data-label="$t('history.transfer.amount')">
+  {{ formatAmount(item.amount, item.currency) }}
+</td>
+
+<td :data-label="$t('history.transfer.converted')">
+  <span v-if="item.expected_amount">
+    {{ formatAmount(item.expected_amount, getCurrencyByPlatformId(item.to_platform_id)) }}
+  </span>
+  <span v-else>-</span>
+</td>
+
+<td :data-label="$t('history.transfer.status')">
+  <span :class="'badge status-' + item.status">
+    {{ formatStatus(item.status) }}
+  </span>
+</td>
+
+    </tr>
+  </tbody>
+</table>
+
 
       <div v-else style="text-align: center; padding: 2rem; color: #777;">
         {{ $t('history.noRechargeHistory') }}
@@ -189,7 +205,7 @@ onMounted(() => {
   fetchHistory()
 })
 onMounted(async () => {
-  const res = await axiosUser.get('/users/info')
+  const res = await axios.get('/users/info')
 })
 </script>
 
@@ -334,4 +350,68 @@ td {
 .clickable-row:hover {
   background-color: #f0f8ff;
 }
+/* 💡 모바일에서 테이블이 깨지지 않게 감싸기 */
+@media (max-width: 768px) {
+  /* 카드형 전환 */
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.1s ease;
+  }
+
+  tbody tr:active {
+    transform: scale(0.99);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    border: none;
+    font-size: 13px;
+  }
+
+  /* 각 셀 제목 표시 */
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+  }
+
+  .badge {
+    font-size: 12px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .clickable-row {
+    cursor: pointer;
+  }
+
+  .recharge-history {
+    padding: 1rem;
+    box-shadow: none;
+  }
+
+  .pagination {
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+
+
 </style>

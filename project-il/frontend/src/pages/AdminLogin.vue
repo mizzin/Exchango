@@ -22,21 +22,31 @@
   const username = ref('')
   const password = ref('')
   
-  const handleLogin = async () => {
-    try {
-      const res = await axios.post('/users/login', {
-        username: username.value,
-        password: password.value
-      })
-  
-      if (res.data.token) {
-        localStorage.setItem('admin_token', res.data.token)
-        router.push('/admin/dashboard')
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || '로그인 실패')
+ const handleLogin = async () => {
+  try {
+    const res = await axios.post('/users/login', {
+      username: username.value,
+      password: password.value
+    })
+
+    const role = res.data.role
+    const token = res.data.token
+
+    // ✅ 관리자 계정만 통과
+    if (role !== 'admin') {
+      alert('관리자 전용 계정이 아닙니다.')
+      return
     }
+
+    if (token) {
+      localStorage.setItem('admin_token', token)
+      router.push('/admin/dashboard')
+    }
+  } catch (err) {
+    alert(err.response?.data?.message || '로그인 실패')
   }
+}
+
   </script>
   
   <style scoped>

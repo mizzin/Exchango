@@ -66,9 +66,9 @@
                 {{ formatStatus(item.status) }}
               </span>
             </td>
-            <td>{{ formatDate(item.created_at) }}</td>
+            <td>{{ item.created_at }}</td>
             <td>
-              <span v-if="item.status === 'completed'">{{ formatDate(item.updated_at) }}</span>
+              <span v-if="item.status === 'completed'">{{ item.updated_at }}</span>
               <span v-else>-</span>
             </td>
             <td>

@@ -245,7 +245,7 @@ const submitWithdraw = async () => {
   }
 }
 onMounted(async () => {
-  await axiosUser.get('/users/info')
+  await axios.get('/users/info')
 })
 
 onMounted(() => {

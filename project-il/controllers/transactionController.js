@@ -6,6 +6,8 @@ const sendMessage = require('../utils/sendMessage')
 const bcrypt = require('bcrypt');
 const transaction = require('../models/transaction');
 const sendTelegramMessage = require('../utils/telegram');
+const toManilaTime = require('../utils/formatDate')
+
 
 //충전신청 0728 쿼리 외부
 exports.createTransaction = async (req, res) => {
@@ -544,6 +546,8 @@ exports.getWalletChargeList = async (req, res) => {
   } = req.query;
 
 
+
+
   const parsedLimit = Number(limit) || 20;
   const parsedOffset = (Number(page) - 1) * parsedLimit;
 
@@ -594,10 +598,18 @@ const countQuery = `
   SELECT COUNT(*) as total
   ${baseQuery}
 `;
+
+
 // ⚠️ 여기! LIMIT/OFFSET은 쿼리에 직접 들어가 있으니, params에 넣지 말 것!
 const [rows] = await db.execute(listQuery, params);
 const [countRows] = await db.execute(countQuery, params.slice(0, params.length));
-    res.json({ data: rows, total: countRows[0].total });
+
+const formattedRows = rows.map(r => ({
+  ...r,
+  created_at: toManilaTime(r.created_at),
+  updated_at: toManilaTime(r.updated_at)
+}))
+    res.json({ data: formattedRows, total: countRows[0].total });
   } catch (err) {
     console.error('❌ getWalletChargeList error:', err);
     res.status(500).json({ message: 'Internal Server Error', error: err.message });
@@ -765,9 +777,14 @@ console.log('📤 [API 응답 데이터 확인]', {
   totalPages,
   rows: rows.length
 })
+const formattedRows = rows.map(r => ({
+  ...r,
+  created_at: toManilaTime(r.created_at),
+  updated_at: toManilaTime(r.updated_at)
+}))
     // ✅ 프론트가 기대하는 포맷으로 반환
     return res.json({
-      data: rows,
+      data: formattedRows,
       total,
       totalPages,      // ✅ 반드시 추가
       page: Number(page),
@@ -1354,10 +1371,14 @@ exports.getAllMoveRequests = async (req, res) => {
     const totalPages = Math.ceil(total / limit);
 
     console.log('📊 총 개수:', total, '| 총 페이지:', totalPages);
-
+const formattedRows = rows.map(r => ({
+  ...r,
+  created_at: toManilaTime(r.created_at),
+  updated_at: toManilaTime(r.updated_at)
+}))
     res.status(200).json({
       success: true,
-      data: rows,
+      data: formattedRows,
       total,
       totalPages,
       currentPage: page,
@@ -1423,9 +1444,13 @@ if (endDate) {
 
     const data = await db.query(dataSql, [...params, parseInt(limit), parseInt(offset)])
     const count = await db.query(countSql, params)
-
+      const formattedData = data[0].map(r => ({
+        ...r,
+        created_at: toManilaTime(r.created_at),
+        updated_at: toManilaTime(r.updated_at)
+      }))
     res.json({
-      data: data[0],
+      data: formattedData,
       total: count[0][0].total,
       page: parseInt(page),
       limit: parseInt(limit)

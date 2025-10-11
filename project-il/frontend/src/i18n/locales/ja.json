@@ -13,7 +13,10 @@
     "linkSent": "再設定リンクをメールで送信しました。",
     "requestFailed": "リクエストに失敗しました",
       "sessionExpiredTitle": "セッションの有効期限が切れました",
-    "sessionExpiredText": "再度ログインしてください。"
+    "sessionExpiredText": "再度ログインしてください。",
+     "transferSuccess": "送金リクエストが正常に送信されました。",
+    "rateNotReady": "為替レートの計算がまだ完了していません。",
+    "transferFailed": "送金リクエストに失敗しました。"
 }
 ,"reset": {
   "invalidAccess": "不正なアクセスです。",

@@ -13,7 +13,11 @@
     "linkSent": "A reset link has been sent to your email.",
     "requestFailed": "Request failed",
        "sessionExpiredTitle": "Session expired",
-    "sessionExpiredText": "Please log in again."
+    "sessionExpiredText": "Please log in again.",
+    "transferSuccess": "Transfer request submitted successfully.",
+    "pendingRequestWithAction": "You already have a pending request.",
+    "rateNotReady": "Exchange rate is not ready yet.",
+    "transferFailed": "Failed to submit transfer request."
 
 },"reset": {
   "invalidAccess": "Invalid access.",

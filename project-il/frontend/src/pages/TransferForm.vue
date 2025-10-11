@@ -39,7 +39,7 @@
         <select v-model="form.from_platform_id">
           <option v-for="p in platformOptions" :key="p.platform_id" :value="p.platform_id">{{ p.name }}</option>
         </select>
-        <input v-model="form.from_platform_user_id" :placeholder="$t('transfer.request1.fromPlatformId')" />
+        <input   type="text" v-model="form.from_platform_user_id" :placeholder="$t('transfer.request1.fromPlatformId')" />
       </div>
 
       <!-- 도착 플랫폼 -->
@@ -50,7 +50,7 @@
           <option value="wallet">{{ $t('transfer.request1.myWallet') }}</option>
           <option v-for="p in platformOptions" :key="p.platform_id" :value="p.platform_id">{{ p.name }}</option>
         </select>
-        <input v-model="form.to_platform_user_id" :placeholder="$t('transfer.request1.toPlatformId')" />
+        <input v-model="form.to_platform_user_id"   type="text" :placeholder="$t('transfer.request1.toPlatformId')" />
       </div>
 
       <!-- 금액 입력 -->
@@ -84,6 +84,8 @@ import { ref, onMounted, watch, computed } from 'vue'
 import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
+import Swal from 'sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 
 // ✅ 추가: pending 상태
 const hasPending = ref(false)
@@ -190,20 +192,45 @@ const submit = async () => {
   // ✅ 제출 직전에도 최신 상태로 재확인 (경쟁 상태 방지)
   await checkPending()
   if (hasPending.value) {
-    return alert(t('alert.pendingRequestWithAction'))
+    return Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: t('alert.pendingRequestWithAction'),
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    })
   }
 
   if (!form.value.exchange_rate || !form.value.expected_amount) {
-    return alert(t('transfer.request1.alert.rateNotReady'))
+    return Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: t('alert.rateNotReady'),
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    })
   }
-
   try {
     const res = await axios.post('/transactions/wallet/transfer', form.value)
-    alert(res.data.message)
-    // 필요하면 새로고침
-    window.location.reload()
+     // ✅ 성공 알림
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: t('alert.transferSuccess'),
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    })
+
+    // 새로고침은 잠시 딜레이 후 실행하면 더 자연스러움
+    setTimeout(() => window.location.reload(), 1000)
   } catch (err) {
-    alert(err.response?.data?.message || t('transfer.request1.alert.failed'))
+    alert(err.response?.data?.message || t('alert.transferFailed'))
   }
 }
 
@@ -212,152 +239,187 @@ onMounted(() => {
   checkPending() // ✅ 페이지 진입 시 체크
 })
 onMounted(async () => {
-  const res = await axiosUser.get('/users/info')
+  const res = await axios.get('/users/info')
 })
 </script>
 
 
 <style scoped>
-.pending-banner {
-  background-color: #fff3cd; /* 연한 노랑 (경고 느낌) */
-  color: #856404;            /* 어두운 갈색 텍스트 */
-  border: 1px solid #ffeeba;
-  padding: 12px 16px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  margin-bottom: 1rem;
-}
 
-.pending-banner i {
-  color: #856404;
-  font-size: 18px;
-}
-
-.pending-banner a {
-  margin-left: auto;
-  color: #0d6efd; /* 파란색 링크 */
-  font-weight: 500;
-  text-decoration: underline;
-}
-
-
-.blur-overlay {
-  position: absolute; top:0; left:0; right:0; bottom:0;
-  background: rgba(255,255,255,0.8);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  font-size: 17px; z-index:10;
-  pointer-events: all;
-}
-
-.transfer-form{
+/* 💡 전체 폼 박스 */
+.transfer-form {
   background-color: #fff;
   max-width: 420px;
   margin: auto;
   padding: 2rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-  border-radius: 12px;}
+  border-radius: 12px;
+}
 
+
+/* 라벨 */
 .form-group label {
   font-weight: 600;
-    margin-bottom: 6px;
-    color: #333;
-    font-size: 14px;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 0.4rem;
 }
-
-.form-group input[type="radio"] {
-  margin-right: 6px;
-  accent-color: #007bff; /* 선택된 색상 커스터마이즈 */
-}
-.form-group{
-  margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column;
-}
-
-input, select {
+/* 인풋/셀렉트 */
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select {
   width: 100%;
-  padding: 10px;
-  margin-bottom:0.4rem ;
-}
-.btn-submit {
-  width: 100%;
-  padding: 12px;
-  font-size: 14px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  border: 1.2px solid #dbe1fa;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  font-size: 0.95rem;
+  background: #ffffff;
+  color: #333;
+  outline: none;
+  transition: 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
 }
 
+input:focus,
+select:focus {
+  border-color: #3c5ef0;
+  box-shadow: 0 0 0 3px rgba(60,94,240,0.1);
+}
 
+::placeholder {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+/* select 바로 아래 input 간격 확보 */
+select + input {
+  margin-top: 0.6rem; /* 살짝 띄워서 시각적으로 여유 줌 */
+}
+
+/* 그룹 간격 */
+.form-group {
+  margin-bottom: 1.1rem;
+}
+
+/* 라디오 버튼 그룹 */
 .radio-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.8rem;
 }
 
+/* 라디오 버튼 카드 */
 .radio-option {
+  border: 1.6px solid #e4e8ff;
+  border-radius: 14px;
+  background: #fff;
+  padding: 1rem;
+  transition: 0.25s ease;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-  background-color: #f9f9f9;
+  gap: 0.8rem;
   cursor: pointer;
 }
-.radio-option:hover,
-.radio-option:active {
-  border-color: #3b49df;
-}
+
 .radio-option.selected {
-  background-color: #fff;
-  border-color: #3b49df;
-}
-.radio-option input[type="radio"] {
-  margin-top: 4px;
-  transform: scale(1.2);
+  border-color: #3c5ef0;
+  background: linear-gradient(180deg, #f6f8ff 0%, #ffffff 100%);
+  box-shadow: 0 3px 10px rgba(60, 94, 240, 0.1);
 }
 
+.radio-option input[type="radio"] {
+  transform: scale(1.2);
+  accent-color: #3c5ef0;
+}
 .radio-content {
-  display: flex;
-  flex-direction: column;
+    display: flex
+;
+    flex-direction: column;
+}
+.radio-content strong {
+  font-size: 0.95rem;
+  color: #222;
 }
 
 .radio-desc {
-  font-size: 13px;
-  color: #666;
-  margin-top: 2px;
   font-weight: 400;
+  font-size: 0.82rem;
+  color: #666;
+  margin-top: 0.25rem;
 }
-input[type="radio"] {
-  width: auto;
-  height: auto;
-  margin: 2px 6px 0 0;
-  padding: 0;
-  transform: scale(1.1);
-  vertical-align: middle;
-  cursor: pointer;
+
+/* 버튼 */
+.btn-submit {
+  background: linear-gradient(90deg, #3c5ef0 0%, #274bdf 100%);
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.9rem;
+  margin-top: 1.2rem;
+  box-shadow: 0 4px 10px rgba(60, 94, 240, 0.25);
+  transition: 0.2s ease;
 }
-/* 모바일 대응 */
-@media (max-width: 480px) {
+
+.btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(60, 94, 240, 0.3);
+}
+
+
+/* 경고 배너 */
+.pending-banner {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.2rem;
+}
+
+/* 블러 오버레이 */
+.blur-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  pointer-events: all;
+  border-radius: 16px;
+}
+
+/* ✅ 모바일 세부 조정 */
+@media (max-width: 768px) {
+  .transfer-form {
+    box-shadow: none;
+    border: none;
+    padding: 1.2rem;
+  }
+
   .radio-option {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    padding: 0.9rem 0.8rem;
+    border-radius: 10px;
   }
 
-  .radio-option input[type="radio"] {
-    margin-top: 0;
+  input, select {
+    font-size: 0.9rem;
+    border-radius: 10px;
   }
 
-  .radio-content {
-    margin-left: 0;
+  .btn-submit {
+    border-radius: 10px;
+    font-size: 0.95rem;
+    padding: 0.9rem;
   }
 }
+
 </style>

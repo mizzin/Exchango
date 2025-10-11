@@ -13,7 +13,10 @@
     "linkSent": "재설정 링크를 이메일로 보냈습니다.",
     "requestFailed": "요청 실패",
     "sessionExpiredTitle": "세션이 만료되었습니다",
-    "sessionExpiredText": "다시 로그인해주세요."
+    "sessionExpiredText": "다시 로그인해주세요.",
+         "transferSuccess": "이동 신청이 성공적으로 완료되었습니다.",
+    "rateNotReady": "환율 계산이 아직 완료되지 않았습니다.",
+    "transferFailed": "이동 신청에 실패했습니다."
 }
 ,"reset": {
   "invalidAccess": "잘못된 접근입니다.",

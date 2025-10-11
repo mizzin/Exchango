@@ -4,41 +4,40 @@
       <h2>{{ $t('history.wallet.title') }}</h2>
       <p>{{ $t('history.wallet.description') }}</p>
 
-      <table v-if="paginatedHistory.length">
-        <thead>
-          <tr>
-            <th>{{ $t('history.wallet.date') }}</th>
-            <th>{{ $t('history.wallet.type') }}</th>
-            <th>{{ $t('history.wallet.currency') }}</th>
-            <th>{{ $t('history.wallet.amountUsd') }}</th>
-            <th>{{ $t('history.wallet.convertedAmount') }}</th>
-            <th>{{ $t('history.wallet.status') }}</th>
-            <th>{{ $t('history.wallet.approvedAt') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in paginatedHistory" :key="item.id">
-            <td>{{ formatDate(item.created_at) }}</td>
-            <td>{{ formatType(item.type) }}</td>
-            <td>{{ item.currency }}</td>
-            <td>{{ formatAmount(item.amount) }} USD</td>
-            <td>
-              {{ formatAmount(item.krw_amount) }}
-              {{ item.currency }}
-            </td>
-            <td>
-              <span :class="'badge status-' + item.status">
-                {{ formatStatus(item.status) }}
-              </span>
-            </td>
-            <td>
-              <span v-if="item.status === 'completed'">
-                {{ formatDate(item.updated_at) }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+     <table v-if="paginatedHistory.length">
+  <thead>
+    <tr>
+      <th>{{ $t('history.wallet.date') }}</th>
+      <th>{{ $t('history.wallet.type') }}</th>
+      <th>{{ $t('history.wallet.currency') }}</th>
+      <th>{{ $t('history.wallet.amountUsd') }}</th>
+      <th>{{ $t('history.wallet.convertedAmount') }}</th>
+      <th>{{ $t('history.wallet.status') }}</th>
+      <th>{{ $t('history.wallet.approvedAt') }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="item in paginatedHistory" :key="item.id">
+     <td :data-label="$t('history.wallet.date')">{{ formatDate(item.created_at) }}</td>
+<td :data-label="$t('history.wallet.type')">{{ formatType(item.type) }}</td>
+<td :data-label="$t('history.wallet.currency')">{{ item.currency }}</td>
+<td :data-label="$t('history.wallet.amountUsd')">{{ formatAmount(item.amount) }} USD</td>
+<td :data-label="$t('history.wallet.convertedAmount')">
+  {{ formatAmount(item.krw_amount) }} {{ item.currency }}
+</td>
+<td :data-label="$t('history.wallet.status')">
+  <span :class="'badge status-' + item.status">
+    {{ formatStatus(item.status) }}
+  </span>
+</td>
+<td :data-label="$t('history.wallet.approvedAt')">
+  <span v-if="item.status === 'completed'">{{ formatDate(item.updated_at) }}</span>
+</td>
+
+    </tr>
+  </tbody>
+</table>
+
 
       <div v-else style="text-align: center; padding: 2rem; color: #777;">
         {{ $t('history.wallet.noHistory') }}
@@ -87,8 +86,6 @@ const fetchHistoryAndBalance = async () => {
       }),
     ])
 
-    console.log('🔄 충전 이력 데이터:', res1.data)
-    console.log('💰 유저 잔액 데이터:', res2.data)
 
     history.value = res1.data.transactions || []
     userBalance.value = res2.data.balance || 0
@@ -115,7 +112,7 @@ const formatType = (type) => {
 }
 
 onMounted(() => {
-  console.log('onmount진입')
+  
   fetchHistoryAndBalance()
 })
 
@@ -156,7 +153,7 @@ const formatStatus = (status) => {
   }
 }
 onMounted(async () => {
-  await axiosUser.get('/users/info')
+  await axios.get('/users/info')
 })
 
 </script>
@@ -263,6 +260,66 @@ td {
 .pagination button:disabled {
   background: #e9ecef;
   cursor: not-allowed;
+}
+@media (max-width: 768px) {
+  /* 💡 테이블 형태 해제 */
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none; /* 제목행 숨김 */
+  }
+
+  tbody tr {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    border: none;
+    font-size: 13px;
+  }
+
+  /* 각 셀 왼쪽에 헤더명 표시 */
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+  }
+
+  /* 상태 뱃지 */
+  .badge {
+    font-size: 12px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  /* 날짜나 긴 문자열은 줄바꿈 없이 유지 */
+  td span, td {
+    word-break: keep-all;
+  }
+
+  /* 전체 영역 여백 정리 */
+  .recharge-history {
+    padding: 1rem;
+    box-shadow: none;
+  }
+
+  /* 페이징 버튼 */
+  .pagination {
+    margin-top: 1rem;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
 }
 
 
