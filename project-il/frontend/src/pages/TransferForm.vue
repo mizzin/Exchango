@@ -71,7 +71,7 @@
         <input type="password" v-model="form.money_password" />
       </div>
 
-      <button class="btn-submit" @click="submit">{{ $t('transfer.request1.submit') }}</button>
+      <button class="btn-submit" :disabled="isSubmitting" @click="submit">{{ $t('transfer.request1.submit') }}</button>
       </div>
     </div>
   </UserLayout>
@@ -86,6 +86,10 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
+
+
+const isSubmitting = ref(false)
+
 
 // ✅ 추가: pending 상태
 const hasPending = ref(false)
@@ -151,6 +155,10 @@ const checkPending = async () => {
     hasPending.value = false
   }
 }
+const canSubmit = computed(() =>
+  currency.value && amountUsd.value >= 40
+)
+
 
 // 계산 결과값이 백엔드에서 한번 더 검증됨. 수정 시 함께 반영할 것.
 const calculateExpected = async () => {
@@ -189,50 +197,55 @@ watch([
 ], calculateExpected)
 
 const submit = async () => {
-  // ✅ 제출 직전에도 최신 상태로 재확인 (경쟁 상태 방지)
-  await checkPending()
-  if (hasPending.value) {
-    return Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'warning',
-      title: t('alert.pendingRequestWithAction'),
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    })
-  }
+  if (isSubmitting.value) return
+  isSubmitting.value = true
 
-  if (!form.value.exchange_rate || !form.value.expected_amount) {
-    return Swal.fire({
-      toast: true,
-      position: 'top-end',
-      icon: 'warning',
-      title: t('alert.rateNotReady'),
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
-    })
-  }
   try {
-    const res = await axios.post('/transactions/wallet/transfer', form.value)
-     // ✅ 성공 알림
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
+    await checkPending()
+    if (hasPending.value) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('alert.pendingRequestWithAction'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    if (!form.value.exchange_rate || !form.value.expected_amount) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('alert.rateNotReady'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    await axios.post('/transactions/wallet/transfer', form.value)
+
+    // ✅ 성공 알림
+    await Swal.fire({
       icon: 'success',
       title: t('alert.transferSuccess'),
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true,
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#0052cc',
     })
 
-    // 새로고침은 잠시 딜레이 후 실행하면 더 자연스러움
-    setTimeout(() => window.location.reload(), 1000)
+    window.location.reload()
+
   } catch (err) {
-    alert(err.response?.data?.message || t('alert.transferFailed'))
+    await Swal.fire({
+      icon: 'error',
+      title: err.response?.data?.message || t('alert.transferFailed'),
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#0052cc',
+    })
+  } finally {
+    isSubmitting.value = false
   }
 }
+
 
 onMounted(() => {
   fetchPlatformOptions()
@@ -295,6 +308,11 @@ select:focus {
 /* select 바로 아래 input 간격 확보 */
 select + input {
   margin-top: 0.6rem; /* 살짝 띄워서 시각적으로 여유 줌 */
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* 그룹 간격 */

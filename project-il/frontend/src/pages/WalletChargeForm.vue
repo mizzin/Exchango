@@ -33,7 +33,7 @@
         <input type="text" :value="`${sendAmountWithFee.toLocaleString()} ${currency}`" readonly class="readonly-input" />
       </div>
 
-      <button class="btn-submit" :disabled="!canSubmit" @click="submit">{{ $t('charge.wallet.submit') }}</button>
+      <button class="btn-submit" :disabled="!canSubmit|| isSubmitting" @click="submit">{{ $t('charge.wallet.submit') }}</button>
     </div>
     </div>
   </UserLayout>
@@ -45,6 +45,8 @@ import { reactive, computed, ref, watch, onMounted } from 'vue'
 import UserLayout from '@/components/UserLayout.vue'
 import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
+import Swal from 'sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 
 const hasPending = ref(false)
 const { t } = useI18n()
@@ -54,6 +56,9 @@ const localAmount = ref(0)
 const exchangeRate = ref(0)
 const usdAmount = ref(0)
 const amountUsd = ref(0) // 사용자가 입력할 USD
+
+const isSubmitting = ref(false)
+
 
 // 🔹 환율 불러오기
 const fetchExchangeRate = async () => {
@@ -100,6 +105,9 @@ const sendAmountWithFee = computed(() => {
 
 // 🔹 충전 요청
 const submit = async () => {
+    if (isSubmitting.value) return
+      isSubmitting.value = true
+
   try {
     await axios.post('/transactions/wallet/charge', {
       currency: currency.value,
@@ -107,15 +115,24 @@ const submit = async () => {
       amount_usd: amountUsd.value,
       expected_amount: sendAmountWithFee.value,
     })
-    alert(t('charge.wallet.success'))
+        Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: t('charge.wallet.success'),
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#0052cc',
+    })
+
     currency.value = ''
     localAmount.value = 0
     usdAmount.value = 0
-    alert(t('withdraw.alert.success'))
-    window.location.reload()
+
   } catch (e) {
     console.error(e)
     alert(t('charge.wallet.failed'))
+  }finally {
+    isSubmitting.value = false
   }
 }
 

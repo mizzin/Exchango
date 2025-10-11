@@ -260,14 +260,15 @@ const directionLabel = (item) => {
 const goToHandler = (item) => {
   const normalizedType = item.type === 'platform_to_platform' ? 'transfer' : item.type
 
-  const map = {
+  const map = { 
     wallet_charge: '/admin/trade/wallet-charge',
     platform_charge: '/admin/trade/recharge',
     wallet_withdraw: '/admin/trade/wallet-withdraw',
     platform_withdraw: '/admin/trade/withdraw',
-        platform_withdraw: '/admin/trade/withdraw',
- wallet_to_platform:'/admin/trade/wallet-transfer',
+    platform_withdraw: '/admin/trade/withdraw',
+    wallet_to_platform:'/admin/trade/wallet-transfer',
     transfer: '/admin/trade/wallet-transfer',
+    platform_to_wallet : '/admin/trade/wallet-transfer'
   }
 
   const target = map[normalizedType] || '/admin/dashboard'

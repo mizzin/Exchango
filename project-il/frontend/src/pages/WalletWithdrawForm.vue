@@ -90,7 +90,7 @@
       </div>
 
       <!-- 제출 버튼 -->
-      <button class="btn-submit" @click="submitWithdraw">
+      <button class="btn-submit"  :disabled="isSubmitting"  @click="submitWithdraw">
   {{ t('withdraw.submit') }}
 </button>
 
@@ -105,6 +105,8 @@ import UserLayout from '@/components/UserLayout.vue'
 import { ref, computed, onMounted, watch } from 'vue'
 import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
+import Swal from 'sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 
 const { t } = useI18n()
 
@@ -118,6 +120,9 @@ const user_memo = ref('')
 const moneyPassword = ref('')
 const agree = ref(false)
 const user = ref({})
+
+const isSubmitting = ref(false)
+
 
 const userBalance = computed(() => Number(user.value?.balance ?? 0))
 const bankInfo = computed(() => `${user.value?.bank_name ?? '-'} / ${user.value?.bank_account ?? '-'}`)
@@ -210,25 +215,84 @@ const calculateConvertedAmount = () => {
 }
 
 const submitWithdraw = async () => {
-  if (!agree.value) return alert(t('withdraw.alert.agree'))
-  if (!currency.value || !amountUsd.value || !moneyPassword.value) {
-    if (!currency.value) return alert(t('withdraw.alert.requiredCurrency'))
-    if (!amountUsd.value) return alert(t('withdraw.alert.requiredAmount'))
-    if (!moneyPassword.value || moneyPassword.value.length !== 6) return alert(t('withdraw.alert.requiredPassword'))
-  }
-  if (amountUsd.value < 40) return alert(t('withdraw.alert.minimumAmount'))
-  if (amountUsd.value > userBalance.value) {
-    return alert(t('withdraw.alert.insufficientBalance'))
-  }
-
-  // ✅ pending일 땐 막기 (프런트 이중 방지)
-  if (hasPending.value) {
-    return alert(t('alert.pendingRequestWithAction'))
-  }
-
-  calculateConvertedAmount()
+  if (isSubmitting.value) return
+  isSubmitting.value = true
 
   try {
+    // ✅ 필수 입력 확인
+    if (!agree.value) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('withdraw.alert.agree'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    if (!currency.value) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('withdraw.alert.requiredCurrency'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    if (!amountUsd.value) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('withdraw.alert.requiredAmount'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    if (!moneyPassword.value || moneyPassword.value.length !== 6) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('withdraw.alert.requiredPassword'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    if (amountUsd.value < 40) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('withdraw.alert.minimumAmount'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    if (amountUsd.value > userBalance.value) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('withdraw.alert.insufficientBalance'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    if (hasPending.value) {
+      await Swal.fire({
+        icon: 'warning',
+        title: t('alert.pendingRequestWithAction'),
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#0052cc',
+      })
+      return
+    }
+
+    calculateConvertedAmount()
+
+    // ✅ 출금 요청
     await axios.post('/transactions/wallet/withdraw', {
       currency: currency.value,
       amount_usd: amountUsd.value,
@@ -237,13 +301,29 @@ const submitWithdraw = async () => {
       money_password: moneyPassword.value,
       expected_amount: convertedAmountValue.value,
     })
-    alert(t('withdraw.alert.success'))
-    window.location.reload() 
+
+    // ✅ 성공 알림
+    await Swal.fire({
+      icon: 'success',
+      title: t('withdraw.alert.success'),
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#0052cc',
+    })
+    window.location.reload()
+
   } catch (err) {
     console.error('[출금 오류]', err)
-    alert(err.response?.data?.message || '출금 중 오류 발생')
+    await Swal.fire({
+      icon: 'error',
+      title: err.response?.data?.message || t('withdraw.alert.failed'),
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#0052cc',
+    })
+  } finally {
+    isSubmitting.value = false
   }
 }
+
 onMounted(async () => {
   await axios.get('/users/info')
 })
