@@ -14,7 +14,8 @@
           <option value="platform_charge">플랫폼 충전</option>
           <option value="wallet_withdraw">내 지갑 출금</option>
           <option value="platform_withdraw">플랫폼 출금</option>
-          <option value="transfer">머니 이동</option>
+          <option value="platform_to_wallet">플랫폼에서 지갑</option>
+          <option value="wallet_to_platform">지갑에서 플랫폼</option>
         </select>
       </div>
 
@@ -22,7 +23,7 @@
         <select v-model="filters.status" class="form-select">
           <option value="">전체 상태</option>
           <option value="pending">대기중</option>
-          <option value="approved">승인됨</option>
+          <option value="completed">승인됨</option>
           <option value="rejected">거절됨</option>
         </select>
       </div>
@@ -42,6 +43,8 @@
     <div class="mt-3 text-end">
       <button @click="fetchHistory" class="btn btn-primary me-2">검색</button>
       <button @click="resetFilters" class="btn btn-secondary">초기화</button>
+        <button @click="downloadExcel" class="btn btn-success">엑셀 다운로드</button>
+
     </div>
   </div>
 
@@ -121,6 +124,41 @@ const page = ref(1)
 const totalPages = ref(1)   // ✅ 추가
 const limit = 50   
 
+const downloadExcel = async () => {
+  try {
+    const params = {
+      type: filters.type,
+      status: filters.status,
+      username: filters.username,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+    }
+
+    const res = await axios.get('/transactions/requests/export', {
+      params,
+      responseType: 'blob',
+    })
+
+    // ✅ 오늘 날짜 자동 파일명
+    const today = new Date().toISOString().slice(0, 10)
+    const filename = `거래이력_${today}.xlsx`
+
+    const blob = new Blob([res.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('❌ 엑셀 다운로드 실패:', err)
+    alert('엑셀 파일 다운로드 중 오류가 발생했습니다.')
+  }
+}
 const fetchHistory = async () => {
   const res = await axios.get('/admin/requests', {
     params: {
@@ -168,7 +206,7 @@ const formatType = (type) => {
 const formatStatus = (status) => {
   const map = {
     pending: '대기중',
-    approved: '승인됨',
+    completed: '승인됨',
     rejected: '거절됨',
   }
   return map[status] || status

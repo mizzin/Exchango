@@ -24,7 +24,7 @@
   <select class="form-select" v-model="filters.status">
     <option value="">전체 상태</option>
     <option value="pending">대기중</option>
-    <option value="approved">승인됨</option>
+    <option value="completed">승인됨</option>
     <option value="rejected">거절됨</option>
   </select>
 </div>
@@ -221,7 +221,7 @@ const formatAmount = (amount, currency = 'USD') => {
 const formatStatus = (status) => {
   const map = {
     pending: '대기중',
-    approved: '승인됨',
+    completed: '승인됨',
     rejected: '거절됨'
   }
   return map[status] || status
@@ -229,7 +229,7 @@ const formatStatus = (status) => {
 const statusColor = (status) => {
   switch (status) {
     case 'pending': return 'warning'
-    case 'approved': return 'success'
+    case 'completed': return 'success'
     case 'rejected': return 'danger'
     default: return 'secondary'
   }
@@ -265,7 +265,7 @@ const goToHandler = (item) => {
     platform_charge: '/admin/trade/recharge',
     wallet_withdraw: '/admin/trade/wallet-withdraw',
     platform_withdraw: '/admin/trade/withdraw',
-    platform_withdraw: '/admin/trade/withdraw',
+    platform_withdraw: '/admin/trade/withdraw', 
     wallet_to_platform:'/admin/trade/wallet-transfer',
     transfer: '/admin/trade/wallet-transfer',
     platform_to_wallet : '/admin/trade/wallet-transfer'

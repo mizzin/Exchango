@@ -17,6 +17,10 @@ router.post('/wallet/withdraw', verifyToken, transactionController.createWalletW
 router.post('/wallet/transfer', verifyToken, transactionController.requestPlatformMove);
 router.get('/wallet/transfer/history', verifyToken, transactionController.getPlatformMoveHistory);
 
+//엑셀다운로드
+router.get('/requests/export', transactionController.exportAllRequests)
+
+
 
  
 module.exports = router

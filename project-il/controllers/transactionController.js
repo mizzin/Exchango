@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt');
 const transaction = require('../models/transaction');
 const sendTelegramMessage = require('../utils/telegram');
 const toManilaTime = require('../utils/formatDate')
+const ExcelJS = require('exceljs')
+
 
 
 //충전신청 0728 쿼리 외부
@@ -1478,3 +1480,79 @@ if (endDate) {
 }
 
 
+
+exports.exportAllRequests = async (req, res) => {
+  try {
+    const { type, status, username, startDate, endDate } = req.query
+    let where = `WHERE 1=1`
+    const params = []
+
+    if (type) {
+      where += ` AND t.type = ?`
+      params.push(type)
+    }
+    if (status) {
+      where += ` AND t.status = ?`
+      params.push(status)
+    }
+    if (username) {
+      where += ` AND u.username LIKE ?`
+      params.push(`%${username}%`)
+    }
+    if (startDate) {
+      where += ` AND t.created_at >= ?`
+      params.push(`${startDate} 00:00:00`)
+    }
+    if (endDate) {
+      where += ` AND t.created_at <= ?`
+      params.push(`${endDate} 23:59:59`)
+    }
+
+    const sql = `
+      SELECT 
+        t.id, t.type, t.status, t.currency, t.amount, 
+        t.created_at, t.updated_at, t.to_platform_id, t.to_platform_user_id,t.from_platform_id, t.from_platform_user_id,
+        u.username, u.real_name, u.bank_name, u.bank_account
+      FROM transactions t
+      LEFT JOIN users u ON t.user_id = u.id
+      ${where}
+      ORDER BY t.created_at DESC
+    `
+    const [rows] = await db.query(sql, params)
+
+    // ✅ 엑셀 워크북 생성
+    const workbook = new ExcelJS.Workbook()
+    const sheet = workbook.addWorksheet('Requests')
+
+    // ✅ 헤더 정의
+    sheet.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+      { header: 'Type', key: 'type', width: 20 },
+      { header: 'Status', key: 'status', width: 15 },
+      { header: 'Currency', key: 'currency', width: 10 },
+      { header: 'Amount', key: 'amount', width: 15 },
+      { header: 'Username', key: 'username', width: 20 },
+      { header: 'Real Name', key: 'real_name', width: 20 },
+      { header: 'Bank Name', key: 'bank_name', width: 20 },
+      { header: 'Bank Account', key: 'bank_account', width: 25 },
+      { header: 'Created At', key: 'created_at', width: 25 },
+      { header: 'Updated At', key: 'updated_at', width: 25 },
+    ]
+
+    // ✅ 데이터 채우기
+    rows.forEach(r => sheet.addRow(r))
+
+    // ✅ 응답 헤더
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    res.setHeader('Content-Disposition', 'attachment; filename=requests.xlsx')
+
+    await workbook.xlsx.write(res)
+    res.end()
+  } catch (err) {
+    console.error('❌ 엑셀 내보내기 실패:', err)
+    res.status(500).json({ message: '엑셀 생성 중 오류' })
+  }
+}
