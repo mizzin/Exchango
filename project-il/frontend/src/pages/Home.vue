@@ -1,16 +1,17 @@
 <script setup>
 import UserLayout from '@/components/UserLayout.vue'
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axiosUser  from '@/axiosUser'
 import '@/assets/style.css'
 import home001 from '@/assets/img/home001.jpg';
 import home002 from '@/assets/img/home002.jpg';
 import home003 from '@/assets/img/home003.jpg';
+import { useI18n } from 'vue-i18n'
 
-
-
-
+const userInfo = ref({})
+const isMobile = ref(false)
+const user = ref(null) 
 
 const externalSites = [
   {
@@ -36,12 +37,14 @@ const router = useRouter()
 
 const logout = () => {
   localStorage.removeItem('user_token')
+  localStorage.removeItem('exp') 
   router.push('/home')
 }
 
 
 const rates = ref({})
 const date = ref('')
+const { locale } = useI18n()
 const notices = ref([])
 
 const getRates = async () => {
@@ -63,7 +66,7 @@ const getRates = async () => {
 
 const getNotices = async () => {
   try {
-    const lang = localStorage.getItem('lang') || 'en'
+    const lang = locale.value|| 'en'
     const res = await axiosUser.get(`/users/notices?limit=3&lang=${lang}`)
     notices.value = res.data.notices
   } catch (err) {
@@ -71,52 +74,91 @@ const getNotices = async () => {
   }
 }
 
-onMounted(async () => {
+watch(locale, () => {
+  getNotices()
+})
+
+const fetchUserInfo = async () => {
   try {
-    // 🔹 사용자 정보 (토큰 만료 자동 처리)
-    const res = await axiosUser.get('/users/info')
+    const token = localStorage.getItem('user_token')
+    if (!token) return
+    const lang = localStorage.getItem('lang') || 'ko'
+    const res = await axiosUser.get(`/users/info?lang=${lang}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    user.value = res.data // ✅ 데이터 저장
+    console.log('✅ user 정보 로드 완료:', res.data)
   } catch (err) {
-    console.error('사용자 정보 로드 실패:', err)
+    console.error('❌ 사용자 정보 로드 실패:', err)
+  }
+}
+
+onMounted(async () => {
+    if (isLoggedIn.value) {
+    await fetchUserInfo() // ✅ 여기서 user.value 채워짐
   }
 
-  // 🔹 기존 기능
+  const token = localStorage.getItem('user_token')
+  if (token) {
+    try {
+      const res = await axiosUser.get('/users/info')
+      console.log('👤 사용자 정보:', res.data)
+    } catch (err) {
+      console.error('사용자 정보 로드 실패:', err)
+    }
+  }
   getRates()
   getNotices()
 
-  // 🔹 오버레이 처리
-  if (sessionStorage.getItem('overlayClosed') === '1') {
-    showOverlay.value = false
-  }
+  isMobile.value = window.innerWidth <= 768
+  window.addEventListener('resize', () => {
+    isMobile.value = window.innerWidth <= 768
+  })
 })
 
 const formatRate = val => Number(val).toFixed(2)
 const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
 
-const showOverlay = ref(true)
-// URL에 preview=true 있으면 닫기 버튼 보이고 오버레이 닫기 가능
-const canClose = new URLSearchParams(window.location.search).has('preview')
 
-
-function closeOverlay() {
-  showOverlay.value = false
-  sessionStorage.setItem('overlayClosed', '1')
-}
 </script>
 
 <template>
   <UserLayout>
-<!-- home.vue -->
-     <div class="home">
+    <div class="home">
 
-      <!-- 🔹 외부 링크 카드 영역 -->
+      <!-- ✅ 모바일 전용 지갑 카드 -->
+      <section v-if="isMobile && isLoggedIn && user" class="wallet-card">
+          <div class="wallet-header">
+    <span class="wallet-label">{{ $t('home.myWallet') }}</span>
+    <span class="wallet-tag">USD</span>
+  </div>
+        <div class="wallet-balance">
+          <p class="balance-amount">
+               <strong>{{ user.balance ? user.balance.toLocaleString() : 0 }}</strong>
+          </p>
+        </div>
+
+         <div class="wallet-actions top">
+            <button @click="router.push('/wallet/charge')" class="btn-wallet">
+              {{ $t('home.wallet.charge') }}
+            </button>
+            <button @click="router.push('/wallet/withdraw')" class="btn-wallet">
+              {{ $t('home.wallet.withdraw') }}
+            </button>
+          </div>
+          <div class="wallet-actions bottom">
+            <button @click="router.push('/wallet/transfer')" class="btn-wallet wide">
+              {{ $t('home.wallet.transfer') }}
+            </button>
+          </div>
+
+      </section>
+
+      <!-- 🔹 외부 링크 카드 -->
       <section class="section-grid external-links">
-        <div
-          v-for="site in externalSites"
-          :key="site.name"
-          class="card external-card"
-        >
+        <div v-for="site in externalSites" :key="site.name" class="card external-card">
           <a :href="site.url" target="_blank" rel="noopener" class="card-link">
-            <img :src="site.image || placeholderImage" alt="site.name" class="card-img" />
+            <img :src="site.image" alt="site.name" class="card-img" />
             <div class="card-body">
               <h3 class="card-title">{{ $t(`home.external.${site.name}`) }}</h3>
             </div>
@@ -124,34 +166,34 @@ function closeOverlay() {
         </div>
       </section>
 
-      <!-- 기존 공지사항 / 환율 -->
+      <!-- 공지사항 / 환율 -->
       <section class="section-two-grid">
-      <div class="card notice-card">
-        <h2>📢 {{ $t('home.notice') }}</h2>
-        <ul class="notice-list">
-        <li v-for="n in notices" :key="n.id">
-          <router-link :to="`/support/notice/${n.id}`" class="notice-row">
-            <span class="title">{{ n.title || 'no title' }}</span>
-            <span class="date">{{ formatDate(n.created_at) }}</span>
-          </router-link>
-        </li>
-      </ul>
-      </div>
-
-      <div class="card rate-card">
-        <h2>📢 {{ $t('home.exchangeRate') }}</h2>
-        <div class="rate-list-block">
-          <div v-if="rates.KRW">🇰🇷 1 USD ≈ ₩{{ formatRate(rates.KRW) }} <span class="note"></span></div>
-          <div v-if="rates.PHP">🇵🇭 1 USD ≈ ₱{{ formatRate(rates.PHP) }}</div>
-          <div v-if="rates.USDT">₮ USDT = ₩{{ formatRate(rates.USDT) }}<span class="note"></span></div>
+        <div class="card notice-card">
+          <h2>📢 {{ $t('home.notice') }}</h2>
+          <ul class="notice-list">
+            <li v-for="n in notices" :key="n.id">
+              <router-link :to="`/support/notice/${n.id}`" class="notice-row">
+                <span class="title">{{ n.title || 'no title' }}</span>
+                <span class="date">{{ formatDate(n.created_at) }}</span>
+              </router-link>
+            </li>
+          </ul>
         </div>
-        <div class="rate-date">{{ $t('home.date') }}: {{ formatDate(date) }}</div>
-      </div>
 
-  </section>
-  </div>
+        <div class="card rate-card">
+          <h2>💱 {{ $t('home.exchangeRate') }}</h2>
+          <div class="rate-list-block">
+            <div v-if="rates.KRW">🇰🇷 1 USD ≈ ₩{{ formatRate(rates.KRW) }}</div>
+            <div v-if="rates.PHP">🇵🇭 1 USD ≈ ₱{{ formatRate(rates.PHP) }}</div>
+            <div v-if="rates.USDT">₮ USDT = ₩{{ formatRate(rates.USDT) }}</div>
+          </div>
+          <div class="rate-date">{{ $t('home.date') }}: {{ formatDate(date) }}</div>
+        </div>
+      </section>
+    </div>
   </UserLayout>
 </template>
+
 
 <style scoped>
 /* 기본 배경 단순화 */
@@ -376,12 +418,134 @@ function closeOverlay() {
 .notice-list li:last-child {
     border-bottom: none;
   }
+/* ✅ 모바일 전용 지갑 카드 */
+.wallet-card {
+  background: linear-gradient(180deg, #f5f7ff 0%, #ffffff 100%);
+  border: 1px solid #e6ecff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 1.2rem;
+  margin-bottom: 1rem;
+  margin-top: 0.4rem;
+  animation: fadeIn 0.4s ease;
+}
+
+/* 헤더 (내 지갑 / USD 라벨) */
+.wallet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.wallet-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.wallet-tag {
+  background: #eef4ff;
+  color: #2563eb;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+/* 보유금액 */
+.wallet-balance {
+  margin: 0.4rem 0 1rem;
+  text-align: left;
+}
+
+.balance-amount strong {
+  background: linear-gradient(90deg, #111, #222);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.3px;
+  font-family: 'Inter', 'Noto Sans KR', 'Pretendard', sans-serif;
+}
+
+.balance-amount span {
+  font-size: 1rem;
+  color: #4b5563; /* USD 단위 */
+  margin-left: 4px;
+}
+
+/* 버튼 그룹 */
+.wallet-actions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.wallet-actions.bottom {
+  margin-top: 0.6rem;
+}
+
+/* 버튼 */
+.btn-wallet {
+  flex: 1;
+  padding: 0.65rem 0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #fff;
+  border: 1.5px solid #e4e9ff;
+  color: #127ad9;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* 머니이동 버튼은 가로로 넓게 */
+.btn-wallet.wide {
+  flex: 1;
+}
+
+/* hover 효과 */
+.btn-wallet:hover {
+  background: #f2f5ff;
+  border-color: #cdd8ff;
+}
+.btn-wallet.wide {
+  flex: 1;
+}
+
+.btn-wallet:active {
+  transform: scale(0.97);
+  opacity: 0.95;
+}
+.btn-wallet:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ PC에서는 비표시 */
+@media (min-width: 769px) {
+  .wallet-card {
+    display: none;
+  }
+}
 
 @media screen and (max-width: 768px) {
 
   .home {
     background: linear-gradient(180deg, #f5f8ff 0%, #f9fbff 100%) !important;
-    padding: 1rem 0.8rem 2rem;
   }
   /* 🔹 카드 레이아웃 정리 */
   .section-grid {

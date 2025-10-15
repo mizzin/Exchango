@@ -32,6 +32,17 @@
         <label>{{ $t('charge.wallet.totalSendWithFee') }}</label>
         <input type="text" :value="`${sendAmountWithFee.toLocaleString()} ${currency}`" readonly class="readonly-input" />
       </div>
+        <!-- ✅ 선택한 통화의 입금 주소 표시 -->
+        <div v-if="depositAddress" class="form-group deposit-address-box">
+          <label>{{ $t('charge.wallet.depositAddress') }}</label>
+          <div class="address-row">
+            <input type="text" :value="depositAddress" readonly class="readonly-input" />
+            <button type="button" @click="copyAddress" class="btn-copy">복사</button>
+          </div>
+          <p class="note">
+            {{t('charge.wallet.note')}}
+          </p>
+        </div>
 
       <button class="btn-submit" :disabled="!canSubmit|| isSubmitting" @click="submit">{{ $t('charge.wallet.submit') }}</button>
     </div>
@@ -47,6 +58,7 @@ import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
+const depositAddress = ref('')
 
 const hasPending = ref(false)
 const { t } = useI18n()
@@ -133,6 +145,39 @@ const submit = async () => {
     alert(t('charge.wallet.failed'))
   }finally {
     isSubmitting.value = false
+  }
+}
+
+// 🔹 선택한 통화의 입금 주소 불러오기
+const fetchDepositAddress = async () => {
+  if (!currency.value) return
+  try {
+    const res = await axios.get(`/deposit-addresses/${currency.value}`)
+    depositAddress.value = res.data.address || ''
+  } catch (err) {
+    console.warn('❌ 입금주소 없음:', err)
+    depositAddress.value = ''
+  }
+}
+
+// 통화 바뀔 때마다 주소 다시 가져오기
+watch(currency, (newVal) => {
+  if (newVal) fetchDepositAddress()
+})
+
+const copyAddress = async () => {
+  try {
+    await navigator.clipboard.writeText(depositAddress.value)
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Address copied!',
+      showConfirmButton: false,
+      timer: 1500,
+    })
+  } catch (err) {
+    alert('Copy failed. Please copy it manually.')
   }
 }
 
@@ -240,5 +285,38 @@ select, input {
 .btn-submit:disabled {
   background: #bbb;
   cursor: not-allowed;
+}
+.deposit-address-box {
+  margin-top: 15px;
+  background: #f9fbff;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #d0d7e2;
+}
+
+.address-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-copy {
+  background: #0052cc;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-copy:hover {
+  opacity: 0.85;
+}
+
+.note {
+  font-size: 0.85rem;
+  color: #b02a37;
+  margin-top: 6px;
+  line-height: 1.4;
 }
 </style>

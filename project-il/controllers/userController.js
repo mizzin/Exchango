@@ -249,6 +249,27 @@ exports.register = async (req, res) => {
       await conn.commit();
       res.status(201).json({ message: 'Membership registration successful!' });
 
+// ✅ 회원가입 축하 쪽지 전송
+try {
+  const [[template]] = await db.query(
+    'SELECT content FROM message_templates WHERE template_key = ?',
+    ['welcome_message'] // 템플릿 키 이름만 따로 정하면 됨
+  )
+
+  if (template) {
+    const content = template.content
+      .replace('{{nickname}}', username)
+
+    await sendMessage({
+      to_user_id: userId,
+      subject: '🎉 Welcome to Tranasia!',
+      content,
+      type: 'system',
+    })
+  }
+} catch (msgErr) {
+  console.error('⚠️ 쪽지 전송 실패:', msgErr.message)
+}
     // 📢 텔레그램 알림 보내기
     try {
       await sendTelegramMessage(

@@ -100,7 +100,9 @@
     "submit": "チャージ申請",
         "fetchRateFailed": "為替レートの取得に失敗しました。",
     "success": "チャージ申請が完了しました。",
-    "failed": "チャージ申請に失敗しました。"
+    "failed": "チャージ申請に失敗しました。",
+    "note":"⚠️ 必ずこのアドレスにのみ送金してください。誤ったアドレスに送金した場合、資金は戻らず、当社は一切の責任を負いません。",
+      "depositAddress": "入金アドレス"
   },
     "inputAmount": "入力金額",
     "amountKrw": "入力金額",
@@ -203,7 +205,12 @@
   "rejected": "拒否済み",
   "cancelled": "キャンセル"
 },
-"home": {
+"home": {"myWallet": "マイウォレット",
+"wallet": {
+  "charge": "チャージ",
+  "withdraw": "出金",
+  "transfer": "送金"
+},
   "title": "MyPointへようこそ",
   "login": "ログイン",
   "register": "新規登録",

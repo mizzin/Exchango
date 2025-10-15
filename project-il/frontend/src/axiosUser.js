@@ -22,6 +22,14 @@ axiosUser.interceptors.request.use((config) => {
 axiosUser.interceptors.response.use(
   res => res,
   async err => {
+       const url = err.config?.url || ''
+    if (
+      url.includes('/users/login') ||
+      url.includes('/users/register') ||
+      url.includes('/auth/forgot')
+    ) {
+      return Promise.reject(err)
+    }
     if (err.response?.status === 401) {
       // 🔹 SweetAlert2로 대체
       const t = i18n.global.t  

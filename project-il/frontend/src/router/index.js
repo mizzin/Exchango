@@ -42,6 +42,10 @@ const routes = [
   {
     path: '/admin/dashboard',
     component: AdminDashboard
+  },  {
+    path: '/admin/deposit-addresses',
+    name: 'AdminDepositAddresses',
+    component: () => import('@/pages/AdminDepositAddress.vue'),
   },{
     path: '/mypage',
     name: 'MyPage',

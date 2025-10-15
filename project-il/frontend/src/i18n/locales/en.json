@@ -103,7 +103,9 @@
     "submit": "Submit Recharge",
      "fetchRateFailed": "Failed to fetch exchange rate.",
     "success": "Recharge request submitted successfully.",
-    "failed": "Recharge request failed."
+    "failed": "Recharge request failed.",
+    "note":"⚠️ Send funds only to this address. If you send to a wrong address, your funds cannot be recovered, and we are not responsible for any loss."
+    ,"depositAddress":"address"
   },
     "inputAmount": "Input Amount",
     "amountKrw": "Entered Amount",
@@ -212,7 +214,12 @@
   "rejected": "Rejected",
   "cancelled": "Cancelled"
 },
-"home": {
+"home": {  "myWallet": "My Wallet",
+  "wallet": {
+    "charge": "Add Funds",
+    "withdraw": "Withdraw",
+    "transfer": "Transfer"
+  },
   "title": "Welcome to MyPoint",
   "login": "Login",
   "register": "Sign Up",

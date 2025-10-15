@@ -7,17 +7,31 @@
           <router-link to="/" class="logo-link">
             <h1 class="logo">TranAsia</h1>
           </router-link>
-  <!-- 💰 보유금액 박스: 햄버거/로고와 같은 라인, PC만 노출 -->
-  <div v-if="isMember && userInfo && userInfo.balance != null && !isMobile" class="user-balance">
-    💰 <strong>{{ Math.floor(userInfo.balance).toLocaleString() }} USD</strong>
-  </div>
+            <!-- ✅ 모바일 전용 언어 셀렉트 (로고 옆 고정) -->
+              <select
+                v-if="isMobile"
+                v-model="$i18n.locale"
+                @change="onChangeLang"
+                class="lang-select-mobile"
+              >
+                <option value="en">EN</option>
+                <option value="ko">한국어</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+              </select>
+
+            <!-- 💰 보유금액 박스: 햄버거/로고와 같은 라인, PC만 노출 -->
+          <div v-if="isMember && userInfo && userInfo.balance != null && !isMobile" class="user-balance">
+            💰 <strong>{{ Math.floor(userInfo.balance).toLocaleString() }} USD</strong>
+          </div>
+
           <!-- 햄버거 버튼 (우측 상단) -->
           <button class="hamburger" @click="toggleMenu">☰</button>
         </div>
-<!-- 모바일에서는 메뉴 바로 아래 보유금액 -->
-<div v-if="isMember && userInfo && userInfo.balance != null && isMobile" class="user-balance-mobile">
-  💰 <strong>{{ Math.floor(userInfo.balance).toLocaleString() }} USD</strong>
-</div>
+        <!-- 모바일에서는 메뉴 바로 아래 보유금액 -->
+        <div v-if="isMember && userInfo && userInfo.balance != null && isMobile" class="user-balance-mobile">
+          💰 <strong>{{ Math.floor(userInfo.balance).toLocaleString() }} USD</strong>
+        </div>
         <!-- 네비게이션 메뉴 (PC에서는 항상 보이도록 위치 수정) -->
         <div class="nav-wrapper" :class="{ open: isOpen || !isMobile }">
           <nav :class="['nav', { open: isOpen || !isMobile }]">
@@ -193,6 +207,8 @@ onMounted(() => {
 const logout = () => {
   localStorage.removeItem('user_token')
   localStorage.removeItem('admin_token')
+    localStorage.removeItem('exp') 
+
   alert('You have been logged out.')
   window.location.href = '/'
 }
@@ -371,16 +387,42 @@ const toggleMenu = () => {
   color: #2563eb;
   font-weight: 600;
 }
+/* ✅ 모바일 전용 언어 셀렉트 */
+.lang-select-mobile {
+  border: 1px solid #d3d3d3;
+  background: #fff;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #333;
+  position: absolute;
+  right: 4rem; 
+  z-index: 1000;
+    -o-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+select::-ms-expand { 
+	display: none;
+}
+.select {
+  -o-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 @media (max-width: 768px) {
    .main {
     padding: 0.5rem 0; /* 모바일에선 여백 줄이기 */
   }
-  .user-balance {
-    display: none; /* PC 전용 */
+  .user-balance,
+  .user-balance-mobile,
+  .lang-select {
+    display: none !important;
   }
-  .user-balance-mobile {
-    display: block; /* 모바일 전용 */
-  }
+
 }
 @media (min-width: 769px) {
   .user-balance-mobile {

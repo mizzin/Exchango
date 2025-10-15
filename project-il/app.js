@@ -52,6 +52,9 @@ app.use('/api/auth', require('./routes/auth'));
 
 app.use('/api', require('./routes/passwordReset'))
 
+app.use('/api/deposit-addresses', require('./routes/adminDepositAddress'))
+
+
 // ✅ 업로드 파일 서빙
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use((req, res, next) => {

@@ -104,7 +104,9 @@
     "submit": "충전 신청",
       "fetchRateFailed": "환율 정보를 불러오지 못했습니다.",
     "success": "충전 신청이 완료되었습니다.",
-    "failed": "충전 신청에 실패했습니다."
+    "failed": "충전 신청에 실패했습니다.",
+    "note":"⚠️ 반드시 이 주소로만 입금해주세요. 잘못된 주소로 송금 시 복구가 불가능하며, 당사는 어떠한 손실에 대해서도 책임지지 않습니다.",
+    "depositAddress": "입금 주소"
   },
   "recentHistory": "최근 충전 신청 이력",
       "title": "플랫폼에서 충전하기",
@@ -221,8 +223,13 @@
   "rejected": "거절",
   "cancelled": "취소"
 },
-"home": {
-  "title": "마이포인트에 오신 것을 환영합니다",
+"home": {"myWallet": "내 지갑",
+"wallet": {
+  "charge": "충전하기",
+  "withdraw": "출금하기",
+  "transfer": "머니이동"
+}
+ ,
   "login": "로그인",
   "register": "회원가입",
   "logout": "로그아웃",

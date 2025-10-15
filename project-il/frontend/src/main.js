@@ -9,7 +9,9 @@ import './assets/style.css'
 if (window.location.pathname.startsWith('/admin')) {
   import('@tabler/core/dist/css/tabler.min.css')
 }
+
 const exp = localStorage.getItem('exp')
+const token = localStorage.getItem('user_token')
 if (exp && Date.now() / 1000 > exp) {
   localStorage.clear()
   window.location.href = '/login'

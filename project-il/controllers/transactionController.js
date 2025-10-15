@@ -464,6 +464,22 @@ if (existing.length > 0) {
     res.status(500).json({ message: 'Failed to process the recharge request' });
   }
 };
+// 특정 통화 주소 조회
+exports.getDepositAddressByCurrency = async (req, res) => {
+  const { currency } = req.params
+  if (!currency) return res.status(400).json({ error: 'currency is required' })
+
+  try {
+    const [rows] = await db.query('SELECT address FROM deposit_addresses WHERE currency = ?', [currency])
+    if (rows.length === 0)
+      return res.status(404).json({ error: 'No address found for this currency' })
+
+    res.status(200).json(rows[0])
+  } catch (err) {
+    console.error('❌ [getDepositAddressByCurrency]', err)
+    res.status(500).json({ error: 'Failed to fetch deposit address' })
+  }
+}
 
 // 내 지갑 출금 신청  사용자
 exports.createWalletWithdraw = async (req, res) => {

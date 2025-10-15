@@ -94,7 +94,9 @@
     "submit": "提交充值",
      "fetchRateFailed": "无法获取汇率信息。",
     "success": "充值申请已成功提交。",
-    "failed": "充值申请失败。"
+    "failed": "充值申请失败。",
+    "note":"⚠️ 请务必仅向此地址转账。资金将无法找回，本公司不承担任何损失责任。"
+    ,"depositAddress": "充值地址"
   }, "amountKrw": "输入金额",
       "usdPlatform": "USD 平台",
       "krwPlatform": "KRW 平台",  
@@ -194,7 +196,12 @@
   "rejected": "已拒绝",
   "cancelled": "已取消"
 },
-"home": {
+"home": {"myWallet": "我的钱包",
+"wallet": {
+  "charge": "充值",
+  "withdraw": "提现",
+  "transfer": "资金转移"
+},
   "title": "欢迎来到 MyPoint",
   "login": "登录",
   "register": "注册",

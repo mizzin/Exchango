@@ -242,19 +242,53 @@ exports.getPendingUsers = async (req, res) => {
 };
 
 //회원승인
+//회원승인
 exports.approveUser = async (req, res) => {
   const { id } = req.params;
+
   try {
-    const [result] = await db.query('UPDATE users SET status = ? WHERE id = ?', ['approved', id]);
+    // 1️⃣ 승인 처리
+    const [result] = await db.query(
+      'UPDATE users SET status = ? WHERE id = ?',
+      ['approved', id]
+    );
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
     }
+
+    // 2️⃣ 유저 정보 조회 (닉네임/언어용)
+    const [[user]] = await db.query(
+      'SELECT username, language FROM users WHERE id = ?',
+      [id]
+    );
+
+    // 3️⃣ 템플릿 가져오기
+    const [[template]] = await db.query(
+      'SELECT content FROM message_templates WHERE template_key = ?',
+      ['welcome_message']
+    );
+
+    // 4️⃣ 쪽지 전송
+    if (template) {
+      const content = template.content.replace('{{nickname}}', user.username);
+
+      await messageModel.createMessage({
+        from_user_id: 1, // 시스템 관리자 ID (예: 1번 계정)
+        to_user_id: id,
+        subject: '🎉 Welcome to Tranasia!',
+        content,
+        language: user.language || 'en',
+            });
+    }
+
+    // 5️⃣ 응답
     res.json({ message: '✅ 가입이 승인되었습니다.' });
   } catch (err) {
     console.error('❌ 사용자 승인 오류:', err);
     res.status(500).json({ message: '서버 오류로 가입 승인에 실패했습니다.' });
   }
 };
+
 
 //회원거절
 exports.rejectUser = async (req, res) => {

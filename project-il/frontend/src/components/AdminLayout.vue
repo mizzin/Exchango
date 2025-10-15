@@ -36,7 +36,8 @@
 
           <!-- 단독 메뉴: 거래 처리 이력 -->
           <router-link to="/admin/history" class="nav-link text-white">거래 처리 이력</router-link>
-
+          <router-link to="/admin/deposit-addresses" class="nav-link text-white">입금주소 관리</router-link>
+    
           <router-link to="/admin/notice" class="nav-link text-white">공지사항</router-link>
           <router-link to="/admin/inquiry" class="nav-link text-white">1:1문의</router-link>
 
