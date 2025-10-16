@@ -305,14 +305,14 @@
   "referral": "Referral ID",
   "linkedPlatforms": "Linked Platforms",
   "platformName": "Platform Name",
-  "platformId": "Platform ID", "bankInfo": "Bank Information",
+  "platformId": "Platform ID", "bankInfo": "Financial Info",
   "moneyPasswordHelp": "If you don't know your current password, please contact the administrator via 1:1 inquiry.",
   "bankInfoName": "After entering your real name, please enter the bank name exactly as it appears under the account holder.",
   "bankInfoSaveFailed": "Failed to save bank account information.",
   "bankInfoSaveSuccess": "Saved successfully.",  "passwordMismatch": "The new passwords do not match.",
   "passwordChanged": "Password has been changed.",
-  "passwordChangeFailed": "Failed to change password.","moneyPasswordUpdated": "Withdrawal password has been updated."
-,
+  "passwordChangeFailed": "Failed to change password.","moneyPasswordUpdated": "Withdrawal password has been updated.",
+    "walletAddress": "Wallet Address",
   "common":{  "save": "save" 
 }
 },"notice": {

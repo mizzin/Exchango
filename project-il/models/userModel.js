@@ -35,15 +35,24 @@ const findUserByUsername = async (username) => {
   return rows[0]; // 존재하면 객체, 없으면 undefined
 };
 //0630
-const updateBankInfo = async (userId, { real_name, bank_name, bank_account }) => {
-  const query = `
-    UPDATE users 
-    SET real_name = ?, bank_name = ?, bank_account = ? 
-    WHERE id = ?
-  `
-  const [result] = await db.execute(query, [real_name, bank_name, bank_account, userId])
-  return result
+const updateBankInfo = async (id, fields) => {
+  const setClauses = []
+  const values = []
+
+  for (const [key, value] of Object.entries(fields)) {
+    if (value !== undefined) {
+      setClauses.push(`${key} = ?`)
+      values.push(value)
+    }
+  }
+
+  if (setClauses.length === 0) return
+  const sql = `UPDATE users SET ${setClauses.join(', ')}, updated_at = NOW() WHERE id = ?`
+  values.push(id)
+
+  await db.execute(sql, values)
 }
+
 // 사용자 저장
 const createUser = async (data) => {
   const {
@@ -157,7 +166,6 @@ module.exports = {
   findUserByUsername,
   createUser,
   insertUserPlatforms,
-  findUserByUsername,
   findUserByUsernameWithPassword,
   findUserByIdWithPassword,
   updatePassword,
@@ -165,5 +173,5 @@ module.exports = {
   getNoticeById,
   getPrevNotice,
   getNextNotice,
-  updateBankInfo
-};
+  updateBankInfo 
+}

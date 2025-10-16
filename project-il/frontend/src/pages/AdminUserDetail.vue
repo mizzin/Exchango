@@ -10,6 +10,7 @@
           <p><strong>이메일(인증 및 알림에 사용):</strong> {{ user.email || '-' }}</p>
           <p><strong>상태(시스템에서 자동으로 관리되는 상태값):</strong> {{ user.status }}</p>
           <p><strong>가입일(이력 관리 목적상 수정할 수 없음):</strong> {{ formatDate(user.created_at) }}</p>
+          <p><strong>지갑 주소:</strong> {{ user.wallet_address || '-' }}</p>
           <p><strong>경고 횟수:</strong> {{ user.warning_count }}</p>
         </div>
         <div class="editable-section">

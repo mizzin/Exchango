@@ -26,6 +26,8 @@
         
 
         <input v-model="filters.referral_id" placeholder="추천인 ID" />
+        <input v-model="filters.wallet_address" placeholder="지갑 주소" />
+
 
         <button @click="fetchUsers">검색</button>
         <button @click="resetFilters">초기화</button>
@@ -38,6 +40,8 @@
             <th>상태</th>
             <th>지갑금액(usd)</th>
             <th>가입일</th>
+            <th>지갑 주소</th>
+
             <th>승인 여부</th> 
             <th>상세</th>
           </tr>
@@ -54,6 +58,8 @@
               <span v-else>-</span>
             </td>
             <td>{{ user.created_at ? formatDate(user.created_at) : '-' }}</td>
+            <td>{{ user.wallet_address || '-' }}</td>
+
             <td>
               <template v-if="user.status === 'pending'">
                 <button class="btn-approve" @click="approve(user.id)">승인</button>
@@ -103,6 +109,8 @@
     warningOnly: false,
     platform: '',
     referral_id: ''
+    ,
+  wallet_address: ''
   })
       const platformOptions = ref([])
 

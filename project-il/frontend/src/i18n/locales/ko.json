@@ -445,7 +445,7 @@
     "passwordError": "※ 6자리 숫자 비밀번호를 입력해주세요.",
     "agreeError": "※ 출금 내용에 동의하셔야 합니다."
   },
-  "bankInfo": "은행정보",
+  "bankInfo": "금융 정보",
     "agreeConfirm": "출금 정보 확인에 동의합니다.",
   "moneyPassword": "출금 비밀번호（６자리）",
     "recentHistory": "최근 출근 신청 이력",

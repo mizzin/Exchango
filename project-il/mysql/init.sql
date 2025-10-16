@@ -15,11 +15,13 @@ CREATE TABLE IF NOT EXISTS users (
   real_name VARCHAR(100),
   bank_name VARCHAR(100),
   bank_account VARCHAR(100),
+  wallet_address VARCHAR(255),
   role ENUM('user', 'admin') DEFAULT 'user',
   admin_note TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
 --   내 지갑(USD) 잔액 관리
 CREATE TABLE IF NOT EXISTS user_balances (
   user_id INT PRIMARY KEY,

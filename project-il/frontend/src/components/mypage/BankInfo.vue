@@ -33,7 +33,13 @@
           :placeholder="$t('mypage.bankAccount')"
         />
       </div>
-
+      <div class="form-group">
+        <label>{{ $t('mypage.walletAddress') }}</label>
+        <input
+          v-model="form.wallet_address"
+          :placeholder="$t('mypage.walletAddress')"
+        />
+      </div>
       <button
         type="submit"
         :disabled="!isFormValid || loading"
@@ -46,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
 
@@ -57,10 +63,27 @@ const emit = defineEmits(['updated'])
 const form = ref({
   real_name: '',
   bank_name: '',
-  bank_account: ''
+  bank_account: '',
+  wallet_address: ''
 })
 const token = localStorage.getItem('user_token')
 const loading = ref(false)
+
+// ✅ 페이지 로드시 서버에 저장된 정보 불러오기
+onMounted(async () => {
+  try {
+    const res = await axios.get('/users/info', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    const data = res.data
+    form.value.real_name = data.real_name || ''
+    form.value.bank_name = data.bank_name || ''
+    form.value.bank_account = data.bank_account || ''
+    form.value.wallet_address = data.wallet_address || ''  // ✅ 추가
+  } catch (err) {
+    console.error('❌ 사용자 정보 불러오기 실패:', err)
+  }
+})
 
 const isFormValid = computed(() => {
   const hasRealName = props.user.real_name || form.value.real_name
@@ -76,7 +99,8 @@ const submitBankInfo = async () => {
       {
         real_name: props.user.real_name || form.value.real_name,
         bank_name: form.value.bank_name,
-        bank_account: form.value.bank_account
+        bank_account: form.value.bank_account,
+        wallet_address: form.value.wallet_address
       },
       { headers: { Authorization: `Bearer ${token}` } }
     )
@@ -89,6 +113,7 @@ const submitBankInfo = async () => {
   }
 }
 </script>
+
 
 <style scoped>
 

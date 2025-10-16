@@ -71,7 +71,7 @@ exports.login = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   const {
     username, status, startDate, endDate,
-    warningOnly, platform, referral_id,
+    warningOnly, platform, referral_id,wallet_address, 
     page = 1, limit = 15
   } = req.query;
 
@@ -93,7 +93,11 @@ exports.getAllUsers = async (req, res) => {
   if (referral_id) {
     conditions.push('u.referral_id = ?');
     values.push(referral_id);
-  }
+  }  
+   if (wallet_address) {
+      sql += ' AND wallet_address LIKE ?'
+      params.push(`%${wallet_address}%`)
+    }
   if (warningOnly === 'true') {
     conditions.push('wcnt.warning_count >= 1');
   }
@@ -176,7 +180,7 @@ exports.getUserById = async (req, res) => {
   const { id } = req.params;
   try {
     const [[user]] = await db.query(`
-      SELECT id, username, email, phone, status, role,
+      SELECT id, username, email, phone, status, role,wallet_address,
              real_name, bank_name, bank_account, referral_id, created_at, admin_note
       FROM users WHERE id = ?
     `, [id]);

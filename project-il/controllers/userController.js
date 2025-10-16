@@ -117,7 +117,7 @@ exports.getUserInfo = async (req, res) => {
     const [userRows] = await db.query(
       `SELECT 
          u.id, u.username, u.real_name, u.referral_id, 
-         u.warning_count, u.language, u.bank_name, u.bank_account,
+         u.warning_count, u.language, u.bank_name, u.bank_account,  u.wallet_address,  
          ub.balance
        FROM users u
        LEFT JOIN user_balances ub ON u.id = ub.user_id
@@ -353,7 +353,7 @@ exports.getCurrentUser = async (req, res) => {
     const userId = req.user.id
 
     const [userRows] = await db.query(
-       `SELECT id, username, real_name, bank_name, bank_account 
+       `SELECT id, username, real_name, bank_name, bank_account,  wallet_address
        FROM users 
        WHERE id = ?`,
       [userId]
@@ -387,25 +387,24 @@ exports.updateBankInfo = async (req, res) => {
   const { id } = req.params
   const userIdFromToken = req.user.id
 
-  // 자기 자신만 수정 가능하게 제한
   if (parseInt(id) !== userIdFromToken) {
     return res.status(403).json({ message: 'You are not authorized to update this user.' })
   }
 
-  const { real_name, bank_name, bank_account } = req.body
+  const { real_name, bank_name, bank_account, wallet_address } = req.body
 
   try {
-    // 현재 사용자 정보 조회
     const user = await userModel.getUserById(id)
     if (!user) return res.status(404).json({ message: 'User not found.' })
 
-    // 실명이 이미 있는 경우, 덮어쓰지 않음
     const updatedRealName = user.real_name ? user.real_name : real_name
 
+    // ✅ 빈 값이 아닌 필드만 업데이트
     await userModel.updateBankInfo(id, {
-      real_name: updatedRealName,
-      bank_name,
-      bank_account
+      real_name: updatedRealName || user.real_name,
+      bank_name: bank_name ?? user.bank_name,
+      bank_account: bank_account ?? user.bank_account,
+      wallet_address: wallet_address ?? user.wallet_address
     })
 
     res.json({ message: 'Bank info updated successfully.' })
@@ -612,3 +611,44 @@ exports.getMyTransactions = async (req, res) => {
   }
 }
 
+// GET /users/me/wallet-address 지갑조회
+exports.getWalletAddress = async (req, res) => {
+  try {
+    const userId = req.user?.id
+    const [rows] = await db.execute(
+      'SELECT wallet_address FROM users WHERE id = ?',
+      [userId]
+    )
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.json({ wallet_address: rows[0].wallet_address || null })
+  } catch (error) {
+    console.error('❌ getWalletAddress Error:', error)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
+// PATCH /users/me/wallet-address  지갑등록 및 수정
+exports.updateWalletAddress = async (req, res) => {
+  try {
+    const userId = req.user?.id
+    const { wallet_address } = req.body
+
+    if (!wallet_address || wallet_address.trim() === '') {
+      return res.status(400).json({ message: 'Wallet address is required' })
+    }
+
+    await db.execute(
+      'UPDATE users SET wallet_address = ? WHERE id = ?',
+      [wallet_address.trim(), userId]
+    )
+
+    res.json({ message: 'Wallet address updated successfully' })
+  } catch (error) {
+    console.error('❌ updateWalletAddress Error:', error)
+    res.status(500).json({ message: 'Server error' })
+  }
+}

@@ -45,6 +45,19 @@ router.get(
   must(verifyToken, 'verifyToken'),
   must(messageController.getUserMessages, 'messageController.getUserMessages')
 );
+// ✅ 지갑 주소 조회
+router.get(
+  '/wallet-address',
+  must(verifyToken, 'verifyToken'),
+  must(userController.getWalletAddress, 'userController.getWalletAddress')
+);
+
+// ✅ 지갑 주소 등록/수정
+router.patch(
+  '/wallet-address',
+  must(verifyToken, 'verifyToken'),
+  must(userController.updateWalletAddress, 'userController.updateWalletAddress')
+);
 router.get(
   '/me',
   must(verifyToken, 'verifyToken'),
