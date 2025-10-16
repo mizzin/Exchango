@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import axios from '@/axiosAdmin'
 import { useRouter } from 'vue-router'
 import AdminLayout from '@/components/AdminLayout.vue'
-const to_username = ref('')
+const to_type = ref('single') // ✅ single | all
 const subject = ref('')
 const content = ref('')
 const language = ref('ko')
@@ -13,18 +13,29 @@ const router = useRouter()
 const sendMessage = async () => {
   try {
     const token = localStorage.getItem('admin_token')
-    await axios.post('/admin/messages/send', {
-      to_username: to_username.value,
+    let url = '/admin/messages/send'
+    let body = {
       subject: subject.value,
       content: content.value,
-      language: language.value
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      language: language.value,
+    }
+
+    // ✅ 전체 발송이면 endpoint 변경
+    if (to_type.value === 'all') {
+      url = '/admin/messages/send-all'
+    } else {
+      body.to_username = to_username.value
+    }
+
+    await axios.post(url, body, {
+      headers: { Authorization: `Bearer ${token}` },
     })
 
-    alert('쪽지가 성공적으로 전송되었습니다.')
+    alert(
+      to_type.value === 'all'
+        ? '✅ 전체 사용자에게 쪽지를 발송했습니다.'
+        : '쪽지가 성공적으로 전송되었습니다.'
+    )
     router.push('/admin/dashboard')
   } catch (err) {
     alert(err.response?.data?.message || '쪽지 전송 실패')
@@ -37,8 +48,18 @@ const sendMessage = async () => {
     <div class="message-send">
       <h2>쪽지 보내기</h2>
       <form @submit.prevent="sendMessage">
-        <label>받는 사용자 아이디 *</label>
-        <input v-model="to_username" required />
+          <!-- ✅ 대상 선택 -->
+        <label>발송 대상 *</label>
+        <select v-model="to_type">
+          <option value="single">개별 사용자</option>
+          <option value="all">전체 사용자</option>
+        </select>
+
+                <!-- ✅ 전체가 아닐 때만 사용자 입력 -->
+        <div v-if="to_type === 'single'">
+          <label>받는 사용자 아이디 *</label>
+          <input v-model="to_username" required />
+        </div>
   
         <label>제목 *</label>
         <input v-model="subject" required />

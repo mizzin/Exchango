@@ -371,6 +371,44 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
+exports.sendMessageToAllUsers = async (req, res) => {
+  const adminId = req.user.id; // 로그인된 관리자 ID
+  const { subject, content, language } = req.body;
+
+  if (!subject || !content) {
+    return res.status(400).json({ message: '제목과 내용을 모두 입력해주세요.' });
+  }
+
+  try {
+    // 1️⃣ 전체 사용자 목록 조회
+    const [users] = await db.query('SELECT id FROM users WHERE role = "user" AND status = "approved"');
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: '등록된 사용자가 없습니다.' });
+    }
+
+    // 2️⃣ values 배열 생성
+    const values = users.map(u => [
+      adminId,
+      u.id,
+      subject,
+      content,
+      language || 'ko',
+    ]);
+
+    // 3️⃣ 다중 INSERT
+    await db.query(
+      `INSERT INTO messages (from_user_id, to_user_id, subject, content, language)
+       VALUES ?`,
+      [values]
+    );
+
+    res.status(201).json({ message: `전체 사용자(${users.length}명)에게 쪽지를 발송했습니다.` });
+  } catch (err) {
+    console.error('❌ 전체 쪽지 발송 오류:', err);
+    res.status(500).json({ message: '전체 쪽지 발송 중 오류가 발생했습니다.' });
+  }
+};
 // 🚨 사용자에게 경고 주기
 exports.giveWarning = async (req, res) => {
   const { id: userId } = req.params;

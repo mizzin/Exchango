@@ -36,6 +36,8 @@ router.get('/messages/sent', verifyToken, isAdmin, adminController.getSentMessag
 router.get('/message-templates', verifyToken, isAdmin, adminController.getMessageTemplates)
 router.post('/message-templates', verifyToken, isAdmin, adminController.updateMessageTemplates)
 router.delete('/messages/:id', verifyToken, isAdmin, adminController.deleteMessage)
+router.post('/messages/send-all',verifyToken, isAdmin,  adminController.sendMessageToAllUsers)
+
 // 관리자 충전 내역 조회
 router.get('/trade/recharge', verifyToken, isAdmin, transactionController.getRechargeTransactions)
 router.get('/trade/withdraw', verifyToken, isAdmin, transactionController.getWithdrawTransactions)
