@@ -41,8 +41,10 @@ router.post('/messages/send-all',verifyToken, isAdmin,  adminController.sendMess
 // 관리자 충전 내역 조회
 router.get('/trade/recharge', verifyToken, isAdmin, transactionController.getRechargeTransactions)
 router.get('/trade/withdraw', verifyToken, isAdmin, transactionController.getWithdrawTransactions)
+
 // 관리자 충전 내역 조회 0721
 router.get('/transactions/wallet-charge', verifyToken, isAdmin, transactionController.getWalletChargeList);
+
 // 관리자 출금 내역 조회 0721
 router.get('/transactions/wallet-withdraw', verifyToken, isAdmin, transactionController.getWalletWithdrawList);
 

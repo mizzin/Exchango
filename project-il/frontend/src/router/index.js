@@ -185,7 +185,11 @@ const routes = [
      path: '/admin/history',
     name: 'AdminHistory',
     component: () => import('@/pages/AdminHistory.vue')
-  }
+  },{
+  path: '/how-to-play',
+  name: 'HowToPlay',
+  component: () => import('@/pages/HowToPlay.vue')
+}
   
   
 ]

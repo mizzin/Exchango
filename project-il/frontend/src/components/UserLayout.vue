@@ -82,7 +82,8 @@
 
             <router-link v-if="isMember" to="/mypage" class="nav-item">{{ $t('nav.mypage') }}</router-link>
             <router-link v-if="isMember" to="/messages" class="nav-item">{{ $t('nav.messages') }}</router-link>
-            
+            <router-link to="/how-to-play" class="nav-item">how-to-play</router-link>
+
             <router-link to="/login" class="nav-item" v-if="isMember" @click="logout">{{ $t('nav.logout') }}</router-link>
             <router-link to="/login" class="nav-item" v-else>{{ $t('nav.login') }}</router-link>
 
