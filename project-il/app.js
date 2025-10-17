@@ -46,6 +46,9 @@ app.use('/api/transactions', require('./routes/transaction'));
 const exchangeRateRouter = require('./routes/exchangeRate');
 app.use('/api/exchange-rate', exchangeRateRouter); 
 
+const messageRoutes = require('./routes/messageRoutes')
+app.use('/api/messages', messageRoutes)
+
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/auth', require('./routes/auth'));
@@ -58,7 +61,12 @@ app.use('/api/deposit-addresses', require('./routes/adminDepositAddress'))
 // ✅ 업로드 파일 서빙
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use((req, res, next) => {
-  console.log(`🌐 ${req.method} ${req.originalUrl}`)
+  // 읽지 않은 쪽지 카운트 API는 로그 남기지 않음
+  if (req.path === '/api/messages/unread-count' || req.path === '/api/users/messages/messagecount') {
+    return next()
+  }
+
+  console.log(`[${new Date().toISOString()}] [info] ➡️ ${req.method} ${req.originalUrl} 요청 from ${req.ip}`)
   next()
 })
 // ✅ 마지막 SPA fallback

@@ -421,7 +421,7 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
 /* ✅ 모바일 전용 지갑 카드 */
 .wallet-card {
   background: linear-gradient(180deg, #f5f7ff 0%, #ffffff 100%);
-  border: 1px solid #e6ecff;
+  border: 1px solid #afbde7;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   padding: 1.5rem 1.2rem;
@@ -494,8 +494,8 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
   font-size: 0.9rem;
   font-weight: 600;
   background: #fff;
-  border: 1.5px solid #e4e9ff;
-  color: #127ad9;
+  border: 1.5px solid #7a81d3;
+  color: #4d5ee1;
   cursor: pointer;
   transition: all 0.25s ease;
 }

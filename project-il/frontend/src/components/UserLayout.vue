@@ -5,8 +5,8 @@
       <header class="user-header">
         <div class="container header-flex">
           <router-link to="/" class="logo-link">
-            <h1 class="logo">TranAsia</h1>
-          </router-link>
+              <img src="@/assets/img/logo.png" alt="TranAsia" class="logo-img" style="height:38px;width:auto;"/>
+            </router-link>
             <!-- ✅ 모바일 전용 언어 셀렉트 (로고 옆 고정) -->
               <select
                 v-if="isMobile"
@@ -27,6 +27,12 @@
 
           <!-- 햄버거 버튼 (우측 상단) -->
           <button class="hamburger" @click="toggleMenu">☰</button>
+          <span
+            v-if="isMobile && unreadCount > 0"
+            class="msg-badge-floating"
+          >
+            {{ unreadCount > 9 ? '9+' : unreadCount }}
+          </span>       
         </div>
         <!-- 모바일에서는 메뉴 바로 아래 보유금액 -->
         <div v-if="isMember && userInfo && userInfo.balance != null && isMobile" class="user-balance-mobile">
@@ -81,7 +87,11 @@
             </div>
 
             <router-link v-if="isMember" to="/mypage" class="nav-item">{{ $t('nav.mypage') }}</router-link>
-            <router-link v-if="isMember" to="/messages" class="nav-item">{{ $t('nav.messages') }}</router-link>
+            <router-link to="/messages" class="nav-item message-link">
+              {{ $t('nav.messages') }}
+  <span v-if="unreadCount > 0" class="msg-badge-inline">
+    {{ unreadCount > 9 ? '9+' : unreadCount }}
+  </span>            </router-link>
             <router-link to="/how-to-play" class="nav-item">how-to-play</router-link>
 
             <router-link to="/login" class="nav-item" v-if="isMember" @click="logout">{{ $t('nav.logout') }}</router-link>
@@ -168,6 +178,31 @@ const fetchUserInfo = async () => {
     userInfo.value = null
   }
 }
+const unreadCount = ref(0)
+
+const fetchUnreadMessages = async () => {
+  const token = localStorage.getItem('user_token')
+  if (!token) return
+  try {
+    const res = await axios.get('/messages/unread-count', {
+      headers: { Authorization: `Bearer ${token}` }
+      
+    })
+           
+
+    unreadCount.value = res.data.count || 0
+    console.log('📨 unreadCount:', unreadCount.value)
+
+  } catch (err) {
+    console.error('쪽지 갯수 불러오기 실패:', err)
+  }
+}
+
+onMounted(() => {
+  fetchUnreadMessages()
+  setInterval(fetchUnreadMessages, 30000) // 30초마다 새로고침
+})
+
 const getRates = async () => {
   try {
     const res = await axios.get(`/exchange-rate`);
@@ -226,6 +261,64 @@ const toggleMenu = () => {
 
  
 <style scoped>
+.message-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.msg-badge-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ff3b30;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 16px;
+  line-height: 1;
+  padding: 0 4px;
+  margin-left: 5px; /* 글자랑 간격 */
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+  vertical-align: middle;
+}
+.msg-badge-floating {
+  position: absolute;
+  top: 5px; /* 살짝 아래로 */
+  right: 10px;
+  min-width: 18px;
+  height: 18px;
+  background-color: #ff3b30;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+  z-index: 2000;
+}
+.msg-badge-floating:has(:not(:empty)) {
+  border-radius: 10px;
+  min-width: 20px;
+  height: 18px;
+}
+
+@keyframes blink {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+.user-header .logo-img {
+  height: 38px !important;
+  width: auto !important;
+}
+
 .user-layout {
   display: flex;
   flex-direction: column;
@@ -233,22 +326,12 @@ const toggleMenu = () => {
 }
 
 .user-header {
-  background-color: white;
-  border-bottom: 1px solid #ddd;
-  padding: 1rem; /* ← 충분한 높이 확보 */
+    box-shadow: 0 2px 6px #0000000f;
+        padding: 1rem;
   position: relative; /* ← 햄버거 기준점으로 작용 */
-  min-height: 60px; /* ← 명시적으로 최소 높이 지정 */
+  min-height: 50px; /* ← 명시적으로 최소 높이 지정 */
 }
 
-.logo {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #2563eb;
-  letter-spacing: 0.5px;
-  font-family: 'Segoe UI', 'Pretendard', sans-serif;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
 
 .logo-link {
   text-decoration: none;
@@ -340,13 +423,14 @@ const toggleMenu = () => {
 
 .hamburger {
   display: none; /* PC에서는 숨김 */
-  font-size: 2rem;
+  font-size: 2rem;   
+  top: 0.2rem;
   background: none !important; /* Tabler 스타일 무효화 */
   border: none !important;
-  color: #2563eb !important; /* 원하는 파란색 아이콘 */
+  color: #6d7c9c !important; /* 원하는 파란색 아이콘 */
   position: absolute;
   right: 1rem;
-         top: 0.1rem;
+  top: 0.1rem;
   z-index: 1001;
   padding: 0;
   line-height: 1;
@@ -393,11 +477,11 @@ const toggleMenu = () => {
   border: 1px solid #d3d3d3;
   background: #fff;
   border-radius: 20px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
+  padding: 4px 8px;
+  font-size: 0.8rem;
   color: #333;
   position: absolute;
-  right: 4rem; 
+  right: 3.5rem;  
   z-index: 1000;
     -o-appearance: none;
   -webkit-appearance: none;
@@ -415,8 +499,27 @@ select::-ms-expand {
 }
 
 @media (max-width: 768px) {
+    .msg-badge {
+    right: 303px;
+  }
+    .msg-badge-hamburger {
+   
+      display: none;
+  }
+  .user-header {
+    box-shadow: none;
+    padding-top: 0.9rem !important;
+    padding-right: 0 !important;
+    padding-bottom: 0.5rem !important;
+    padding-left: 0 !important;
+    position: relative;
+    min-height: 48px;
+  }
+   .logo-img {
+    height: 28px !important; /* 로고 크기 축소 */
+  }
    .main {
-    padding: 0.5rem 0; /* 모바일에선 여백 줄이기 */
+    padding: 0; /* 모바일에선 여백 줄이기 */
   }
   .user-balance,
   .user-balance-mobile,
@@ -429,6 +532,9 @@ select::-ms-expand {
   .user-balance-mobile {
     display: none;
   }
+    .msg-badge-floating {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -438,7 +544,7 @@ select::-ms-expand {
   }
   .hamburger {
     display: block; 
-            top: 0.1rem;
+    top: 0.1rem;
     right: 1rem;
   }
   .nav {

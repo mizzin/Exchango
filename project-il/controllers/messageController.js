@@ -47,3 +47,17 @@ exports.getMessageTemplates = async (req, res) => {
   `)
   res.json({ templates: rows })
 }
+
+exports.getUnreadCount = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const [[{ count }]] = await db.query(
+      'SELECT COUNT(*) AS count FROM messages WHERE to_user_id = ? AND is_read = 0',
+      [userId]
+    );
+    res.json({ count });
+  } catch (err) {
+    console.error('❌ getUnreadCount 오류:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
