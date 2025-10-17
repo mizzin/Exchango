@@ -86,8 +86,12 @@ onMounted(async () => {
 })
 
 const isFormValid = computed(() => {
-  const hasRealName = props.user.real_name || form.value.real_name
-  return hasRealName && form.value.bank_name && form.value.bank_account
+  return (
+    form.value.real_name ||
+    form.value.bank_name ||
+    form.value.bank_account ||
+    form.value.wallet_address
+  )
 })
 
 const submitBankInfo = async () => {
