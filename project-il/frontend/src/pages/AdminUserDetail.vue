@@ -11,7 +11,10 @@
           <p><strong>상태(시스템에서 자동으로 관리되는 상태값):</strong> {{ user.status }}</p>
           <p><strong>가입일(이력 관리 목적상 수정할 수 없음):</strong> {{ formatDate(user.created_at) }}</p>
           <p><strong>지갑 주소:</strong> {{ user.wallet_address || '-' }}</p>
+          <p><strong>페소타입:</strong> {{ user.peso_account_type  || '-' }}</p>
+          <p><strong>페소 주소:</strong> {{ user.peso_account   || '-' }}</p>
           <p><strong>경고 횟수:</strong> {{ user.warning_count }}</p>
+
         </div>
         <div class="editable-section">
           <h3>📝 수정 가능 정보</h3>

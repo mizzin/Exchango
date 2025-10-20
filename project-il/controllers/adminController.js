@@ -180,7 +180,7 @@ exports.getUserById = async (req, res) => {
   const { id } = req.params;
   try {
     const [[user]] = await db.query(`
-      SELECT id, username, email, phone, status, role,wallet_address,
+      SELECT id, username, email, phone, status, role,wallet_address, peso_account_type, peso_account ,
              real_name, bank_name, bank_account, referral_id, created_at, admin_note
       FROM users WHERE id = ?
     `, [id]);

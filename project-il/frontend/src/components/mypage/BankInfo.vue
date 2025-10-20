@@ -3,51 +3,47 @@
     <div class="notice-box">
       ⚠️ {{ $t('mypage.bankInfoName') }}
     </div>
+<form @submit.prevent="submitBankInfo">
 
-    <form @submit.prevent="submitBankInfo">
-      <div class="form-group" v-if="!user.real_name">
-        <label>{{ $t('mypage.realName') }}</label>
-        <input
-          v-model="form.real_name"
-          :placeholder="$t('mypage.realName')"
-        />
-      </div>
-      <div v-else class="readonly-field">
-        <strong>{{ $t('mypage.realName') }}:</strong> {{ user.real_name }}
-      </div>
+  <!-- 🏦 원화 전용 -->
+  <h3 class="section-title">🇰🇷 KRW</h3>
+  <div class="form-group">
+    <label>{{ $t('mypage.bankName') }}</label>
+    <input v-model="form.bank_name" :placeholder="$t('mypage.bankName')" />
+  </div>
+  <div class="form-group">
+    <label>{{ $t('mypage.bankAccount') }}</label>
+    <input v-model="form.bank_account" :placeholder="$t('mypage.bankAccount')" />
+  </div>
 
-      <div class="form-group">
-        <label>{{ $t('mypage.bankName') }}</label>
-        <input
-          v-model="form.bank_name"
-          :disabled="!user.real_name && !form.real_name"
-          :placeholder="$t('mypage.bankName')"
-        />
-      </div>
+  <!-- 💰 USDT 전용 -->
+  <h3 class="section-title">💵 USDT</h3>
+  <div class="form-group">
+    <label>{{ $t('mypage.walletAddress') }}</label>
+    <input v-model="form.wallet_address" :placeholder="$t('mypage.walletAddress')" />
+  </div>
 
-      <div class="form-group">
-        <label>{{ $t('mypage.bankAccount') }}</label>
-        <input
-          v-model="form.bank_account"
-          :disabled="!user.real_name && !form.real_name"
-          :placeholder="$t('mypage.bankAccount')"
-        />
-      </div>
-      <div class="form-group">
-        <label>{{ $t('mypage.walletAddress') }}</label>
-        <input
-          v-model="form.wallet_address"
-          :placeholder="$t('mypage.walletAddress')"
-        />
-      </div>
-      <button
-        type="submit"
-        :disabled="!isFormValid || loading"
-        :class="{ disabled: !isFormValid || loading }"
-      >
-        {{ loading ? $t('common.saving') : $t('mypage.common.save') }}
-      </button>
-    </form>
+  <!-- 🇵🇭 PHP 전용 -->
+  <h3 class="section-title">🇵🇭 PHP</h3>
+  <div class="form-group">
+    <label>{{ $t('mypage.pesoAccountType') }}</label>
+    <select v-model="form.peso_account_type">
+      <option disabled value="">Select</option>
+      <option value="GCash">GCash</option>
+      <option value="GoTyme">GoTyme</option>
+      <option value="BDO">BDO</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>{{ $t('mypage.pesoAccount') }}</label>
+    <input v-model="form.peso_account" :placeholder="$t('mypage.pesoAccountPlaceholder')" />
+  </div>
+
+  <button type="submit" :disabled="loading" :class="{ disabled: loading }">
+    {{ loading ? $t('common.saving') : $t('mypage.common.save') }}
+  </button>
+</form>
+
   </div>
 </template>
 
@@ -79,7 +75,9 @@ onMounted(async () => {
     form.value.real_name = data.real_name || ''
     form.value.bank_name = data.bank_name || ''
     form.value.bank_account = data.bank_account || ''
-    form.value.wallet_address = data.wallet_address || ''  // ✅ 추가
+    form.value.wallet_address = data.wallet_address || ''  
+    form.value.peso_account_type = data.peso_account_type || ''  
+    form.value.peso_account = data.peso_account || ''  
   } catch (err) {
     console.error('❌ 사용자 정보 불러오기 실패:', err)
   }
@@ -90,7 +88,9 @@ const isFormValid = computed(() => {
     form.value.real_name ||
     form.value.bank_name ||
     form.value.bank_account ||
-    form.value.wallet_address
+    form.value.wallet_address||
+    form.value.peso_account_type ||
+    form.value.peso_account
   )
 })
 
@@ -104,7 +104,9 @@ const submitBankInfo = async () => {
         real_name: props.user.real_name || form.value.real_name,
         bank_name: form.value.bank_name,
         bank_account: form.value.bank_account,
-        wallet_address: form.value.wallet_address
+        wallet_address: form.value.wallet_address,
+        peso_account_type: form.value.peso_account_type,
+        peso_account: form.value.peso_account
       },
       { headers: { Authorization: `Bearer ${token}` } }
     )
@@ -128,6 +130,15 @@ const submitBankInfo = async () => {
   color: #c05621;
   border-radius: 8px;
   font-size: 0.9rem;
+}
+.section-title {
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1f2d5a;
+  border-left: 4px solid #0052cc;
+  padding-left: 8px;
 }
 
 .form-group {
@@ -177,4 +188,27 @@ const submitBankInfo = async () => {
   background-color: #ccc;
   cursor: not-allowed;
 }
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #333;
+  appearance: none; /* 브라우저 기본 화살표 제거 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path fill='black' d='M0 0l6 8 6-8z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px 8px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #0052cc;
+  box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1);
+}
+
 </style>

@@ -312,7 +312,10 @@
   "bankInfoSaveSuccess": "Saved successfully.",  "passwordMismatch": "The new passwords do not match.",
   "passwordChanged": "Password has been changed.",
   "passwordChangeFailed": "Failed to change password.","moneyPasswordUpdated": "Withdrawal password has been updated.",
-    "walletAddress": "Wallet Address",
+    "walletAddress": "Wallet Address",  "pesoAccountType": "Peso Account Type (PHP Only)",
+  "pesoAccount": "Peso Account Number",
+  "pesoAccountPlaceholder": "Enter your GCash / GoTyme / BDO account",
+  "selectOption": "Select Account Type",
   "common":{  "save": "save" 
 }
 },"notice": {

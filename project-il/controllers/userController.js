@@ -117,7 +117,7 @@ exports.getUserInfo = async (req, res) => {
     const [userRows] = await db.query(
       `SELECT 
          u.id, u.username, u.real_name, u.referral_id, 
-         u.warning_count, u.language, u.bank_name, u.bank_account,  u.wallet_address,  
+         u.warning_count, u.language, u.bank_name, u.bank_account,  u.wallet_address, u.peso_account_type, u.peso_account,
          ub.balance
        FROM users u
        LEFT JOIN user_balances ub ON u.id = ub.user_id
@@ -391,7 +391,7 @@ exports.updateBankInfo = async (req, res) => {
     return res.status(403).json({ message: 'You are not authorized to update this user.' })
   }
 
-  const { real_name, bank_name, bank_account, wallet_address } = req.body
+  const { real_name, bank_name, bank_account, wallet_address,peso_account_type, peso_account } = req.body
 
   try {
     const user = await userModel.getUserById(id)
@@ -404,7 +404,9 @@ exports.updateBankInfo = async (req, res) => {
       real_name: updatedRealName || user.real_name,
       bank_name: bank_name ?? user.bank_name,
       bank_account: bank_account ?? user.bank_account,
-      wallet_address: wallet_address ?? user.wallet_address
+      wallet_address: wallet_address ?? user.wallet_address,
+      peso_account_type: peso_account_type ?? user.peso_account_type,
+      peso_account: peso_account ?? user.peso_account 
     })
 
     res.json({ message: 'Bank info updated successfully.' })
