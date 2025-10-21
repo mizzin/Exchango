@@ -42,7 +42,7 @@ const updateBankInfo = async (id, fields) => {
   for (const [key, value] of Object.entries(fields)) {
     if (value !== undefined) {
       setClauses.push(`${key} = ?`)
-      values.push(value)
+      values.push(value === '' ? null : value)
     }
   }
 

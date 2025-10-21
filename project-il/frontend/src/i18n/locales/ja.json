@@ -102,7 +102,11 @@
     "success": "チャージ申請が完了しました。",
     "failed": "チャージ申請に失敗しました。",
     "note":"⚠️ 必ずこのアドレスにのみ送金してください。誤ったアドレスに送金した場合、資金は戻らず、当社は一切の責任を負いません。",
-      "depositAddress": "入金アドレス"
+      "depositAddress": "入金アドレス",
+      "title1": "口座情報が必要です",
+"text": "チャージ申請の前に、マイページで金融情報を登録してください。",
+"confirmButtonText": "確認"
+
   },
     "inputAmount": "入力金額",
     "amountKrw": "入力金額",
@@ -303,6 +307,18 @@
     "confirmMoneyPassword": "出金パスワード確認",
     "moneyPasswordHelp": "現在のパスワードが分からない場合は、1:1お問い合わせで管理者に連絡してください。",
     "bankInfoName": "実名を入力した後、口座名義人と同じ情報で銀行名を入力してください。",
+     "walletAddress": "ウォレットアドレス",
+  "pesoAccountType": "ペソ口座の種類",
+  "pesoAccount": "ペソ口座番号",
+  "pesoAccountPlaceholder": "例：GCash または銀行口座",
+  "common": {
+    "save": "保存",
+      "saving": "保存中..."
+
+  },
+  "bankInfoSaveSuccess": "口座情報が正常に保存されました。",
+  "bankInfoSaveFailed": "口座情報の保存に失敗しました。"
+},
     "bankInfoSaveFailed": "口座情報の保存に失敗しました。",
     "bankInfoSaveSuccess": "保存されました。",  "passwordMismatch": "新しいパスワードが一致しません。",
   "passwordChanged": "パスワードが変更されました。",

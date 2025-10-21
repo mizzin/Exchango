@@ -105,7 +105,11 @@
     "success": "Recharge request submitted successfully.",
     "failed": "Recharge request failed.",
     "note":"⚠️ Send funds only to this address. If you send to a wrong address, your funds cannot be recovered, and we are not responsible for any loss."
-    ,"depositAddress":"address"
+    ,"depositAddress":"address",
+    "title1": "Bank Info Required",
+"text": "Please register your financial information in My Page before submitting a charge request.",
+"confirmButtonText": "OK"
+
   },
     "inputAmount": "Input Amount",
     "amountKrw": "Entered Amount",
@@ -308,17 +312,26 @@
   "platformId": "Platform ID", "bankInfo": "Financial Info",
   "moneyPasswordHelp": "If you don't know your current password, please contact the administrator via 1:1 inquiry.",
   "bankInfoName": "After entering your real name, please enter the bank name exactly as it appears under the account holder.",
-  "bankInfoSaveFailed": "Failed to save bank account information.",
-  "bankInfoSaveSuccess": "Saved successfully.",  "passwordMismatch": "The new passwords do not match.",
+  
+  "passwordMismatch": "The new passwords do not match.",
   "passwordChanged": "Password has been changed.",
   "passwordChangeFailed": "Failed to change password.","moneyPasswordUpdated": "Withdrawal password has been updated.",
-    "walletAddress": "Wallet Address",  "pesoAccountType": "Peso Account Type (PHP Only)",
+    "walletAddress": "Wallet Address",
+  "pesoAccountType": "Peso Account Type",
+  "pesoAccount": "Peso Account Number",
+  "pesoAccountPlaceholder": "e.g., GCash or bank account",
+  "common": {
+    "save": "Save",
+      "saving": "Saving..."
+
+  },
+  "bankInfoSaveSuccess": "Bank information saved successfully.",
+  "bankInfoSaveFailed": "Failed to save bank information."
+}, "pesoAccountType": "Peso Account Type (PHP Only)",
   "pesoAccount": "Peso Account Number",
   "pesoAccountPlaceholder": "Enter your GCash / GoTyme / BDO account",
   "selectOption": "Select Account Type",
-  "common":{  "save": "save" 
-}
-},"notice": {
+"notice": {
 "backToList":"List"
 },
 "register": {

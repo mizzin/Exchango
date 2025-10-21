@@ -96,7 +96,11 @@
     "success": "充值申请已成功提交。",
     "failed": "充值申请失败。",
     "note":"⚠️ 请务必仅向此地址转账。资金将无法找回，本公司不承担任何损失责任。"
-    ,"depositAddress": "充值地址"
+    ,"depositAddress": "充值地址",
+    "title1": "Bank Info Required",
+"text": "Please register your financial information in My Page before submitting a charge request.",
+"confirmButtonText": "OK"
+
   }, "amountKrw": "输入金额",
       "usdPlatform": "USD 平台",
       "krwPlatform": "KRW 平台",  
@@ -283,12 +287,19 @@
   "platformName": "平台名称",
   "platformId": "平台账号",
    "moneyPasswordHelp": "如不知道当前密码，请通过1:1咨询联系管理员。",
-   "bankInfoName": "请输入真实姓名后，填写与账户持有人一致的银行名称。",
+   "bankInfoName": "请输入真实姓名后，填写与账户持有人一致的银行名称。",  "walletAddress": "钱包地址",
+  "pesoAccountType": "比索账户类型",
+  "pesoAccount": "比索账户号码",
+  "pesoAccountPlaceholder": "例如：GCash 或银行账户",
+  "common": {
+    "save": "保存",  "saving": "保存中..."
+  },
+  "bankInfoSaveSuccess": "账户信息已成功保存。",
+  "bankInfoSaveFailed": "账户信息保存失败。"
+},
    "bankInfoSaveFailed": "保存银行账户信息失败。",
-    "bankInfoSaveSuccess": "保存成功。",
-  "common":{  
-    "save": "保存"} 
-},"register": {
+    "bankInfoSaveSuccess": "保存成功。"
+    ,"register": {
   "emailNote": "邮箱将用于找回密码，请正确填写。",
   "title": "注册账户",
   "username": "用户名 *",

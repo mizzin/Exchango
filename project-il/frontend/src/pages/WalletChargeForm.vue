@@ -53,8 +53,9 @@
 
 <script setup>
 import { reactive, computed, ref, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import UserLayout from '@/components/UserLayout.vue'
-import axios from '@/axiosUser'
+import axiosUser  from '@/axiosUser'
 import { useI18n } from 'vue-i18n'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
@@ -62,6 +63,8 @@ const depositAddress = ref('')
 
 const hasPending = ref(false)
 const { t } = useI18n()
+
+const router = useRouter()
 
 const currency = ref('')
 const localAmount = ref(0)
@@ -75,7 +78,7 @@ const isSubmitting = ref(false)
 // 🔹 환율 불러오기
 const fetchExchangeRate = async () => {
   try {
-    const res = await axios.get('/exchange-rate')
+    const res = await axiosUser.get('/exchange-rate')
     const rates = res.data.rates
 
     if (currency.value === 'KRW') {
@@ -152,7 +155,7 @@ const submit = async () => {
 const fetchDepositAddress = async () => {
   if (!currency.value) return
   try {
-    const res = await axios.get(`/deposit-addresses/${currency.value}`)
+    const res = await axiosUser.get(`/deposit-addresses/${currency.value}`)
     depositAddress.value = res.data.address || ''
   } catch (err) {
     console.warn('❌ 입금주소 없음:', err)
@@ -181,10 +184,39 @@ const copyAddress = async () => {
   }
 }
 
+onMounted(async () => {
+  try {
+    const token = localStorage.getItem('user_token')
+    if (!token) return
+
+    const res = await axiosUser.get('/users/info')
+
+    const user = res.data
+    // ✅ 계좌/지갑/페소 정보 확인
+    const hasBankInfo = user.bank_name && user.bank_account
+    const hasWallet = user.wallet_address
+    const hasPesoAccount = user.peso_account_type && user.peso_account
+
+    // ✅ 계좌 정보 확인
+    if (!hasBankInfo || !hasWallet || !hasPesoAccount) {
+      await Swal.fire({
+        title: $t('charge.wallet.title1'),
+        text: $t('charge.wallet.text'),
+        icon: 'info',
+        confirmButtonText: $t('charge.wallet.confirmButtonText'),
+        confirmButtonColor: '#0052cc'
+      })
+      router.push('/mypage')
+    }
+  } catch (err) {
+    console.error('유저 정보 확인 실패:', err)
+  }
+})
+
 // 🔹 진행중 신청 확인
 const checkPending = async () => {
   try {
-    const res = await axios.get('/users/me/transactions/pending-check?status=pending')
+    const res = await axiosUser.get('/users/me/transactions/pending-check?status=pending')
     const arr = Array.isArray(res.data.transactions) ? res.data.transactions : []
 
     const pendingTypes = [
