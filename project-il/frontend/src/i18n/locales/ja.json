@@ -325,7 +325,7 @@
   "passwordChangeFailed": "パスワードの変更に失敗しました。",
   "common":{ 
      "save": "保存する"
-}},
+},
 "register": {
   "emailNote": "メールアドレスはパスワードの再設定に使用されます。正しく入力してください。",
   "title": "会員登録",
