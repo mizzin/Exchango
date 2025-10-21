@@ -293,7 +293,7 @@
     "info": "기본정보",
     "password": "비밀번호변경",
     "moneyPassword": "출금비밀번호변경",
-    "bank": "계좌정보"
+    "bank": "금융정보"
   }, "balance": "보유 금액  ",
     "userInfo": "회원 정보",
     "recommender": "추천인",

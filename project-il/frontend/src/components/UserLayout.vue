@@ -191,7 +191,6 @@ const fetchUnreadMessages = async () => {
            
 
     unreadCount.value = res.data.count || 0
-    console.log('📨 unreadCount:', unreadCount.value)
 
   } catch (err) {
     console.error('쪽지 갯수 불러오기 실패:', err)

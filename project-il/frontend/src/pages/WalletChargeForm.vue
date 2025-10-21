@@ -118,19 +118,44 @@ const sendAmountWithFee = computed(() => {
   return Math.round(local)
 })
 
-// 🔹 충전 요청
 const submit = async () => {
-    if (isSubmitting.value) return
-      isSubmitting.value = true
+  if (isSubmitting.value) return
+  isSubmitting.value = true
 
   try {
-    await axios.post('/transactions/wallet/charge', {
+    const token = localStorage.getItem('user_token')
+    if (!token) return
+
+    // ✅ 유저 정보 확인 (버튼 클릭 시 체크)
+    const res = await axiosUser.get('/users/info')
+    const user = res.data
+
+    const hasBankInfo = user.bank_name && user.bank_account
+    const hasWallet = user.wallet_address
+    const hasPesoAccount = user.peso_account_type && user.peso_account
+
+    // ✅ 셋 다 없으면 팝업 띄우고 종료
+    if (!hasBankInfo && !hasWallet && !hasPesoAccount) {
+      await Swal.fire({
+        title: t('charge.wallet.title1'),
+        text: t('charge.wallet.text'),
+        icon: 'info',
+        confirmButtonText: t('charge.wallet.confirmButtonText'),
+        confirmButtonColor: '#0052cc'
+      })
+      isSubmitting.value = false
+      return
+    }
+
+    // ✅ 정상 충전 요청
+    await axiosUser.post('/transactions/wallet/charge', {
       currency: currency.value,
       local_amount: sendAmountWithFee.value,
       amount_usd: amountUsd.value,
       expected_amount: sendAmountWithFee.value,
     })
-        Swal.fire({
+router.push('/mypage')
+    Swal.fire({
       toast: true,
       position: 'top-end',
       icon: 'success',
@@ -146,10 +171,11 @@ const submit = async () => {
   } catch (e) {
     console.error(e)
     alert(t('charge.wallet.failed'))
-  }finally {
+  } finally {
     isSubmitting.value = false
   }
 }
+
 
 // 🔹 선택한 통화의 입금 주소 불러오기
 const fetchDepositAddress = async () => {
@@ -183,35 +209,6 @@ const copyAddress = async () => {
     alert('Copy failed. Please copy it manually.')
   }
 }
-
-onMounted(async () => {
-  try {
-    const token = localStorage.getItem('user_token')
-    if (!token) return
-
-    const res = await axiosUser.get('/users/info')
-
-    const user = res.data
-    // ✅ 계좌/지갑/페소 정보 확인
-    const hasBankInfo = user.bank_name && user.bank_account
-    const hasWallet = user.wallet_address
-    const hasPesoAccount = user.peso_account_type && user.peso_account
-
-    // ✅ 계좌 정보 확인
-    if (!hasBankInfo || !hasWallet || !hasPesoAccount) {
-      await Swal.fire({
-        title: $t('charge.wallet.title1'),
-        text: $t('charge.wallet.text'),
-        icon: 'info',
-        confirmButtonText: $t('charge.wallet.confirmButtonText'),
-        confirmButtonColor: '#0052cc'
-      })
-      router.push('/mypage')
-    }
-  } catch (err) {
-    console.error('유저 정보 확인 실패:', err)
-  }
-})
 
 // 🔹 진행중 신청 확인
 const checkPending = async () => {
@@ -276,7 +273,7 @@ onMounted(checkPending)
   background-color: #fff;
   max-width: 420px;
   margin: auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.04);
   border-radius: 12px;
 }
