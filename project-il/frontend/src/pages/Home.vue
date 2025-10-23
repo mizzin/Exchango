@@ -87,7 +87,6 @@ const fetchUserInfo = async () => {
       headers: { Authorization: `Bearer ${token}` },
     })
     user.value = res.data // ✅ 데이터 저장
-    console.log('✅ user 정보 로드 완료:', res.data)
   } catch (err) {
     console.error('❌ 사용자 정보 로드 실패:', err)
   }
@@ -102,7 +101,6 @@ onMounted(async () => {
   if (token) {
     try {
       const res = await axiosUser.get('/users/info')
-      console.log('👤 사용자 정보:', res.data)
     } catch (err) {
       console.error('사용자 정보 로드 실패:', err)
     }

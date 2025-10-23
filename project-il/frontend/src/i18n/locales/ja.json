@@ -48,6 +48,7 @@
     "myWallet": "マイウォレット",
     "amount": "移動金額",
     "expectedAmount": "受取予定金額",
+        "noRegisteredId": "このプラットフォームに連携されたIDが見つかりません。マイページでプラットフォームを登録してください。",
     "rateNote": "適用為替レート: 1 {from} → {rate} {to}（2％手数料）",
     "moneyPassword": "出金パスワード",
     "submit": "申請する", "alert": {
@@ -295,7 +296,10 @@
   "referral": "紹介者ID",
   "bankInfo": "金融情報",
   "linkedPlatforms": "連携済みプラットフォーム",
+      "noPlatform": "登録されたプラットフォームがありません。このサイトのサービスを利用するには、1つ以上登録してください。",
+"addPlatform": "プラットフォームを登録する",
   "platformName": "プラットフォーム名",
+    "platformNote": "プラットフォームIDの修正や削除はサポートまでご連絡ください。",
   "platformId": "プラットフォームID",
     "changePassword": "パスワードを変更する",
     "changeMoneyPassword": "出金パスワードを変更する(近日公開)",

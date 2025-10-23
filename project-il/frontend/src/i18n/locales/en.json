@@ -50,7 +50,9 @@
     "amount": "Transfer Amount",
     "expectedAmount": "Expected Received Amount",
     "rateNote": "Applied rate: 1 {from} → {rate} {to} (2% fee)",
-    "moneyPassword": "Withdrawal Password",
+    "moneyPassword": "Withdrawal Password",    "registerFirst": "No linked platform found. Please register first.",  "noRegisteredId": "No linked ID found for this platform. Please register the platform first in My Page.",
+    "goToMypage": "Go to My Page"
+,
     "submit": "Submit Request",    "alert": {
       "rateFetchFailed": "Failed to retrieve exchange rate.",
       "rateNotReady": "Exchange rate calculation is not complete.",
@@ -310,6 +312,9 @@
   "linkedPlatforms": "Linked Platforms",
   "platformName": "Platform Name",
   "platformId": "Platform ID", "bankInfo": "Financial Info",
+   "noPlatform":"No platform registered. Please register at least one to use the services on this site.",
+       "platformNote": "To modify or delete your platform ID, please contact support.",
+  "addPlatform": "Register Platform",
   "moneyPasswordHelp": "If you don't know your current password, please contact the administrator via 1:1 inquiry.",
   "bankInfoName": "After entering your real name, please enter the bank name exactly as it appears under the account holder.",
   

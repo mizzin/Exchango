@@ -55,6 +55,7 @@
     "toPlatformId": "目标平台ID",
     "myWallet": "我的钱包",
     "amount": "转移金额",
+        "noRegisteredId": "未找到该平台的关联ID。请先在“我的页面”中注册平台。",
     "expectedAmount": "预计到账金额",
     "rateNote": "适用汇率: 1 {from} → {rate} {to}（2%手续费）",
     "moneyPassword": "提现密码",

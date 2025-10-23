@@ -62,9 +62,10 @@ app.use('/api/deposit-addresses', require('./routes/adminDepositAddress'))
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use((req, res, next) => {
   // 읽지 않은 쪽지 카운트 API는 로그 남기지 않음
-if (
-    req.originalUrl === '/api/messages/unread-count' ||
-    req.originalUrl === '/api/users/messages/messagecount'
+ if (
+    !req.url.startsWith('/assets') &&
+    !req.url.endsWith('.svg') &&
+    !req.url.includes('/api/messages/unread-count') // 🔹 쪽지 카운트 요청 제외
   ) {
     return next()
   }
