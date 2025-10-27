@@ -45,9 +45,9 @@
           <tr>
             <th>사용자</th>
             <th>선택한통화</th>
-            <th>받아야하는금액</th>
+            <th>입금예정금액</th>
             <th>입력금액</th>
-            
+            <th>반영된금액</th>
             <th>상태</th>
             <th>요청일</th>
             <th>승인일시</th>
@@ -60,7 +60,7 @@
             <td><span class="currency-pill">{{ item.currency }}</span></td>
              <td>{{ Number(item.expected_amount).toLocaleString() }}</td>
             <td>{{ Number(item.amount).toLocaleString() }}</td>
-                       
+            <td>{{ (Number(item.amount) + Number(item.bonus_amount || 0)).toLocaleString() }}</td>
 
             <td>
               <span :class="['status-badge', item.status]">
@@ -75,6 +75,9 @@
             <td>
               <div v-if="item.status === 'pending'">
                 <button class="btn-approve" @click="approve(item.id)">승인</button>
+                <button   class="btn-bonus" :disabled="!hasActiveEvent"  @click="approve(item.id, true)"                >
+                  이벤트적용승인
+                </button>
                 <button class="btn-reject" @click="reject(item.id)">거절</button>
               </div>
               <div v-else>—</div>
@@ -182,6 +185,21 @@ const fetchList = async () => {
     console.error('❌ 충전 내역 로딩 실패:', e)
   }
 }
+const hasActiveEvent = ref(false)
+
+const checkActiveEvent = async () => {
+  try {
+    const res = await axios.get('/admin/events')
+    hasActiveEvent.value = res.data.some(e => e.is_active === 1)
+  } catch (err) {
+    console.error('❌ 이벤트 조회 실패:', err)
+  }
+}
+
+onMounted(() => {
+  fetchList()
+  checkActiveEvent()
+})
 
 // 상태 텍스트 변환
 const formatStatus = (status) => {
@@ -215,11 +233,21 @@ const nextPage = () => {
 }
 
 // 승인/거절 처리
-const approve = async (id) => {
-  if (!confirm('정말 승인하시겠습니까?')) return
-  await axios.patch(`/admin/transactions/wallet-charge/${id}/approve`)
-  alert('승인 완료')
-  fetchList()
+// ✅ 승인 처리
+const approve = async (id, applyEvent = false) => {
+  const msg = applyEvent
+    ? '이벤트 보너스를 포함하여 승인하시겠습니까?'
+    : '정말 승인하시겠습니까?'
+
+  if (!confirm(msg)) return
+
+  try {
+    await axios.patch(`/admin/transactions/wallet-charge/${id}/approve`, { applyEvent })
+    alert(applyEvent ? '이벤트 포함 승인 완료' : '승인 완료')
+    fetchList()
+  } catch (err) {
+    alert('승인 실패: ' + (err.response?.data?.message || err.message))
+  }
 }
 
 const reject = async (id) => {
@@ -247,6 +275,20 @@ onMounted(fetchList)
   display: flex;
   gap: 10px;
   align-items: center;
+}
+.btn-bonus {
+  background-color: #ffd43b;
+  color: #333;
+  margin-left: 5px;
+}
+.btn-bonus:hover {
+  background-color: #fab005;
+}
+.btn-bonus[disabled] {
+  background-color: #ccc;
+  color: #777;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .reset-button {

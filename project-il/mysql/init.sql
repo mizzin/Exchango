@@ -137,56 +137,52 @@ CREATE TABLE IF NOT EXISTS warnings (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 --   모든 요청 기록을 이 테이블에 통합
+-- 💾 거래 내역 테이블 (통합 버전)
 CREATE TABLE IF NOT EXISTS transactions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
-  type ENUM('charge', 'withdraw') NOT NULL,
-  amount DECIMAL(10,2) NOT NULL,         -- 사용자가 입력한 USD 금액
-  currency VARCHAR(5),                   -- 통화 종류 (KRW, PHP, USDT 등)
-  krw_amount INT,                        -- 환전된 금액 (원화 기준 등)
-  platform_name VARCHAR(50),            -- 플랫폼명 (예: 포커스타즈)
-  platform_user_id VARCHAR(50),         -- 플랫폼 ID
-  user_memo TEXT,                        -- 사용자가 입력한 메모 (출금 주소 등)
-  status ENUM('pending', 'completed', 'cancelled', 'rejected') DEFAULT 'pending',
-  confirmed_by_admin BOOLEAN DEFAULT FALSE, -- 관리자 승인 여부
-  admin_note TEXT,                       -- 관리자가 남긴 메모
+  type ENUM(
+    'wallet_charge',      -- 내 지갑 충전
+    'platform_charge',    -- 플랫폼으로 바로 충전
+    'wallet_withdraw',    -- 내 지갑에서 출금
+    'platform_withdraw',  -- 플랫폼으로 출금
+    'wallet_to_platform', -- 내 지갑 → 플랫폼 이동
+    'platform_to_wallet', -- 플랫폼 → 내 지갑 이동
+    'platform_to_platform', -- 플랫폼 간 이동
+    'transfer',           -- 기타 머니 이동
+    'reward',             -- 보상
+    'penalty',            -- 패널티 또는 차감
+    'unknown'             -- 예외 처리용
+  ) NOT NULL,
+
+  from_type ENUM('wallet', 'platform') DEFAULT 'wallet',  -- 출발지 타입
+  from_platform_id VARCHAR(10) DEFAULT NULL,              -- 출발 플랫폼 ID
+  from_platform_user_id VARCHAR(50) DEFAULT NULL,         -- 출발 플랫폼 유저 ID
+  to_platform_id VARCHAR(10) DEFAULT NULL,                -- 도착 플랫폼 ID
+  to_platform_user_id VARCHAR(50) DEFAULT NULL,           -- 도착 플랫폼 유저 ID
+
+  amount DECIMAL(10,2) NOT NULL,         -- 금액(USD 기준)
+  currency VARCHAR(5) DEFAULT 'USD',     -- 통화 종류
+  krw_amount INT DEFAULT NULL,           -- 원화 환산 금액
+  exchange_rate DECIMAL(10,4) DEFAULT NULL, -- 환율
+  expected_amount DECIMAL(10,2) DEFAULT NULL, -- 환산 후 예상 금액
+
+  platform_name VARCHAR(50) DEFAULT NULL,   -- 플랫폼명
+  platform_user_id_old VARCHAR(50) DEFAULT NULL, -- (이전 구조 호환용)
+  user_memo TEXT,                        -- 메모
+  status ENUM('pending', 'approved', 'completed', 'cancelled', 'rejected') DEFAULT 'pending',
+  confirmed_by_admin BOOLEAN DEFAULT FALSE,
+  admin_id INT NULL,
+  admin_note TEXT,
+
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
- 
--- 1. ENUM → VARCHAR(50)로 임시 변경0721
-ALTER TABLE transactions MODIFY COLUMN type VARCHAR(50);
-
--- 2. 기존 데이터 타입 값 매핑 업데이트
-UPDATE transactions SET type = 'wallet_charge' WHERE type = 'charge';
-UPDATE transactions SET type = 'wallet_withdraw' WHERE type = 'withdraw';
-
--- 3. 새로운 ENUM 타입으로 재설정
 ALTER TABLE transactions
-MODIFY COLUMN type ENUM(
-  'wallet_charge',     -- 내 지갑 충전
-  'platform_charge',   -- 플랫폼으로 바로 충전
-  'wallet_withdraw',   -- 내 지갑에서 출금
-  'platform_withdraw', -- 플랫폼으로 출금
-  'transfer',          -- 머니 이동 (내 지갑 → 플랫폼) 
-  'reward',            -- 보상
-  'penalty'            -- 패널티 또는 차감
-) NOT NULL;
-
--- 2. 머니 이동 관련 컬럼 추가
-ALTER TABLE transactions
-  ADD COLUMN from_type ENUM('wallet', 'platform') AFTER type,
-  ADD COLUMN from_platform_id VARCHAR(10) AFTER from_type,
-  ADD COLUMN from_platform_user_id VARCHAR(50) AFTER from_platform_id,
-  ADD COLUMN to_platform_id VARCHAR(10) AFTER platform_user_id,
-  ADD COLUMN to_platform_user_id VARCHAR(50) AFTER to_platform_id,
-  ADD COLUMN exchange_rate DECIMAL(10,4) AFTER user_memo,
-  ADD COLUMN expected_amount DECIMAL(10,2) AFTER exchange_rate
-  ADD COLUMN admin_id INT NULL AFTER status;
-
-ALTER TABLE transactions ADD COLUMN expected_amount DECIMAL(10,2) NULL;
-ALTER TABLE transactions MODIFY COLUMN type VARCHAR(30);
+ADD COLUMN event_id INT NULL,
+ADD COLUMN bonus_amount DECIMAL(10,2) DEFAULT 0;
 
 
 CREATE TABLE IF NOT EXISTS notices (
@@ -253,4 +249,28 @@ CREATE TABLE deposit_addresses (
   address VARCHAR(255) NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+-- ===================================================
+-- Event Bonus Table
+-- ===================================================
+CREATE TABLE event_bonus (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  event_name VARCHAR(100),
+  start_date DATE,
+  end_date DATE,
+  bonus_rate DECIMAL(5,2),
+  target_type ENUM('first_charge', 'all_charge', 'withdraw', 'custom'),
+  is_active TINYINT DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE event_bonus_log (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  transaction_id INT,
+  event_id INT,
+  bonus_amount DECIMAL(18,2),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (transaction_id)
 );

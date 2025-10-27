@@ -189,6 +189,11 @@ const routes = [
   path: '/how-to-play',
   name: 'HowToPlay',
   component: () => import('@/pages/HowToPlay.vue')
+},{
+  path: '/admin/events',
+  name: 'AdminEvents',
+  component: () => import('@/pages/AdminEvents.vue'),
+    meta: { requiresAdmin: true }
 }
   
   
@@ -201,30 +206,30 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('user_token')
   const role = localStorage.getItem('role')
-  const userToken = !!token 
+  const userToken = !!token
   const adminToken = !!localStorage.getItem('admin_token')
 
-  const requiresAuth = ['mypage', 'messages', 'recharge', 'withdraw']
-
-  // 로그인 사용자만 접근 가능한 페이지
-  if (to.name && requiresAuth.includes(to.name) && (!token || role !== 'user')) {
-    alert('로그인이 필요한 페이지입니다.')
-    return next('/login')
-  }
-
-  // meta: { requiresAuth: true } 설정된 경우
-  if (to.meta.requiresAuth && !userToken) {
-    alert('로그인이 필요합니다.')
-    return next('/login')
-  }
-
-  // meta: { requiresAdmin: true } 설정된 경우
+  // ✅ 관리자 페이지는 제일 먼저 검사
   if (to.meta.requiresAdmin && !adminToken) {
     alert('관리자 권한이 필요합니다.')
     return next('/admin/login')
   }
 
+  const requiresAuth = ['mypage', 'messages', 'recharge', 'withdraw']
+
+  // 일반 유저 로그인 검사
+  if (to.name && requiresAuth.includes(to.name) && (!token || role !== 'user')) {
+    alert('로그인이 필요한 페이지입니다.')
+    return next('/login')
+  }
+
+  if (to.meta.requiresAuth && !userToken) {
+    alert('로그인이 필요합니다.')
+    return next('/login')
+  }
+
   next()
 })
+
 
 export default router

@@ -633,14 +633,15 @@ const formattedRows = rows.map(r => ({
     res.status(500).json({ message: 'Internal Server Error', error: err.message });
   }
 };
-
-//사이트 내 충전 신청 승인/거절API 0721 관리자
+// ✅ 사이트 내 충전 신청 승인/거절API (이벤트 적용 포함)
+// 사이트 내 충전 신청 승인/거절 API (이벤트 포함)
 exports.approveTransaction = async (req, res) => {
   const transactionId = req.params.id
-  const adminId = req.admin?.id || null // 로그인한 관리자 ID
+  const adminId = req.admin?.id || null
+  const { applyEvent } = req.body
 
   try {
-    // 🔹 1. 트랜잭션 조회
+    // 1️⃣ 트랜잭션 조회
     const [rows] = await db.execute(
       'SELECT * FROM transactions WHERE id = ? AND type = ? AND status = ?',
       [transactionId, 'wallet_charge', 'pending']
@@ -651,19 +652,47 @@ exports.approveTransaction = async (req, res) => {
     }
 
     const tx = rows[0]
-
     const connection = await db.getConnection()
     await connection.beginTransaction()
 
     try {
-      // 🔹1. 거래 상태 완료로 변경
+      // 2️⃣ 이벤트 적용 여부에 따라 보너스 계산
+      let bonusAmount = 0
+      let activeEvent = null
+
+      if (applyEvent) {
+      const [eventRows] = await connection.execute(`
+          SELECT * FROM event_bonus 
+          WHERE is_active = 1 
+          AND NOW() BETWEEN start_date AND end_date 
+          LIMIT 1
+        `)
+
+
+        if (eventRows.length > 0) {
+          activeEvent = eventRows[0]
+          const baseAmount = Number(tx.amount)
+          const bonusRate = Number(activeEvent.bonus_rate)
+          bonusAmount = Math.round(baseAmount * bonusRate / 100)
+
+          console.log(`🟢 이벤트 적용됨: ${activeEvent.event_name}, 보너스율: ${bonusRate}%, 보너스금액: ${bonusAmount}`)
+        } else {
+          console.log('⚪ 활성 이벤트 없음 — 보너스 0원 적용')
+        }
+      }
+
+      const baseAmount = Number(tx.amount)
+      const totalAmount = baseAmount + bonusAmount
+
+      console.log('🧮 계산 확인:', { baseAmount, bonusAmount, totalAmount })
+
+      // 3️⃣ 거래 상태 변경
       await connection.execute(
-        'UPDATE transactions SET status = ?, admin_id = ?, updated_at = NOW() WHERE id = ?',
-        ['completed', adminId, transactionId]
-      );
+        'UPDATE transactions SET status = ?, admin_id = ?, bonus_amount = ?, updated_at = NOW() WHERE id = ?',
+        ['completed', adminId, bonusAmount, transactionId]
+      )
 
-
-      // 🔹 3.  user_balances 삽입 또는 업데이트
+      // 4️⃣ 사용자 잔액 반영 (보너스 포함)
       const [balanceRows] = await connection.execute(
         'SELECT * FROM user_balances WHERE user_id = ?',
         [tx.user_id]
@@ -672,18 +701,26 @@ exports.approveTransaction = async (req, res) => {
       if (balanceRows.length === 0) {
         await connection.execute(
           'INSERT INTO user_balances (user_id, balance) VALUES (?, ?)',
-          [tx.user_id, tx.amount]
+          [tx.user_id, totalAmount]
         )
       } else {
         await connection.execute(
           'UPDATE user_balances SET balance = balance + ? WHERE user_id = ?',
-          [tx.amount, tx.user_id]
+          [totalAmount, tx.user_id]
         )
       }
+
       await connection.commit()
       connection.release()
 
-      res.json({ message: 'Transaction approved and balance updated' })
+      console.log('✅ 승인 완료:', {
+        user_id: tx.user_id,
+        baseAmount,
+        bonusAmount,
+        totalAmount
+      })
+
+      res.json({ message: 'Transaction approved successfully', bonusAmount, totalAmount })
     } catch (innerErr) {
       await connection.rollback()
       connection.release()
@@ -695,6 +732,7 @@ exports.approveTransaction = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: err.message })
   }
 }
+
 exports.rejectTransaction = async (req, res) => {
   const transactionId = req.params.id;
   const adminId = req.admin?.id || null;

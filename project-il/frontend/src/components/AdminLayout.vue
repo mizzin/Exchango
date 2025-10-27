@@ -23,23 +23,35 @@
           <div class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown">거래 신청</a>
             <div class="dropdown-menu">
-              <router-link to="/admin/trade/recharge" class="dropdown-item">외부 충전 처리</router-link>
-              <router-link to="/admin/trade/withdraw" class="dropdown-item">외부 출금 처리</router-link>
-              <router-link to="/admin/trade/wallet-charge" class="dropdown-item">지갑 충전 처리</router-link>
-              <router-link to="/admin/trade/wallet-withdraw" class="dropdown-item">지갑 출금 처리</router-link>
-              <router-link to="/admin/trade/wallet-transfer" class="dropdown-item">머니 이동 처리</router-link>
+                <!--<router-link to="/admin/trade/recharge" class="dropdown-item">외부 충전 처리</router-link>
+              <router-link to="/admin/trade/withdraw" class="dropdown-item">외부 출금 처리</router-link>-->
+              <router-link to="/admin/trade/wallet-charge" class="dropdown-item">지갑충전신청처리</router-link>
+              <router-link to="/admin/trade/wallet-withdraw" class="dropdown-item">지갑출금신청처리</router-link>
+              <router-link to="/admin/trade/wallet-transfer" class="dropdown-item">머니이동신청처리</router-link>
+            <router-link to="/admin/history" class="dropdown-item">모든거래처리이력</router-link>
+
             </div>
           </div>
 
           <!-- 단독 메뉴: 전체 신청내역 -->
           <router-link to="/admin/requests" class="nav-link text-white">전체 신청내역</router-link>
 
-          <!-- 단독 메뉴: 거래 처리 이력 -->
-          <router-link to="/admin/history" class="nav-link text-white">거래 처리 이력</router-link>
-          <router-link to="/admin/deposit-addresses" class="nav-link text-white">입금주소 관리</router-link>
-    
-          <router-link to="/admin/notice" class="nav-link text-white">공지사항</router-link>
-          <router-link to="/admin/inquiry" class="nav-link text-white">1:1문의</router-link>
+          <!-- 드롭다운: 관리 -->
+          <div class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown">관리</a>
+            <div class="dropdown-menu">
+              <router-link to="/admin/deposit-addresses" class="dropdown-item">입금주소 관리</router-link>
+              <router-link to="/admin/events" class="dropdown-item">이벤트 관리</router-link>
+            </div>
+          </div>
+
+              <div class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown">고객센타</a>
+            <div class="dropdown-menu">
+              <router-link to="/admin/notice" class="dropdown-item">공지사항</router-link>
+              <router-link to="/admin/inquiry" class="dropdown-item">1:1문의</router-link>
+            </div>
+          </div>
 
           <!-- 로그아웃 -->
           <span class="nav-link text-white" @click="logout" style="cursor:pointer">로그아웃</span>

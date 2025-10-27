@@ -52,8 +52,10 @@ app.use('/api/messages', messageRoutes)
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/auth', require('./routes/auth'));
-
+app.use('/api/admin/events', require('./routes/eventRoutes'));
 app.use('/api', require('./routes/passwordReset'))
+app.use('/api/admin', require('./routes/admin'))
+
 
 app.use('/api/deposit-addresses', require('./routes/adminDepositAddress'))
 
