@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from '@/axiosAdmin'
 import AdminLayout from '@/components/AdminLayout.vue'
@@ -7,13 +7,20 @@ import '@/assets/style.css'
 
 const router = useRouter()
 const notices = ref([])
-
 const currentPage = ref(1)
 const perPage = 15
 const totalPages = ref(1)
 
-const fetchNotices = async () => {
+// ✅ 언어 탭 상태
+const currentLang = ref('ko')
 
+// ✅ 필터링된 목록
+const filteredNotices = computed(() => {
+  return notices.value.filter(n => n.language === currentLang.value)
+})
+
+// ✅ 공지 불러오기
+const fetchNotices = async () => {
   const token = localStorage.getItem('admin_token')
   if (!token) {
     alert('로그인이 필요합니다.')
@@ -21,7 +28,6 @@ const fetchNotices = async () => {
     return
   }
 
-  // ✅ 토큰 만료 체크
   try {
     const payload = JSON.parse(atob(token.split('.')[1]))
     if (payload.exp * 1000 < Date.now()) {
@@ -36,20 +42,16 @@ const fetchNotices = async () => {
     return
   }
 
-  // ✅ 서버 페이징 요청
   try {
     const res = await axios.get('/admin/notices', {
-      
       headers: { Authorization: `Bearer ${token}` },
       params: {
         page: currentPage.value,
         limit: perPage
       }
     })
-    notices.value = res.data.notices
-      console.log('📢 서버 응답:', res.data)
-    totalPages.value = res.data.totalPages
-    console.log('📢 totalPages 값:', totalPages.value)
+    notices.value = res.data.notices || []
+    totalPages.value = res.data.totalPages || 1
   } catch (err) {
     console.error('❌ 공지 불러오기 실패:', err)
   }
@@ -61,14 +63,11 @@ const changePage = (page) => {
   fetchNotices()
 }
 
-const editNotice = (id) => {
-  router.push(`/admin/notices/${id}/edit`)
-}
+const editNotice = (id) => router.push(`/admin/notices/${id}/edit`)
 
 const deleteNotice = async (id) => {
   if (!confirm('정말 삭제하시겠습니까?')) return
   const token = localStorage.getItem('admin_token')
-
   try {
     await axios.delete(`/admin/notices/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -79,9 +78,7 @@ const deleteNotice = async (id) => {
   }
 }
 
-const goToCreate = () => {
-  router.push('/admin/notices/create')
-}
+const goToCreate = () => router.push('/admin/notices/create')
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleString()
 
@@ -96,6 +93,18 @@ onMounted(fetchNotices)
         <button class="create-btn" @click="goToCreate">새 글 등록하기</button>
       </div>
 
+      <!-- ✅ 언어 탭 -->
+      <div class="lang-tabs">
+        <button
+          v-for="lang in ['ko', 'en', 'ja', 'zh']"
+          :key="lang"
+          @click="currentLang = lang"
+          :class="{ active: currentLang === lang }"
+        >
+          {{ lang.toUpperCase() }}
+        </button>
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -106,11 +115,12 @@ onMounted(fetchNotices)
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr v-if="notices.length === 0">
-            <td colspan="5" style="text-align: center; padding: 20px;">등록된 공지사항이 없습니다.</td>
+          <tr v-if="filteredNotices.length === 0">
+            <td colspan="5" style="text-align: center; padding: 20px;">해당 언어의 공지사항이 없습니다.</td>
           </tr>
-          <tr v-else v-for="notice in notices" :key="notice.id">
+          <tr v-else v-for="notice in filteredNotices" :key="notice.id">
             <td>{{ notice.id }}</td>
             <td>{{ notice.language }}</td>
             <td>{{ notice.title }}</td>
@@ -125,33 +135,40 @@ onMounted(fetchNotices)
 
       <!-- 페이지네이션 -->
       <div v-if="totalPages > 1" class="pagination">
-        <button 
-          @click="changePage(currentPage - 1)" 
-          :disabled="currentPage === 1"
-        >
-          이전
-        </button>
-        <button 
-          v-for="page in totalPages" 
-          :key="page" 
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">이전</button>
+        <button
+          v-for="page in totalPages"
+          :key="page"
           @click="changePage(page)"
           :class="{ active: page === currentPage }"
         >
           {{ page }}
         </button>
-        <button 
-          @click="changePage(currentPage + 1)" 
-          :disabled="currentPage === totalPages"
-        >
-          다음
-        </button>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">다음</button>
       </div>
     </div>
   </AdminLayout>
 </template>
 
-
 <style scoped>
+.lang-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.lang-tabs button {
+  border: 1px solid #ddd;
+  background: #f5f6fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.lang-tabs button.active {
+  background: #4a6ef6;
+  color: white;
+  font-weight: bold;
+}
 
   .pagination {
   margin-top: 20px;
@@ -225,3 +242,5 @@ button {
 }
 
 </style>
+
+
