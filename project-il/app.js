@@ -25,13 +25,41 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const distPath = path.resolve(__dirname, 'frontend', 'dist');
 
 // ✅ 요청 로그 (정적 자원 제외)
+// ✅ 요청 로그 (불필요한 API 제외 + 오류 시 항상 표시)
 app.use((req, res, next) => {
-  if (!req.url.startsWith('/assets') && !req.url.endsWith('.svg')) {
-    const ip = req.ip.includes('::ffff:') ? req.ip.replace('::ffff:', '') : req.ip;
-    logger.info(`➡️ ${req.method} ${req.url} 요청 from ${ip}`);
-  }
-  next();
-});
+  const start = Date.now()
+  const ip = req.ip.includes('::ffff:') ? req.ip.replace('::ffff:', '') : req.ip
+
+  const noisyEndpoints = [
+    '/api/messages/unread-count',
+    '/api/exchange-rate',
+    '/api/users/info',
+    '/assets',
+  ]
+
+  res.on('finish', () => {
+    const duration = Date.now() - start
+    const status = res.statusCode
+
+    // ✅ 오류(4xx, 5xx)는 항상 표시
+    if (status >= 400) {
+      logger.warn(
+        `⚠️ ${req.method} ${req.originalUrl} → ${status} (${duration}ms) from ${ip}`
+      )
+      return
+    }
+
+    // ❌ 제외할 요청이면 무시
+    if (noisyEndpoints.some(ep => req.originalUrl.startsWith(ep))) return
+
+    // ✅ 나머지 요청만 표시
+    logger.info(
+      `➡️ ${req.method} ${req.originalUrl} → ${status} (${duration}ms) from ${ip}`
+    )
+  })
+
+  next()
+})
 
 // ✅ 정적 파일 서빙 (딱 한 번만!)
 app.use(express.static(distPath));
@@ -62,20 +90,7 @@ app.use('/api/deposit-addresses', require('./routes/adminDepositAddress'))
 
 // ✅ 업로드 파일 서빙
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
-app.use((req, res, next) => {
-  // 읽지 않은 쪽지 카운트 API는 로그 남기지 않음
-  if (
-    req.url.startsWith('/assets') ||
-    req.url.endsWith('.svg') ||
-    req.url.includes('/api/messages/unread-count') // 쪽지 카운트 요청은 제외
-  ) {
-    return next()
-  }
 
-  // ✅ 나머지만 로그 출력
-  console.log(`[${new Date().toISOString()}] [info] ➡️ ${req.method} ${req.originalUrl} 요청 from ${req.ip}`)
-  next()
-})
 // ✅ 마지막 SPA fallback
 app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
