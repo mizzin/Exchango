@@ -107,7 +107,9 @@
         <div class="platform-add-row">
             <select v-model="newPlatform.platform_id">
               <option value="">플랫폼 선택</option>
-              <option v-for="p in platformOptions" :key="p.platform_id" :value="p.platform_id">
+              <option v-for="p in platformOptions" 
+        :key="p.id" 
+        :value="p.id">
                 {{ p.name }}
               </option>
             </select>
@@ -229,6 +231,8 @@ const fetchPlatformOptions = async () => {
         console.log("📥 플랫폼 옵션 API 응답:", res.data)
 
      platformOptions.value = res.data
+     console.log(platformOptions.value)
+
   } catch (err) {
     console.error('플랫폼 목록 로딩 실패:', err)
   }
