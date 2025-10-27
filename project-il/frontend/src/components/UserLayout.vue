@@ -121,7 +121,7 @@
             <label>💱 {{ $t('footer.exchangeLabel') }}</label>
             <ul v-if="Object.keys(rates).length">
               <li>USD: ₩1.00</li>
-              <li v-if="rates.KRW">KRW: ₩{{ formatRate(rates.KRW) }} <span class="note"></span></li>
+              <li v-if="rates.KRW">KRW: ₩{{ formatRate(rates.USDT) }} </li>
               <li v-if="rates.PHP">PHP: ₱{{ formatRate(rates.PHP) }}</li>
               <li v-if="rates.USDT">USDT: ₮{{ formatRate(rates.USDT) }}</li>
                <li v-else class="error">USDT: {{ $t('footer.usdtUnavailable') }}</li>

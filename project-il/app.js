@@ -62,14 +62,15 @@ app.use('/api/deposit-addresses', require('./routes/adminDepositAddress'))
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use((req, res, next) => {
   // 읽지 않은 쪽지 카운트 API는 로그 남기지 않음
- if (
-    !req.url.startsWith('/assets') &&
-    !req.url.endsWith('.svg') &&
-    !req.url.includes('/api/messages/unread-count') // 🔹 쪽지 카운트 요청 제외
+  if (
+    req.url.startsWith('/assets') ||
+    req.url.endsWith('.svg') ||
+    req.url.includes('/api/messages/unread-count') // 쪽지 카운트 요청은 제외
   ) {
     return next()
   }
 
+  // ✅ 나머지만 로그 출력
   console.log(`[${new Date().toISOString()}] [info] ➡️ ${req.method} ${req.originalUrl} 요청 from ${req.ip}`)
   next()
 })

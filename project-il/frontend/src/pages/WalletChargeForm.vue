@@ -82,7 +82,7 @@ const fetchExchangeRate = async () => {
     const rates = res.data.rates
 
     if (currency.value === 'KRW') {
-      exchangeRate.value = rates['KRW']
+  exchangeRate.value = rates['USDT'] || rates['KRW']
     } else if (currency.value === 'PHP') {
       exchangeRate.value = rates['PHP']
     } else if (currency.value === 'USDT') {
@@ -96,7 +96,7 @@ const fetchExchangeRate = async () => {
     alert(t('charge.wallet.fetchRateFailed'))
   }
 }
-
+console.log(exchangeRate)
 // 🔹 USD 계산 (수수료 제거)
 const calculateUsd = () => {
   if (!localAmount.value || !exchangeRate.value) return

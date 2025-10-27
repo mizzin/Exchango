@@ -36,7 +36,7 @@ const platformOptions = ref([])
 const fetchPlatformOptions = async () => {
   try {
     const lang = localStorage.getItem('lang') || 'en'
-    const res = await axios.get(`/platforms?lang=${lang}`)
+    const res = await axios.get(`/platforms/public?lang=${lang}`)
     platformOptions.value = res.data // [{ id: '001', name: 'A플랫폼' }, ...]
     
 

@@ -195,7 +195,7 @@ const fetchPlatformOptions = async () => {
   try {
     const lang = localStorage.getItem('lang') || 'en'
     
-    const res = await axios.get(`/platforms?lang=${lang}`)
+    const res = await axios.get(`/platforms/public?lang=${lang}`)
     
     platformOptions.value = Array.isArray(res.data) ? res.data : []
   } catch (err) {
@@ -299,6 +299,96 @@ const calculateExpected = async () => {
 }
 
 watch([() => form.amount, () => form.to_platform_id, () => form.from_platform_id, () => form.from_type], calculateExpected)
+// ✅ 머니이동 신청
+const submit = async () => {
+
+  if (isSubmitting.value) return
+  isSubmitting.value = true
+
+  try {
+    // 유효성 검사
+    if (!form.from_platform_id && form.from_type === 'platform') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Need Info',
+      text: 'Pick where you send from.',
+      })
+      return
+    }
+
+    if (!form.to_platform_id) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Need Info',
+      text: 'Pick where you send to.',
+      })
+      return
+    }
+
+    if (!form.amount || form.amount <= 0) {
+      Swal.fire({
+        icon: 'warning',
+            title: 'Wrong Number',
+      text: 'Type how much you send.',
+      })
+      return
+    }
+
+    if (!form.money_password) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Password',
+      text: 'Type your 6 number password.',
+      })
+      return
+    }
+if (
+  form.from_type === 'platform' &&
+  form.from_platform_id &&
+  form.to_platform_id &&
+  form.from_platform_id === form.to_platform_id
+) {
+  Swal.fire({
+    icon: 'warning',
+    title: 'Invalid Request',
+    text: 'You cannot transfer between the same platform.',
+  })
+  return
+}
+    // ✅ 실제 요청
+    const res = await axios.post('/transactions/wallet/transfer', form)
+
+    Swal.fire({
+      icon: 'success',
+      title: 'success',
+      confirmButtonText: 'OK',
+    }).then(() => {
+  // ✅ SweetAlert 닫힌 후 새로고침
+  window.location.reload()
+})
+
+    // 폼 초기화
+    Object.assign(form, {
+      from_platform_id: '',
+      from_platform_user_id: '',
+      to_platform_id: '',
+      to_platform_user_id: '',
+      amount: 0,
+      expected_amount: 0,
+      money_password: '',
+      memo: '',
+    })
+  } catch (err) {
+    console.error('❌ 전송 실패:', err)
+    Swal.fire({
+      icon: 'error',
+      title: 'error',
+      confirmButtonText: 'OK',
+    })
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
 onMounted(async () => {
   await fetchPlatformOptions()

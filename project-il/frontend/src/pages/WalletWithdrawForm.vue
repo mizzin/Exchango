@@ -191,7 +191,7 @@ const fetchExchangeRate = async () => {
   const rates = res.data.rates
 
   if (currency.value === 'KRW') {
-    exchangeRate.value = rates['KRW']      // USD → KRW
+    exchangeRate.value = rates['USDT'] || rates['KRW']
   } else if (currency.value === 'PHP') {
     exchangeRate.value = rates['PHP']      // USD → PHP
   } else if (currency.value === 'USDT') {

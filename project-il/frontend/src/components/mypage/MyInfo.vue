@@ -121,7 +121,8 @@ const fetchUserPlatforms = async () => {
 // ✅ 등록 가능한 플랫폼 목록 불러오기
 const fetchPlatformOptions = async () => {
   try {
-    const res = await axiosUser.get(`/platforms?lang=${locale.value}`)
+    const lang = localStorage.getItem('lang') || 'en'
+    const res = await axiosUser.get(`/platforms/public?lang=${lang}`)
     platformOptions.value = res.data
   } catch (err) {
     console.error('❌ 플랫폼 옵션 불러오기 실패:', err)

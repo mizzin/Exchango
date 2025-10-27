@@ -219,12 +219,13 @@ const submitEdit = async () => {
   }
 }
 
-const newPassword = ref('');
+const newPassword = ref(''); 
 
 const fetchPlatformOptions = async () => {
   try {
-    const lang = localStorage.getItem('lang') || 'ko'
-    const res = await axios.get('/platforms?lang=ko')
+   const lang = localStorage.getItem('lang') || 'en'
+    
+    const res = await axios.get(`/platforms/public?lang=${lang}`)
         console.log("📥 플랫폼 옵션 API 응답:", res.data)
 
      platformOptions.value = res.data
