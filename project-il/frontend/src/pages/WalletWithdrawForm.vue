@@ -17,7 +17,7 @@
       <div v-if="hasPending" class="blur-overlay">
         </div>
       <!-- 출금 통화 선택 -->
-      <div class="form-group">
+      <div class="form-group"> 
         <label for="currency">{{ t('withdraw.selectCurrency') }}</label>
         <select id="currency" v-model="currency" @change="fetchExchangeRate">
           <option disabled value="">{{ t('charge.selectPlaceholder') }}</option>
@@ -45,6 +45,17 @@
       <div v-if="currency" class="form-group">
         <label>{{ t('withdraw.totalSend') }}</label>
         <div class="output-box">{{ convertedAmountDisplay }}</div>
+  <small class="fee-note" style="color:#666; font-size:13px; margin-top:4px; display:block;">
+    {{
+      currency === 'KRW'
+        ? t('withdraw.feeNoticekrw')
+        : currency === 'USDT'
+        ? t('withdraw.feeNoticeusdt')
+        : currency === 'PHP'
+        ? t('withdraw.feeNoticephp')
+        : ''
+    }}
+  </small>
       </div>
 
       <!-- KRW 선택 시 은행 정보 표시 -->

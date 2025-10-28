@@ -5,23 +5,23 @@
 
       <div class="stats">
         <div class="card">
-          <h3>총 회원 수</h3>
+          <h3>총 승인된 사용자 수<br/> (test/admin 계정 제외)</h3>
           <p>{{ totalUsers }}</p>
         </div>
         <div class="card">
-          <h3>대기 중인 승인</h3>
+          <h3>오늘 신규 가입자 수</h3>
           <p>{{ pendingUsers }}</p>
         </div>
         <div class="card">
-          <h3>오늘 등록된 회원</h3>
+          <h3>가입 대기자 수</h3>
           <p>{{ todayUsers }}</p>
         </div>
       <div class="card">
-          <h3>대기 중 충전 요청</h3>
+          <h3>대기 중 충전 신청 수 (내지갑 + 이동 둘 다 포함)</h3>
           <p>{{ pendingRecharge  }}</p>
         </div>
         <div class="card">
-          <h3>대기 중 출금 요청</h3>
+          <h3>대기 중 출금 신청 수</h3>
           <p>{{ pendingWithdraw  }}</p>
         </div>
       </div>

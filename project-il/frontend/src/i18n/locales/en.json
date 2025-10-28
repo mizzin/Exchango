@@ -443,7 +443,10 @@
     "create_failed": "An error occurred while submitting your inquiry.",
        "fetch_failed": "An error occurred while loading your inquiries."
   }
-    },"withdraw": {
+    },"withdraw": {"moneyPassword":"Withdrawal Password",
+    "feeNoticekrw":"For KRW withdrawals, a 3% fee is applied and the displayed amount reflects the deduction.",
+    "feeNoticeusdt":"For USDT withdrawals, a 2% fee is applied and the displayed amount reflects the deduction.",
+    "feeNoticephp":"For PHP withdrawals, a 2% fee is applied and the displayed amount reflects the deduction.",
         "wallet": {
     "title": "Withdraw from Wallet",
     "selectError": "※ Please select a currency.",

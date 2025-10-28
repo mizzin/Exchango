@@ -405,7 +405,9 @@
     "pending_exists": "您已有未回复的提问，请等待回复后再提交新的提问。",
     "create_failed": "提交提问时发生错误。"
   }
-    },  "withdraw": {  
+    },  "withdraw": {  "feeNoticekrw":"KRW提款时将扣除3%的手续费，显示金额为扣除后的数额。",
+    "feeNoticeusdt":"USDT提款时将扣除2%的手续费，显示金额为扣除后的数额。",
+    "feeNoticephp":"PHP提款时将扣除2%的手续费，显示金额为扣除后的数额。",
       "wallet": {
     "title": "钱包提现",
     "selectError": "※ 请选择货币。",

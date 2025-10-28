@@ -5,37 +5,56 @@ const warningModel = require('../models/warningModel');
 const db = require('../db');
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
-const toManilaTime = require('../utils/formatDate')
+const toManilaTime = require('../utils/formatDate');
+const logger = require('../utils/logger');
 
 
-// 통계 API
+// 📊 관리자 통계 API
 exports.getSummary = async (req, res) => {
   try {
-    const [[{ total } = { total: 0 }]] = await db.query(`
-      SELECT COUNT(*) as total FROM users WHERE role = 'user'
+    // 1️⃣ 총 승인된 사용자 수
+   const [[{ totalUsers }]] = await db.query(`
+  SELECT COUNT(*) AS totalUsers 
+  FROM users 
+  WHERE role = 'user' 
+    AND status = 'approved'
+    AND username NOT LIKE '%test%'
+    AND username NOT LIKE '%admin%'
+`);
+
+    // 2️⃣ 오늘 신규 가입자 수
+    const [[{ todayUsers }]] = await db.query(`
+      SELECT COUNT(*) AS todayUsers FROM users 
+      WHERE role = 'user' AND DATE(created_at) = CURDATE()
     `);
 
-    const [[{ pending } = { pending: 0 }]] = await db.query(`
-      SELECT COUNT(*) as pending FROM users WHERE status = 'pending'
+    // 3️⃣ 가입 대기자 수
+    const [[{ pendingUsers }]] = await db.query(`
+      SELECT COUNT(*) AS pendingUsers FROM users WHERE status = 'pending'
     `);
 
-    const [[{ today } = { today: 0 }]] = await db.query(`
-      SELECT COUNT(*) as today FROM users WHERE DATE(created_at) = CURDATE()
+    // 4️⃣ 대기 중 충전 신청 수 (내지갑 + 플랫폼 둘 다 포함)
+    const [[{ pendingRecharge }]] = await db.query(`
+      SELECT COUNT(*) AS pendingRecharge 
+      FROM transactions 
+      WHERE type IN ('wallet_charge', 'platform_charge')
+      AND status = 'pending'
     `);
 
-    const [[{ recharge } = { recharge: 0 }]] = await db.query(`
-      SELECT COUNT(*) as recharge FROM transactions WHERE type = 'charge' AND status = 'pending'
-    `);
-    const [[{ withdraw } = { withdraw: 0 }]] = await db.query(`
-      SELECT COUNT(*) as withdraw FROM transactions WHERE type = 'withdraw' AND status = 'pending'
+    // 5️⃣ 대기 중 출금 신청 수 (내지갑 + 플랫폼 둘 다 포함)
+    const [[{ pendingWithdraw }]] = await db.query(`
+      SELECT COUNT(*) AS pendingWithdraw 
+      FROM transactions 
+      WHERE type IN ('wallet_withdraw', 'platform_withdraw')
+      AND status = 'pending'
     `);
 
     res.json({
-      totalUsers: total,
-      pendingUsers: pending,
-      todayUsers: today,
-      pendingRecharge: recharge,
-      pendingWithdraw: withdraw
+      totalUsers,
+      todayUsers,
+      pendingUsers,
+      pendingRecharge,
+      pendingWithdraw,
     });
   } catch (err) {
     console.error('📊 관리자 통계 에러:', err);
@@ -265,6 +284,12 @@ exports.approveUser = async (req, res) => {
       'SELECT username, language FROM users WHERE id = ?',
       [id]
     );
+  // 관리자 정보 (JWT에서 추출됨)
+    const adminUsername = req.admin?.username || 'unknown_admin';
+
+    // 로그 기록
+    const now = new Date().toISOString().replace('T', ' ').split('.')[0];
+    logger.info(`✅ [USER APPROVED] ${adminUsername} → ${user.username} (${now})`);
 
     // 3️⃣ 템플릿 가져오기
     const [[template]] = await db.query(

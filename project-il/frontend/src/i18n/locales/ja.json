@@ -434,7 +434,11 @@
     "pending_exists": "未回答のお問い合わせがあります。回答後に新しいお問い合わせを送信してください。",
     "create_failed": "お問い合わせの送信中にエラーが発生しました。"
   }
-    }, "withdraw": {  "wallet": {
+    }, "withdraw": {  
+      "feeNoticekrw":"KRW出金の際は3％の手数料が適用され、表示金額は差し引かれた金額です。",
+    "feeNoticeusdt":"USDT出金の際は2％の手数料が適用され、表示金額は差し引かれた金額です",
+    "feeNoticephp":"PHP出金の際は2％の手数料が適用され、表示金額は差し引かれた金額です。",
+    "wallet": {
     "title": "ウォレット出金",
     "selectError": "※ 通貨を選択してください。",
     "minAmountError": "※ 最低出金金額は40 USDです。",

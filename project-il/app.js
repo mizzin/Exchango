@@ -40,27 +40,23 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     const duration = Date.now() - start
     const status = res.statusCode
+    const cleanUrl = req.originalUrl.split('?')[0] // ❗ 쿼리스트링 제거
 
-    // ✅ 오류(4xx, 5xx)는 항상 표시
+    // 오류는 항상 표시
     if (status >= 400) {
-      logger.warn(
-        `⚠️ ${req.method} ${req.originalUrl} → ${status} (${duration}ms) from ${ip}`
-      )
+      logger.warn(`⚠️ ${req.method} ${req.originalUrl} → ${status} (${duration}ms) from ${ip}`)
       return
     }
 
-    // ❌ 제외할 요청이면 무시
-    if (noisyEndpoints.some(ep => req.originalUrl.startsWith(ep))) return
+    // noisy endpoint면 무시
+    if (noisyEndpoints.some(ep => cleanUrl.startsWith(ep))) return
 
-    // ✅ 나머지 요청만 표시
-    logger.info(
-      `➡️ ${req.method} ${req.originalUrl} → ${status} (${duration}ms) from ${ip}`
-    )
+    // 나머지 정상 요청만 info 로그
+    logger.info(`➡️ ${req.method} ${req.originalUrl} → ${status} (${duration}ms) from ${ip}`)
   })
 
   next()
 })
-
 // ✅ 정적 파일 서빙 (딱 한 번만!)
 app.use(express.static(distPath));
 

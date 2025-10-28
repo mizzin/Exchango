@@ -443,7 +443,11 @@
     "check_failed": "문의 상태를 확인하는 데 실패했습니다."
   }
   },
-  "withdraw": { "title": "플랫폼에서 출금하기",
+  "withdraw": { 
+    "title": "플랫폼에서 출금하기",
+    "feeNoticekrw":"KRW 출금 시 3%의 수수료가 반영되어 차감된 금액이 표시됩니다.",
+    "feeNoticeusdt":"USDT 출금 시 2%의 수수료가 반영되어 차감된 금액이 표시됩니다.",
+    "feeNoticephp":"PHP 출금 시 2%의 수수료가 반영되어 차감된 금액이 표시됩니다.",
      "wallet": {
     "title": "지갑 출금",
     "selectError": "※ 통화를 선택해주세요.",
