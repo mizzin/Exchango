@@ -97,6 +97,14 @@
       <li><strong>메모:</strong> {{ selected.user_memo || '-' }}</li>
       <li><strong>처리자:</strong> {{ selected.confirmed_by_admin || '-' }}</li>
       <li><strong>처리메모:</strong> {{ selected.admin_note || '-' }}</li>
+           <hr />
+<hr />
+<li><strong>💳 사용자 출금정보</strong></li>
+<li><strong>예금주:</strong> {{ selected.user_realname || '-' }}</li>
+<li><strong>은행명:</strong> {{ selected.user_bank_name || '-' }}</li>
+<li><strong>계좌번호:</strong> {{ selected.user_bank_account || '-' }}</li>
+<li><strong>지갑주소:</strong> {{ selected.user_wallet_address || '-' }}</li>
+
     </ul>
     <button class="btn btn-dark w-100 mt-3" @click="selected = null">닫기</button>
   </div>
@@ -120,6 +128,7 @@ const limit = 15
 const fetchRequests = async () => {
   const res = await axios.get('/admin/wallet/transfer', {
     params: { page: page.value, limit }
+    
   })
 
 

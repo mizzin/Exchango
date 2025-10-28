@@ -148,6 +148,14 @@
             <p v-if="selectedRequest.type === 'wallet_transfer'">
             <strong>이동 방향:</strong> {{ directionLabel(selectedRequest) }}
             </p>
+             <!-- ✅ 사용자 출금 정보 추가 -->
+  <hr />
+  <h6>💳 사용자 출금정보</h6>
+<p><strong>예금주:</strong> {{ selectedRequest.user_real_name || '-' }}</p>
+<p><strong>은행명:</strong> {{ selectedRequest.user_bank_name || '-' }}</p>
+<p><strong>계좌번호:</strong> {{ selectedRequest.user_bank_account || '-' }}</p>
+<p><strong>지갑주소:</strong> {{ selectedRequest.user_wallet_address || '-' }}</p>
+
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="closeDetail">닫기</button>
@@ -289,6 +297,7 @@ const fetchRequests = async () => {
 
     requests.value = res.data.data
     total.value = res.data.total
+  
   } catch (err) {
     console.error('❌ 요청 실패:', err)
   }
@@ -310,6 +319,7 @@ const fetchWithResetPage = () => {
 
 const openDetail = (request) => {
   selectedRequest.value = request
+
 }
 
 const closeDetail = () => {

@@ -1376,37 +1376,43 @@ exports.getAllMoveRequests = async (req, res) => {
 
   try {
     // ✅ 데이터 조회 쿼리
-    const dataSql = `
-      SELECT 
-        t.id,
-        t.user_id,
-        u.username,
-        t.amount,
-        t.status,
-        t.currency,
-        t.from_type,
-        t.from_platform_id,
-        t.from_platform_user_id,
-        t.to_platform_id,
-        t.to_platform_user_id,
-        t.expected_amount,
-        t.exchange_rate,
-        t.user_memo,
-        t.admin_note,
-        t.confirmed_by_admin,
-        t.created_at,
-        t.updated_at
-      FROM transactions t
-      JOIN users u ON t.user_id = u.id
-      WHERE t.type IN (
-        'wallet_to_platform',
-        'platform_to_wallet',
-        'platform_to_platform',
-        'transfer'
-      )
-      ORDER BY t.created_at DESC
-      LIMIT ? OFFSET ?
-    `;
+  const dataSql = `
+  SELECT 
+    t.id,
+    t.user_id,
+    u.username,
+u.real_name AS user_real_name,
+u.bank_name AS user_bank_name,
+u.bank_account AS user_bank_account,
+u.wallet_address AS user_wallet_address,
+    t.amount,
+    t.status,
+    t.currency,
+    t.from_type,
+    t.from_platform_id,
+    t.from_platform_user_id,
+    t.to_platform_id,
+    t.to_platform_user_id,
+    t.expected_amount,
+    t.exchange_rate,
+    t.user_memo,
+    t.admin_note,
+    t.confirmed_by_admin,
+    t.created_at,
+    t.updated_at
+  FROM transactions t
+  JOIN users u ON t.user_id = u.id
+  WHERE t.type IN (
+    'wallet_to_platform',
+    'platform_to_wallet',
+    'platform_to_platform',
+    'transfer'
+  )
+  ORDER BY t.created_at DESC
+  LIMIT ? OFFSET ?
+`;
+
+
 
     const [rows] = await db.query(dataSql, [limit, offset]);
 
@@ -1454,60 +1460,66 @@ exports.getAllRequests = async (req, res) => {
   try {
     const { type, status, username, startDate, endDate, page = 1, limit = 15 } = req.query
     const offset = (page - 1) * limit
-let where = `WHERE 1=1`
-const params = []
 
-if (type) {
-  where += ` AND t.type = ?`
-  params.push(type)
-}
-if (status) {
-  where += ` AND t.status = ?`
-  params.push(status)
-}
-if (username) {
-  where += ` AND u.username LIKE ?`
-  params.push(`%${username}%`)
-}
-if (startDate) {
-  where += ` AND t.created_at >= ?`
-  params.push(`${startDate} 00:00:00`)
-}
-if (endDate) {
-  where += ` AND t.created_at <= ?`
-  params.push(`${endDate} 23:59:59`)
-}
+    let where = `WHERE 1=1`
+    const params = []
 
+    if (type) {
+      where += ` AND t.type = ?`
+      params.push(type)
+    }
+    if (status) {
+      where += ` AND t.status = ?`
+      params.push(status)
+    }
+    if (username) {
+      where += ` AND u.username LIKE ?`
+      params.push(`%${username}%`)
+    }
+    if (startDate) {
+      where += ` AND t.created_at >= ?`
+      params.push(`${startDate} 00:00:00`)
+    }
+    if (endDate) {
+      where += ` AND t.created_at <= ?`
+      params.push(`${endDate} 23:59:59`)
+    }
 
+    // ✅ 수정된 SELECT (은행·지갑 포함)
     const dataSql = `
-      SELECT 
-        t.*, 
-        u.username AS user_username, 
-        u.real_name AS user_real_name
+                    SELECT 
+                      t.*, 
+                      u.username AS user_username,
+                      u.real_name AS user_real_name,
+                      u.bank_name AS user_bank_name,
+                      u.bank_account AS user_bank_account,
+                      u.wallet_address AS user_wallet_address
+                    FROM transactions t
+                    LEFT JOIN users u ON t.user_id = u.id
+                    ${where}
+                    ORDER BY t.created_at DESC
+                    LIMIT ? OFFSET ?
+                  `
+
+    const countSql = `
+      SELECT COUNT(*) AS total
       FROM transactions t
       LEFT JOIN users u ON t.user_id = u.id
       ${where}
-      ORDER BY t.created_at DESC
-      LIMIT ? OFFSET ?
     `
 
-    const countSql = `
-  SELECT COUNT(*) AS total
-  FROM transactions t
-  LEFT JOIN users u ON t.user_id = u.id
-  ${where}
-`
+    const [dataRows] = await db.query(dataSql, [...params, parseInt(limit), parseInt(offset)])
+    const [countRows] = await db.query(countSql, params)
 
-    const data = await db.query(dataSql, [...params, parseInt(limit), parseInt(offset)])
-    const count = await db.query(countSql, params)
-      const formattedData = data[0].map(r => ({
-        ...r,
-        created_at: toManilaTime(r.created_at),
-        updated_at: toManilaTime(r.updated_at)
-      }))
+    const formattedData = dataRows.map(r => ({
+      ...r,
+      created_at: toManilaTime(r.created_at),
+      updated_at: toManilaTime(r.updated_at)
+    }))
+
     res.json({
       data: formattedData,
-      total: count[0][0].total,
+      total: countRows[0].total,
       page: parseInt(page),
       limit: parseInt(limit)
     })
