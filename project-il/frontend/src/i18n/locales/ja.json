@@ -501,6 +501,10 @@
     "php": "ペソ",
     "usdt": "テザー"
   }
+,"popup": {
+  "doNotShowToday": "今日は表示しない",
+  "close": "閉じる"
+}
 
 }
  

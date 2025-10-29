@@ -159,6 +159,8 @@ const { locale } = useI18n()
 
 const onChangeLang = () => {
   localStorage.setItem('lang', locale.value)
+    location.reload()
+
 }
 
 const checkLoginStatus = () => {

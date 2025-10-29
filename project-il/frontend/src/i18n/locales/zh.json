@@ -472,7 +472,11 @@
     "krw": "韩元",
     "php": "比索",
     "usdt": "泰达币"
-  }
+  },"popup": {
+  "doNotShowToday": "今天不再显示",
+  "close": "关闭"
+}
+
 
 }
  

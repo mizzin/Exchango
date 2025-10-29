@@ -1,5 +1,7 @@
 <script setup>
 import UserLayout from '@/components/UserLayout.vue'
+import EventPopup from '@/components/common/EventPopup.vue'
+
 import { computed, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axiosUser  from '@/axiosUser'
@@ -189,6 +191,8 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
         </div>
       </section>
     </div>
+        <!-- ✅ 이벤트 팝업 테스트 -->
+    <EventPopup />
   </UserLayout>
 </template>
 

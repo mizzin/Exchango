@@ -527,5 +527,8 @@
       "common": {
     "sending": "Sending...",
     "cancel": "Cancel"
-  }
+  },"popup": {
+  "doNotShowToday": "Don't show again today",
+  "close": "Close"
+}
   }

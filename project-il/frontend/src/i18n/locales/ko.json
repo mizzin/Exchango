@@ -552,7 +552,11 @@
     "krw": "한화",
     "php": "페소",
     "usdt": "테더"
-  }
+  },
+"popup": {
+  "doNotShowToday": "오늘 하루 보지 않기",
+  "close": "닫기"
+}
 
 
 

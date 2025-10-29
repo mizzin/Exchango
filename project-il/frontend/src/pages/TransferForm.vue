@@ -92,7 +92,7 @@
         <!-- 금액 입력 -->
         <div class="form-group">
           <label>{{ $t('transfer.request1.amount') }} ({{ fromCurrency }})</label>
-          <input type="number" v-model.number="form.amount" @input="calculateExpected" />
+          <input type="number" v-model.number="form.amount"  @input="onAmountInput" />
         </div>
 
         <!-- 예상 수령 금액 -->
@@ -155,7 +155,10 @@ const getCurrencyByPlatformId = (id) => {
   const p = platformOptions.value.find(p => String(p.platform_id) === String(id))
   return p?.currency || 'USD'
 }
-
+const onAmountInput = () => {
+  form.amount = Math.floor(form.amount || 0) // 소수점 제거
+  calculateExpected()                        // 정수값으로 다시 계산
+}
 const fromCurrency = computed(() =>
   form.from_type === 'wallet' ? 'USD' : getCurrencyByPlatformId(form.from_platform_id)
 )
