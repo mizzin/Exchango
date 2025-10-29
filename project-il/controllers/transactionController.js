@@ -11,6 +11,7 @@ const ExcelJS = require('exceljs')
 
 
 
+
 //충전신청 0728 쿼리 외부
 exports.createTransaction = async (req, res) => {
   const {
@@ -483,23 +484,24 @@ exports.getDepositAddressByCurrency = async (req, res) => {
   }
 }
 
-// 내 지갑 출금 신청  사용자
+
+// 💰 내 지갑 출금 신청 (사용자)
 exports.createWalletWithdraw = async (req, res) => {
   const userId = req.user.id;
   const { currency, amount_usd, local_amount, user_memo, expected_amount, money_password } = req.body;
-  
-  //중복금액방지
-  const [existing] = await db.execute(
-  `SELECT id FROM transactions
-   WHERE user_id = ? AND status = 'pending' AND type IN (
-      'charge', 'withdraw', 'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform'
-   )`,
-  [userId]
-);
-if (existing.length > 0) {
-   return res.status(400).json({ message: 'You already have a pending money-related request.' });
-}
 
+  // ✅ 중복 신청 방지
+  const [existing] = await db.execute(
+    `SELECT id FROM transactions
+     WHERE user_id = ? AND status = 'pending' AND type IN (
+        'charge', 'withdraw', 'wallet_to_platform', 'platform_to_wallet', 'platform_to_platform'
+     )`,
+    [userId]
+  );
+  if (existing.length > 0)
+    return res.status(400).json({ message: 'You already have a pending money-related request.' });
+
+  // ✅ 기본 유효성 체크
   if (!currency) return res.status(400).json({ message: 'Currency is required.' });
   if (!amount_usd) return res.status(400).json({ message: 'Withdrawal amount (USD) is required.' });
   if (!local_amount) return res.status(400).json({ message: 'Converted local amount is required.' });
@@ -509,36 +511,61 @@ if (existing.length > 0) {
     return res.status(400).json({ message: 'Withdrawal address or memo is required for PHP/USDT.' });
 
   try {
-    // 유저 정보 조회 및 비밀번호 검증
-    const [userRows] = await db.query('SELECT money_password FROM users WHERE id = ?', [userId]);
+    // ✅ 비밀번호 검증
+    const [userRows] = await db.query('SELECT username, money_password FROM users WHERE id = ?', [userId]);
     const user = userRows[0];
-
     if (!user || !user.money_password)
       return res.status(403).json({ message: '출금 비밀번호가 설정되어 있지 않습니다.' });
 
     const isPasswordMatch = await bcrypt.compare(money_password, user.money_password);
-    if (!isPasswordMatch) {
+    if (!isPasswordMatch)
       return res.status(403).json({ message: '출금 비밀번호가 일치하지 않습니다.' });
-    }
 
-    // 출금 신청 INSERT
+    // ✅ 환율 불러오기
+    const rates = await getCustomRates();
+    let exchangeRate = 1;
+    if (currency === 'KRW') exchangeRate = Math.round(rates.KRW);
+    else if (currency === 'PHP') exchangeRate = Math.round(rates.PHP);
+
+    // ✅ 수수료 계산
+    const feePercent = currency === 'KRW' ? 3 : 2; // KRW=3%, PHP/USDT=2%
+    const feeAmount = parseFloat((amount_usd * (feePercent / 100)).toFixed(2));
+
+    const finalExpectedAmount = amount_usd - feeAmount;
+    // 📢 INSERT 전 로그 찍기
+    console.log('--- 💾 출금신청 저장 전 데이터 ---');
+    console.log({
+      userId,
+      currency,
+      amount_usd,
+      local_amount,
+      exchangeRate,
+      feePercent,
+      feeAmount,
+      finalExpectedAmount,
+      user_memo,
+    });
+    // ✅ DB 저장
     const query = currency === 'PHP' || currency === 'USDT'
       ? `INSERT INTO transactions 
-         (user_id, type, amount, krw_amount, currency, expected_amount, user_memo, status, created_at)
-         VALUES (?, 'wallet_withdraw', ?, ?, ?, ?, ?, 'pending', NOW())`
+         (user_id, type, amount, krw_amount, currency, expected_amount, exchange_rate, fee_percent, fee_amount, user_memo, status, created_at)
+         VALUES (?, 'wallet_withdraw', ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`
       : `INSERT INTO transactions 
-         (user_id, type, amount, krw_amount, currency, expected_amount, status, created_at)
-         VALUES (?, 'wallet_withdraw', ?, ?, ?, ?, 'pending', NOW())`;
+         (user_id, type, amount, krw_amount, currency, expected_amount, exchange_rate, fee_percent, fee_amount, status, created_at)
+         VALUES (?, 'wallet_withdraw', ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`;
 
     const params = currency === 'PHP' || currency === 'USDT'
-      ? [userId, amount_usd, local_amount, currency, expected_amount, user_memo]
-      : [userId, amount_usd, local_amount, currency, expected_amount];
+      ? [userId, amount_usd, local_amount, currency, finalExpectedAmount, exchangeRate, feePercent, feeAmount, user_memo]
+      : [userId, amount_usd, local_amount, currency, finalExpectedAmount, exchangeRate, feePercent, feeAmount];
 
+          console.log('💾 SQL Query:', query);
+    console.log('💾 Params:', params);
+    
     await db.query(query, params);
 
-       // 📢 출금신청시 텔레그램 알림 추가!
+    // ✅ 텔레그램 알림
     await sendTelegramMessage(
-      `[지갑 출금신청]\n유저명: ${user.username}\n출금액: ${amount_usd} USD (${currency})\n환산금액: ${local_amount}\n메모: ${user_memo || '-'}`
+      `[지갑 출금신청]\n유저명: ${user.username}\n출금액: ${amount_usd} USD\n통화: ${currency}\n환산금액: ${local_amount}\n환율: ${exchangeRate}\n수수료: ${feeAmount} (${feePercent}%)\n실제 지급: ${finalExpectedAmount}\n메모: ${user_memo || '-'}`
     );
 
     res.status(201).json({ message: '출금 신청이 완료되었습니다.' });
@@ -548,6 +575,7 @@ if (existing.length > 0) {
     res.status(500).json({ message: '출금 신청 처리 실패' });
   }
 };
+
 
 
 //사이트 내 충전 신청 목록 API 0721 관리자
@@ -773,84 +801,93 @@ content: `We regret to inform you that your deposit request for ${tx.amount} ${t
   }
 };
 
-// 사이트 내 출금 신청 목록 API 0721 관리자 wallet_withdraw
+// 관리자 - 지갑 출금 신청 목록 API
 exports.getWalletWithdrawList = async (req, res) => {
+  const {
+    page = 1,
+    limit = 20,
+    username = '',
+    status = '',
+    currency = '',
+    startDate = '',
+    endDate = '',
+  } = req.query;
+
+  const parsedLimit = Number(limit) || 20;
+  const parsedOffset = (Number(page) - 1) * parsedLimit;
+
   try {
-    // limit 오탈자도 수용
-    const rawLimit = req.query.limit ?? req.query.limiit ?? 15
-    const limit = Math.max(1, Number(rawLimit) || 15)
-
-    const { page = 1, status = '', currency = '', startDate = '', endDate = '' } = req.query
-    const username = (req.query.username ?? '').trim()
-
-    const where = [`t.type = 'wallet_withdraw'`]
-    const params = []
-
-    if (username) {
-      if (/^\d+$/.test(username)) {
-        where.push('(u.id = ? OR u.username LIKE ?)')
-        params.push(Number(username), `%${username}%`)
-      } else {
-        where.push('u.username LIKE ?')
-        params.push(`%${username}%`)
-      }
-    }
-
-    if (status)   { where.push('t.status = ?');   params.push(status) }
-    if (currency) { where.push('t.currency = ?'); params.push(currency) }
-    if (startDate && endDate) {
-      where.push('t.created_at >= ? AND t.created_at < DATE_ADD(?, INTERVAL 1 DAY)')
-      params.push(startDate, endDate)
-    }
-
-    const offset = (Number(page) - 1) * Number(limit)
-    const sqlBase = `
+    let baseQuery = `
       FROM transactions t
-      JOIN users u ON u.id = t.user_id
-      WHERE ${where.join(' AND ')}
-    `
+      JOIN users u ON t.user_id = u.id
+      WHERE t.type = 'wallet_withdraw'
+    `;
 
-    const [rows] = await db.query(
-      `SELECT
-         t.id, t.user_id, u.username,
-         t.amount, t.currency, t.expected_amount, t.status,
-         t.created_at, t.updated_at
-       ${sqlBase}
-       ORDER BY t.id DESC
-       LIMIT ?, ?`,
-      [...params, offset, Number(limit)]
-    )
+    const conditions = [];
+    const params = [];
 
-    const [[cnt]] = await db.query(`SELECT COUNT(*) AS total ${sqlBase}`, params)
-    const total = cnt.total
-    const totalPages = Math.ceil(total / limit)  // ✅ 페이지 수 계산 추가
+    if (username.trim()) {
+      conditions.push(`u.username LIKE ?`);
+      params.push(`%${username.trim()}%`);
+    }
 
-    console.log('[CTL-OUT]', { rows: rows.length, total, totalPages })
-console.log('📤 [API 응답 데이터 확인]', {
-  page,
-  limit,
-  total: cnt.total,
-  totalPages,
-  rows: rows.length
-})
-const formattedRows = rows.map(r => ({
-  ...r,
-  created_at: toManilaTime(r.created_at),
-  updated_at: toManilaTime(r.updated_at)
-}))
-    // ✅ 프론트가 기대하는 포맷으로 반환
-    return res.json({
-      data: formattedRows,
-      total,
-      totalPages,      // ✅ 반드시 추가
-      page: Number(page),
-      limit: Number(limit)
-    })
-  } catch (e) {
-    console.error('[CTL-ERR getWalletWithdrawList]', e)
-    return res.status(500).json({ message: 'Failed to load list' })
+    if (status.trim()) {
+      conditions.push(`t.status = ?`);
+      params.push(status.trim());
+    }
+
+    if (currency.trim()) {
+      conditions.push(`t.currency = ?`);
+      params.push(currency.trim());
+    }
+
+    if (startDate && endDate) {
+      conditions.push(`DATE(t.created_at) BETWEEN ? AND ?`);
+      params.push(startDate, endDate);
+    }
+
+    if (conditions.length > 0) {
+      baseQuery += ' AND ' + conditions.join(' AND ');
+    }
+
+    // ✨ 수수료 컬럼 포함한 SELECT
+    const listQuery = `
+      SELECT 
+        t.id, u.username,
+        t.currency,
+        t.amount,
+        t.exchange_rate,
+        t.fee_percent,
+        t.fee_amount,
+        t.expected_amount,
+        t.status,
+        t.created_at,
+        t.updated_at
+      ${baseQuery}
+      ORDER BY t.created_at DESC
+      LIMIT ${parsedLimit} OFFSET ${parsedOffset}
+    `;
+
+    const countQuery = `
+      SELECT COUNT(*) as total
+      ${baseQuery}
+    `;
+
+    const [rows] = await db.execute(listQuery, params);
+    const [countRows] = await db.execute(countQuery, params);
+
+    const formattedRows = rows.map(r => ({
+      ...r,
+      created_at: toManilaTime(r.created_at),
+      updated_at: toManilaTime(r.updated_at)
+    }));
+
+    res.json({ data: formattedRows, total: countRows[0].total });
+  } catch (err) {
+    console.error('❌ getWalletWithdrawList error:', err);
+    res.status(500).json({ message: 'Internal Server Error', error: err.message });
   }
-}
+};
 
 
 //사이트 내 출금 신청 승인/거절API 0721 관리자

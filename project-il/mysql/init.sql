@@ -183,6 +183,9 @@ CREATE TABLE IF NOT EXISTS transactions (
 ALTER TABLE transactions
 ADD COLUMN event_id INT NULL,
 ADD COLUMN bonus_amount DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE transactions
+ADD COLUMN fee_rate INT DEFAULT NULL COMMENT '출금 수수료율 (%)',
+ADD COLUMN fee_amount INT DEFAULT NULL COMMENT '출금 수수료 금액';
 
 
 CREATE TABLE IF NOT EXISTS notices (

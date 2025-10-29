@@ -202,14 +202,17 @@ const fetchExchangeRate = async () => {
   const rates = res.data.rates
 
   if (currency.value === 'KRW') {
-    exchangeRate.value = rates['USDT'] || rates['KRW']
+    // ✅ KRW도 업비트 기준 USDT-KRW 시세로 통일
+    exchangeRate.value = rates['KRW']
   } else if (currency.value === 'PHP') {
-    exchangeRate.value = rates['PHP']      // USD → PHP
+    exchangeRate.value = rates['PHP']
   } else if (currency.value === 'USDT') {
-    exchangeRate.value = 1                 // USD ↔ USDT
+    exchangeRate.value = 1
   }
+
   calculateConvertedAmount()
 }
+
 
 // (선택) 통화 바뀔 때 환율 다시 가져오고 싶으면 이거도 추가:
 // watch(currency, fetchExchangeRate)

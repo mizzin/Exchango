@@ -39,18 +39,26 @@
         <button class="reset-button" @click="resetFilters">초기화</button>
       </div>
     </div>
-
+<tfoot>
+  <tr>
+    <td colspan="5">총 수수료 합계</td>
+    <td colspan="6">{{ totalFee.toLocaleString() }} USD</td>
+    <p>현재 화면에 표시된 데이터(한 페이지 분량) 기준</p>
+  </tr> 
+</tfoot>
       <table class="table">
         <thead>
           <tr>
             <th>사용자</th>
-                <th>선택한통화</th>
-            <th>줘야하는금액</th>
-            <th>입력금액</th>
-            
+            <th>통화</th>
+            <th>입력금액(USD)</th>
+            <th>환율</th>
+            <th>수수료율(%)</th>
+            <th>수수료금액</th>
+            <th>실제지급금액</th>
             <th>상태</th>
             <th>요청일</th>
-            <th>승인일시</th>
+            <th>승인일</th>
             <th>처리</th>
           </tr>
         </thead>
@@ -58,9 +66,11 @@
           <tr v-for="item in list" :key="item.id">
             <td>{{ item.username }}</td>
             <td><span class="currency-pill">{{ item.currency }}</span></td>
+            <td>{{ Number(item.amount).toLocaleString() }}</td>
+            <td>{{ item.exchange_rate ? Number(item.exchange_rate).toLocaleString() : '-' }}</td>
+            <td>{{ item.fee_percent ? item.fee_percent + '%' : '-' }}</td>
+<td>{{ Number(item.fee_amount).toFixed(2) }}</td>
             <td>{{ Number(item.expected_amount).toLocaleString() }}</td>
-                        <td>{{ Number(item.amount).toLocaleString() }}</td>
-
             <td>
               <span :class="['status-badge', item.status]">
                 {{ formatStatus(item.status) }}
@@ -71,6 +81,7 @@
               <span v-if="item.status === 'completed'">{{ item.updated_at }}</span>
               <span v-else>-</span>
             </td>
+
             <td>
               <div v-if="item.status === 'pending'">
                 <button class="btn-approve" @click="approve(item.id)">승인</button>
@@ -80,8 +91,13 @@
             </td>
           </tr>
         </tbody>
+
       </table>
 
+      <!-- 📤 엑셀 내보내기 버튼 
+      <div class="export-section">
+        <button class="export-btn" @click="exportToExcel">엑셀로 내보내기</button>
+      </div>   -->
        <!-- 📄 페이징 -->
       <div class="pagination">
         <button @click="prevPage" :disabled="page === 1">이전</button>
@@ -186,6 +202,41 @@ const fetchList = async () => {
   }
 }
 
+// 예시: computed로 수정
+const totalFee = computed(() => {
+  return list.value
+    .filter(item => item.status === 'completed') // ✅ 승인된 항목만
+    .reduce((sum, item) => sum + (item.fee_amount || 0), 0)
+})
+
+
+// 📤 엑셀 내보내기
+const exportToExcel = () => {
+  if (!list.value.length) return alert('내보낼 데이터가 없습니다.')
+
+  // 엑셀 데이터 구성
+  const exportData = list.value.map(item => ({
+    사용자: item.username,
+    통화: item.currency,
+    입력금액_USD: item.amount,
+    환율: item.exchange_rate,
+    수수료율: item.fee_rate,
+    수수료금액: item.fee_amount,
+    실제지급금액: item.expected_amount,
+    상태: formatStatus(item.status),
+    요청일: item.created_at,
+    승인일: item.updated_at || '-'
+  }))
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData)
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, '출금신청목록')
+
+  const fileName = `지갑출금_${new Date().toISOString().slice(0, 10)}.xlsx`
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' })
+  saveAs(blob, fileName)
+}
 
 // 상태 텍스트 변환
 const formatStatus = (status) => {
@@ -248,6 +299,26 @@ onMounted(fetchList)
 </script>
 
 <style scoped>
+.export-section {
+  margin-top: 16px;
+  text-align: right;
+}
+.export-btn {
+  background-color: #0b57d0;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.export-btn:hover {
+  background-color: #0949b8;
+}
+.summary {
+  margin-top: 10px;
+  font-weight: 600;
+}
 .button-group {
   display: flex;
   gap: 10px;

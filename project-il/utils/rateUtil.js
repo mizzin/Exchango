@@ -25,45 +25,19 @@ exports.getCustomRates = async () => {
   };
 
   try {
-    // open.er-api → PHP, CNY
+    // ✅ 오픈 API (PHP, CNY)
     const fx = await axios.get('https://open.er-api.com/v6/latest/USD');
     const rates = fx.data?.rates || {};
     result.PHP = rates.PHP ?? null;
     result.CNY = rates.CNY ?? null;
 
-    // ✅ 네이버 페이지 (EUC-KR 디코딩)
-    const res = await axios.get('https://finance.naver.com/marketindex/exchangeList.naver', {
-      responseType: 'arraybuffer'  // 중요!
-    });
-    const decoded = iconv.decode(res.data, 'EUC-KR');
-    const $ = cheerio.load(decoded);
-
-    let usdRate = null;
-
-    $('table.tbl_exchange tbody tr').each((_, el) => {
-      const title = $(el).find('td.tit').text().trim().replace(/\s+/g, '');
-      if (title.includes('미국USD')) {
-        const rateText = $(el).find('td.sale').text().replace(/,/g, '');
-        usdRate = parseFloat(rateText);
-      }
-    });
-
-    if (usdRate) {
-      result.KRW = usdRate;
-      result.USDT = usdRate;
-    } else {
-      console.error('❌ 네이버에서 KRW 환율을 찾을 수 없습니다.');
-    }
-
-    
-    // ✅ USDT는 업비트 기준으로
+    // ✅ 업비트 USDT-KRW 실시간 시세
     const upbitUSDT = await getUpbitUSDT();
     if (upbitUSDT) {
-      result.USDT = upbitUSDT;
-    } else if (usdRate) {
-      result.USDT = usdRate; // fallback
+      result.KRW = upbitUSDT;   // 원화 = 업비트 기준 시세
+      result.USDT = upbitUSDT;  // USDT 동일 시세
     }
-    
+
     return result;
   } catch (err) {
     console.error('[환율 수집 실패]', err.message);
