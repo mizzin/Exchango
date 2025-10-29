@@ -201,7 +201,7 @@ const fetchExchangeRate = async () => {
   const res = await axios.get('/exchange-rate')
   const rates = res.data.rates
 
-  if (currency.value === 'KRW') {
+  if (currency.value === 'KRW') { 
     // ✅ KRW도 업비트 기준 USDT-KRW 시세로 통일
     exchangeRate.value = rates['KRW']
   } else if (currency.value === 'PHP') {
