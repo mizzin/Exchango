@@ -24,19 +24,21 @@ router.patch('/users/:id/note', verifyToken, isAdmin, adminController.updateNote
 // ✅ 회원 차단 라우트
 router.patch('/users/:id/block', verifyToken, isAdmin, adminController.blockUser);
 router.patch('/users/:id/unblock', verifyToken, isAdmin, adminController.unblockUser);
-// ✅ 쪽지보내기.
-router.post('/messages', verifyToken, isAdmin, adminController.sendMessage);
+// ✅ 쪽지보내기. 단일
+router.post('/messages/send', verifyToken, isAdmin, adminController.sendMessage);
+//전체
+router.post('/messages/send-all', verifyToken, isAdmin, adminController.sendAllMessage);
 //경고
 router.patch('/users/:id/warning', verifyToken, isAdmin, adminController.giveWarning);
 router.get('/users/:id/warnings', verifyToken, isAdmin, adminController.getWarnings);
-router.post('/messages/send', verifyToken, isAdmin, adminController.sendMessage);
+
 // ✅ 보낸 쪽지 목록
 router.get('/messages/sent', verifyToken, isAdmin, adminController.getSentMessages);
 // ✅ 쪽지관리
 router.get('/message-templates', verifyToken, isAdmin, adminController.getMessageTemplates)
 router.post('/message-templates', verifyToken, isAdmin, adminController.updateMessageTemplates)
 router.delete('/messages/:id', verifyToken, isAdmin, adminController.deleteMessage)
-router.post('/messages/send-all',verifyToken, isAdmin,  adminController.sendMessageToAllUsers)
+
 
 // 관리자 충전 내역 조회
 router.get('/trade/recharge', verifyToken, isAdmin, transactionController.getRechargeTransactions)

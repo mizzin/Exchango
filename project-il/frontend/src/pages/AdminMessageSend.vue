@@ -5,12 +5,15 @@ import axios from '@/axiosAdmin'
 import { useRouter } from 'vue-router'
 import AdminLayout from '@/components/AdminLayout.vue'
 const to_type = ref('single') // ✅ single | all
+const to_username = ref('')   // ✅ 추가
 const subject = ref('')
 const content = ref('')
 const language = ref('ko')
 const router = useRouter()
 
 const sendMessage = async () => {
+  
+
   try {
     const token = localStorage.getItem('admin_token')
     let url = '/admin/messages/send'
@@ -30,7 +33,7 @@ const sendMessage = async () => {
     await axios.post(url, body, {
       headers: { Authorization: `Bearer ${token}` },
     })
-
+console.log('📤 쪽지 전송 요청 시작:', url, body);
     alert(
       to_type.value === 'all'
         ? '✅ 전체 사용자에게 쪽지를 발송했습니다.'

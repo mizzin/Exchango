@@ -396,7 +396,7 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-exports.sendMessageToAllUsers = async (req, res) => {
+exports.sendAllMessage = async (req, res) => {
   const adminId = req.user.id; // 로그인된 관리자 ID
   const { subject, content, language } = req.body;
 
