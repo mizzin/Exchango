@@ -555,23 +555,43 @@ exports.getWalletTransactions = async (req, res) => {
 
   try {
     const [transactions] = await db.query(`
-      SELECT 
-        id, type, currency, amount, krw_amount, status, created_at, updated_at
-      FROM transactions
-      WHERE user_id = ?
-        AND type IN ('wallet_charge', 'wallet_withdraw', 'deduct')
+     SELECT 
+  t.id,
+  t.type,
+  t.currency,
+  t.amount,
+  t.bonus_amount,            -- ✅ 실제 이벤트 금액 컬럼 추가
+  ub.balance AS reflected_balance,   -- ✅ 누적 지갑 잔액 (참고용)
+  t.krw_amount,
+  t.status,
+  t.created_at,
+  t.updated_at
+FROM transactions t
+LEFT JOIN user_balances ub ON t.user_id = ub.user_id
+WHERE t.user_id = ?
+  AND t.type IN ('wallet_charge', 'wallet_withdraw', 'deduct')
 
-      UNION ALL
+UNION ALL
 
-      SELECT 
-        id, 'platform_move' AS type, NULL AS currency, amount, NULL AS krw_amount,
-        status, created_at, updated_at
-      FROM site_transactions
-      WHERE user_id = ?
-        AND type = 'platform_move'
-        AND from_type = 'wallet'
+SELECT 
+  s.id,
+  'platform_move' AS type,
+  NULL AS currency,
+  s.amount,
+  NULL AS bonus_amount,      -- ✅ 컬럼 수 맞추기용
+  ub.balance AS reflected_balance,
+  NULL AS krw_amount,
+  s.status,
+  s.created_at,
+  s.updated_at
+FROM site_transactions s
+LEFT JOIN user_balances ub ON s.user_id = ub.user_id
+WHERE s.user_id = ?
+  AND s.type = 'platform_move'
+  AND s.from_type = 'wallet'
 
-      ORDER BY created_at DESC
+ORDER BY created_at DESC
+
     `, [userId, userId]);
  
     res.json({ transactions });
@@ -580,6 +600,7 @@ exports.getWalletTransactions = async (req, res) => {
     res.status(500).json({ message: 'Failed to load wallet transactions.' });
   }
 };
+
 
 
 // GET /users/me/transactions

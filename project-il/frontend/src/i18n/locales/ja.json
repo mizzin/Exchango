@@ -1,4 +1,5 @@
-{"error": {
+{"eventNotice":"初回入金イベント：$100〜$5,000 の入金のみ対象。",
+"error": {
   "money_password_incorrect": "現在の出金パスワードが一致しません。",
   "user_not_found": "ユーザーが見つかりません。",
   "server_error": "サーバーエラーが発生しました。",
@@ -187,6 +188,8 @@
     "currency": "申請通貨",
     "amountUsd": "申請金額（USD）",
     "convertedAmount": "換算金額",
+        "totalAmount": "Total Reflected Amount"
+,
     "status": "ステータス",
     "approvedAt": "承認日",
     "noHistory": "チャージまたは出金履歴がありません。"

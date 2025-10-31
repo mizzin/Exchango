@@ -12,6 +12,8 @@
       <th>{{ $t('history.wallet.currency') }}</th>
       <th>{{ $t('history.wallet.amountUsd') }}</th>
       <th>{{ $t('history.wallet.convertedAmount') }}</th>
+      <th>{{ $t('history.wallet.totalAmount') }}</th>
+
       <th>{{ $t('history.wallet.status') }}</th>
       <th>{{ $t('history.wallet.approvedAt') }}</th>
     </tr>
@@ -25,6 +27,12 @@
 <td :data-label="$t('history.wallet.convertedAmount')">
   {{ formatAmount(item.krw_amount) }} {{ item.currency }}
 </td>
+<td :data-label="$t('history.wallet.totalAmount')">
+{{ formatAmount(parseFloat(item.amount) + parseFloat(item.bonus_amount || 0)) }} USD
+</td>
+
+
+
 <td :data-label="$t('history.wallet.status')">
   <span :class="'badge status-' + item.status">
     {{ formatStatus(item.status) }}

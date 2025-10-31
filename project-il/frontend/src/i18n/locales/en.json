@@ -1,4 +1,5 @@
-{"error": {
+{"eventNotice":" First Deposit Event: Only deposits between $100–$5,000 are eligible.",
+  "error": {
   "money_password_incorrect": "The current withdrawal password does not match.",
   "user_not_found": "User not found.",
   "server_error": "A server error has occurred.",
@@ -192,6 +193,8 @@
     "currency": "Requested Currency",
     "amountUsd": "Requested Amount (USD)",
     "convertedAmount": "Converted Amount",
+        "totalAmount": "Total Reflected Amount"
+,
     "status": "Status",
     "approvedAt": "Approval Date",
     "noHistory": "No recharge or withdrawal history found."

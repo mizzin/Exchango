@@ -1,4 +1,4 @@
-{
+{"eventNotice":"首次充值活动：仅限 $100–$5,000 范围内的充值可参与。",
   "nav": {
     "home": "首页",
     "trade": "交易",
@@ -178,6 +178,8 @@
     "currency": "申请币种",
     "amountUsd": "申请金额（USD）",
     "convertedAmount": "换算金额",
+        "totalAmount": "Total Reflected Amount"
+,
     "status": "状态",
     "approvedAt": "批准日期",
     "noHistory": "暂无充值或提现记录。"
