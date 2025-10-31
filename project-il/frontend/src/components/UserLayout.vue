@@ -7,6 +7,7 @@
           <router-link to="/" class="logo-link">
               <img src="@/assets/img/logo.png" alt="TranAsia" class="logo-img" style="height:38px;width:auto;"/>
             </router-link>
+            <span v-if="!isMobile" class="break-time-notice" style="margin-left: 15px; font-size: 0.8em; color: #888; font-weight: normal;">{{ $t('notice.breakTime') }}</span>
             <!-- ✅ 모바일 전용 언어 셀렉트 (로고 옆 고정) -->
               <select
                 v-if="isMobile"

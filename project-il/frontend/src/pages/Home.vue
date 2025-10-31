@@ -154,6 +154,11 @@ const formatDate = dateStr => new Date(dateStr).toLocaleDateString()
 
       </section>
 
+      <!-- Break Time Notice for Mobile (for all users) -->
+      <div v-if="isMobile" class="mobile-break-notice" style="padding: 8px 10px; background-color: #f0f4ff; color: #4d5ee1; text-align: center; font-size: 0.8em; border-radius: 0; margin: 0; border-bottom: 1px solid #d0d8ff;">
+        <p style="margin: 0; line-height: 1.2;">{{ $t('notice.breakTime') }}</p>
+      </div>
+
       <!-- 🔹 외부 링크 카드 -->
       <section class="section-grid external-links">
         <div v-for="site in externalSites" :key="site.name" class="card external-card">

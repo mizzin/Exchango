@@ -359,7 +359,8 @@
       "checkUsernameFirst": "ユーザー名の重複確認を先に行ってください。"
 }
 },"notice": {
-"backToList":"返回列表"
+"backToList":"返回列表",
+"breakTime": "休息时间 11:00–15:00（韩国时间）｜ 系统正常运行 / 1对1咨询暂时暂停"
 },
  "inquiry": {
       "list": {

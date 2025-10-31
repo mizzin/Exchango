@@ -340,7 +340,8 @@
   "pesoAccountPlaceholder": "Enter your GCash / GoTyme / BDO account",
   "selectOption": "Select Account Type",
 "notice": {
-"backToList":"List"
+"backToList":"List",
+"breakTime": "Break Time 11:00–15:00 (Korea) ｜ System on / Chat paused"
 },
 "register": {
    "emailNote": "Your email will be used for password recovery. Please enter it correctly.",

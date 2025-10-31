@@ -396,7 +396,8 @@
       "checkUsernameFirst": "아이디 중복 확인을 먼저 해주세요."
   }
 },"notice": {
-"backToList":"목록으로"
+"backToList":"목록으로",
+"breakTime": "브레이크타임 11:00~15:00 ｜ 상담 일시 중단"
 },
  "inquiry": {
     "list": {
