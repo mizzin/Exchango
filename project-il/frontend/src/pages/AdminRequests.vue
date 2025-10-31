@@ -74,7 +74,7 @@
                     @click="openDetail(item)"
                     class="cursor-pointer"
                     >
-                <td>{{ item.created_at }}</td>
+                <td>{{ formatDate(item.created_at) }}</td>
                 <td>
                 {{ formatType(item) }}
                 <div v-if="item.type === 'wallet_transfer'" class="text-muted small">
@@ -180,6 +180,9 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import axios from '@/axiosAdmin'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 const requests = ref([])
 const selectedRequest = ref(null)
@@ -242,16 +245,9 @@ const statusColor = (status) => {
     default: return 'secondary'
   }
 }
-const formatDate = (datetime) => {
-  const date = new Date(datetime)
-  return date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  }).replace(/\./g, '.')
+const formatDate = (str) => {
+  if (!str) return '-'
+  return dayjs.utc(str).add(8, 'hour').format('YYYY.MM.DD HH:mm:ss')
 }
 const directionLabel = (item) => {
   const from = item.from_type === 'wallet'

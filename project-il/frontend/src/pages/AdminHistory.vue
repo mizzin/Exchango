@@ -112,6 +112,9 @@
 import { ref, onMounted } from 'vue'
 import axios from '@/axiosAdmin'
 import AdminLayout from '@/components/AdminLayout.vue'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 const history = ref([])
 const filters = ref({
   type: '',
@@ -183,9 +186,9 @@ const resetFilters = () => {
   fetchHistory()
 }
 
-const formatDate = (val) => {
-  if (!val) return '-'
-  return new Date(val).toLocaleString()
+const formatDate = (str) => {
+  if (!str) return '-'
+  return dayjs.utc(str).add(8, 'hour').format('YYYY.MM.DD HH:mm:ss')
 }
 const formatAmount = (v) => v.toLocaleString()
 const formatType = (type) => {

@@ -55,6 +55,8 @@ import { ref, onMounted,computed } from 'vue'
 import axios from '@/axiosUser'
 import '@/assets/style.css'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 
 const history = ref([])
@@ -118,7 +120,8 @@ const changePage = (page) => {
 }
 
 const formatDate = (str) => {
-   return dayjs(str).format('YYYY.MM.DD HH:mm:ss')
+  if (!str) return '-'
+  return dayjs.utc(str).add(8, 'hour').format('YYYY.MM.DD HH:mm:ss')
 }
 
 const formatStatus = (status) => {

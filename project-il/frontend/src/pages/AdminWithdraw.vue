@@ -64,8 +64,8 @@
                 {{ formatStatus(item.status) }}
               </span>
             </td>
-            <td>{{ item.created_at }}</td>
-            <td v-if="item.status === 'completed'">{{ item.updated_at }}</td>
+            <td>{{ formatDate(item.created_at) }}</td>
+            <td v-if="item.status === 'completed'">{{ formatDate(item.updated_at) }}</td>
             <td v-else>-</td>
             <td>
               <div v-if="item.status === 'pending'" class="action-buttons">
@@ -208,7 +208,10 @@ const formatStatus = (status) => {
 }
 
 const formatDate = (str) => {
-  return new Date(str).toLocaleString()
+  if (!str) return '-'
+  // Assuming the input `str` is an ISO 8601 string or a valid date string that dayjs can parse.
+  // Convert to PHT (UTC+8)
+  return dayjs.utc(str).add(8, 'hour').format('YYYY.MM.DD HH:mm:ss')
 }
 
 const approve = async (id) => {

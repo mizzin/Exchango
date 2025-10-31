@@ -67,9 +67,9 @@
                 {{ formatStatus(item.status) }} 
               </span>
             </td>
-            <td>{{ item.created_at }}</td>
+            <td>{{ formatDate(item.created_at) }}</td>
             <td>
-              <span v-if="item.status === 'completed'">{{ item.updated_at }}</span>
+              <span v-if="item.status === 'completed'">{{ formatDate(item.updated_at) }}</span>
               <span v-else>-</span>
             </td>
             <td>
@@ -101,6 +101,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import axios from '@/axiosAdmin'
 import AdminLayout from '@/components/AdminLayout.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 const confirmModal = ref(null)
 
@@ -212,10 +215,9 @@ const formatStatus = (status) => {
 }
 
 // 날짜 형식 변환
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-  const d = new Date(dateStr)
-  return d.toLocaleString()
+const formatDate = (str) => {
+  if (!str) return '-'
+  return dayjs.utc(str).add(8, 'hour').format('YYYY.MM.DD HH:mm:ss')
 }
 
 // 페이지 이동

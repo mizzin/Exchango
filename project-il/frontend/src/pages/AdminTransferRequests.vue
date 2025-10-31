@@ -50,7 +50,7 @@
       </span>
     </td>
  <td>{{ item.confirmed_by_admin || '-' }}</td>  
- <td>{{ item.created_at}}</td>
+ <td>{{ formatDate(item.created_at)}}</td>
     <td>
       <template v-if="item.status === 'pending'">
      <button class="btn btn-success btn-sm" @click="approve(item.id)" :disabled="item.status !== 'pending'">승인</button>
@@ -118,6 +118,9 @@
 import { ref, onMounted } from 'vue'
 import axios from '@/axiosAdmin'
 import AdminLayout from '@/components/AdminLayout.vue'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 const requests = ref([])
 const selected = ref(null)
@@ -179,7 +182,10 @@ const statusClass = (status) => {
   }
 }
 
-const formatDate = (dateStr) => new Date(dateStr).toLocaleString()
+const formatDate = (str) => {
+  if (!str) return '-'
+  return dayjs.utc(str).add(8, 'hour').format('YYYY.MM.DD HH:mm:ss')
+}
 
 const approve = async (id) => {
   if (!confirm('정말 승인하시겠습니까?')) return

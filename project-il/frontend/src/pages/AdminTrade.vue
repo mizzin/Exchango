@@ -70,8 +70,8 @@
                 {{ formatStatus(item.status) }}
               </span>
             </td>
-            <td>{{ item.created_at}}</td>
-            <td v-if="item.status === 'completed'">{{ item.updated_at }}</td>
+            <td>{{ formatDate(item.created_at)}}</td>
+            <td v-if="item.status === 'completed'">{{ formatDate(item.updated_at) }}</td>
             <td v-else>-</td>
             <td>
               <div v-if="item.status === 'pending'">
@@ -97,6 +97,8 @@ import { ref, onMounted } from 'vue'
 import axios from '@/axiosAdmin'
 import AdminLayout from '@/components/AdminLayout.vue'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 const transactions = ref([])
 const page = ref(1)
@@ -232,9 +234,9 @@ const formatStatus = (status) => {
   }
 }
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr)
-  return date.toLocaleString()
+const formatDate = (str) => {
+  if (!str) return '-'
+  return dayjs.utc(str).add(8, 'hour').format('YYYY.MM.DD HH:mm:ss')
 }
 
 </script>
