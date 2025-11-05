@@ -51,6 +51,9 @@
 <button @click="showPasswordResetModal = true" class="btn-reset-password">
   🔐 비밀번호 초기화
 </button>
+<button @click="resetWithdrawalPassword" class="btn-reset-password">
+  🔑 출금 비밀번호 초기화
+</button>
         <Modal v-if="showPasswordResetModal" @close="showPasswordResetModal = true">
           <h3>비밀번호 초기화</h3>
           <input
@@ -362,6 +365,25 @@ const warnUser = async () => {
     alert('경고 실패')
   }
 }
+
+const resetWithdrawalPassword = async () => {
+  if (!confirm('정말로 이 사용자의 출금 비밀번호를 초기화하시겠습니까?\n초기화된 비밀번호는 000000 입니다.')) {
+    return;
+  }
+
+  const token = localStorage.getItem('admin_token');
+  try {
+    await axios.patch(`/admin/users/${route.params.id}/reset-withdrawal-password`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    alert('출금 비밀번호가 000000으로 초기화되었습니다.');
+    fetchUser();
+  } catch (err) {
+    console.error('❌ 출금 비밀번호 초기화 실패:', err);
+    alert('출금 비밀번호 초기화에 실패했습니다.');
+  }
+};
+
 const goToList = () => {
   router.push('/admin/users');
 };

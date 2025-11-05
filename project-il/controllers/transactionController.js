@@ -532,6 +532,11 @@ exports.createWalletWithdraw = async (req, res) => {
     const feeAmount = parseFloat((amount_usd * (feePercent / 100)).toFixed(2));
 
     const finalExpectedAmount = amount_usd - feeAmount;
+
+    // 서버 측에서 KRW 금액 계산
+    const grossKrwAmount = Math.round(amount_usd * exchangeRate);
+    const finalKrwAmount = Math.round(finalExpectedAmount * exchangeRate);
+
     // 📢 INSERT 전 로그 찍기
     console.log('--- 💾 출금신청 저장 전 데이터 ---');
     console.log({
@@ -544,6 +549,9 @@ exports.createWalletWithdraw = async (req, res) => {
       feeAmount,
       finalExpectedAmount,
       user_memo,
+      // 서버 계산값 로깅
+      server_grossKrwAmount: grossKrwAmount,
+      server_finalKrwAmount: finalKrwAmount
     });
     // ✅ DB 저장
     const query = currency === 'PHP' || currency === 'USDT'
@@ -555,17 +563,17 @@ exports.createWalletWithdraw = async (req, res) => {
          VALUES (?, 'wallet_withdraw', ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`;
 
     const params = currency === 'PHP' || currency === 'USDT'
-      ? [userId, amount_usd, local_amount, currency, finalExpectedAmount, exchangeRate, feePercent, feeAmount, user_memo]
-      : [userId, amount_usd, local_amount, currency, finalExpectedAmount, exchangeRate, feePercent, feeAmount];
+      ? [userId, amount_usd, finalKrwAmount, currency, finalExpectedAmount, exchangeRate, feePercent, feeAmount, user_memo]
+      : [userId, amount_usd, finalKrwAmount, currency, finalExpectedAmount, exchangeRate, feePercent, feeAmount];
 
           console.log('💾 SQL Query:', query);
     console.log('💾 Params:', params);
     
     await db.query(query, params);
 
-    // ✅ 텔레그램 알림
+    // ✅ 텔레그램 알림 (서버 계산 기준으로 변경)
     await sendTelegramMessage(
-      `[지갑 출금신청]\n유저명: ${user.username}\n출금액: ${amount_usd} USD\n통화: ${currency}\n환산금액: ${local_amount}\n환율: ${exchangeRate}\n수수료: ${feeAmount} (${feePercent}%)\n실제 지급: ${finalExpectedAmount}\n메모: ${user_memo || '-'}`
+      `[지갑 출금신청]\n유저명: ${user.username}\n출금액: ${amount_usd} USD\n통화: ${currency}\n환산금액: ${grossKrwAmount.toLocaleString()} KRW\n환율: ${exchangeRate}\n수수료: ${feeAmount} USD (${feePercent}%)\n실제 지급: ${finalKrwAmount.toLocaleString()} KRW\n메모: ${user_memo || '-'}`
     );
 
     res.status(201).json({ message: '출금 신청이 완료되었습니다.' });

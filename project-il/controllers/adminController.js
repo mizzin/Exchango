@@ -824,6 +824,22 @@ exports.resetUserPassword = async (req, res) => {
     res.status(500).json({ message: '서버 오류' });
   }
 };
+
+exports.resetUserWithdrawalPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const newWithdrawalPassword = '000000';
+    const hashedPassword = await bcrypt.hash(newWithdrawalPassword, 10);
+
+    await db.query('UPDATE users SET money_password = ? WHERE id = ?', [hashedPassword, id]);
+
+    res.json({ message: '출금 비밀번호가 초기화되었습니다.' });
+  } catch (err) {
+    console.error('🔥 출금 비밀번호 초기화 중 에러:', err);
+    res.status(500).json({ message: '서버 오류' });
+  }
+};
+
 // controllers/adminController.js  updateUser  사용자 정보 수정
 exports.updateUser = async (req, res) => {
   const { id } = req.params;

@@ -71,6 +71,7 @@ router.patch('/trade/withdraw/:id/approve', verifyToken, isAdmin, transactionCon
 //관리자 사용자 비밀번호 변경 0701
 router.patch('/users/:id', adminController.updateUser)
 router.patch('/users/:id/password', verifyToken, isAdmin, adminController.resetUserPassword);
+router.patch('/users/:id/reset-withdrawal-password', verifyToken, isAdmin, adminController.resetUserWithdrawalPassword);
 
 // 거절
 router.patch('/trade/recharge/:id/reject', verifyToken, isAdmin, transactionController.rejectRecharge)
