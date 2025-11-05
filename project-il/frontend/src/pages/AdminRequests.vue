@@ -84,8 +84,8 @@
                 <td>{{ item.user_username  }}</td>
                 <td>{{ formatAmount(item.amount, item.currency) }}</td>
                 <td>
-                    <span v-if="item.expected_amount">
-                    → {{ formatAmount(item.expected_amount) }}
+                    <span v-if="item.krw_amount">
+                    → {{ formatAmount(item.krw_amount, item.currency) }}
                     </span>
                 </td>
                 <td>
@@ -142,7 +142,7 @@
             <p><strong>거래 유형:</strong> {{ formatType(selectedRequest) }}</p>
             <p><strong>유저명:</strong> {{ selectedRequest.username }}</p>
             <p><strong>금액:</strong> {{ formatAmount(selectedRequest.amount, selectedRequest.currency) }}</p>
-            <p v-if="selectedRequest.expected_amount"><strong>환산금액:</strong> {{ formatAmount(selectedRequest.expected_amount) }}</p>
+            <p v-if="selectedRequest.krw_amount"><strong>환산금액:</strong> {{ formatAmount(selectedRequest.krw_amount, selectedRequest.currency) }}</p>
             <p><strong>상태:</strong> {{ formatStatus(selectedRequest.status) }}</p>
             <p v-if="selectedRequest.user_memo"><strong>신청 메모:</strong> {{ selectedRequest.user_memo }}</p>
             <p v-if="selectedRequest.type === 'wallet_transfer'">

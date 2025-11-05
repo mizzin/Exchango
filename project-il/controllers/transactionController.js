@@ -1139,6 +1139,12 @@ else if (
   transactionType = 'platform_to_platform';// 플랫폼 → 플랫폼
 }
 
+    // ✅ 5.6. unknown 타입 거절
+    if (transactionType === 'unknown') {
+      return res.status(400).json({ message: 'Invalid money transfer type. Please check your selection and try again.' });
+    }
+
+
   // 💡 '내 지갑' 선택한 경우 to_platform_id를 null 또는 'internal'로 변환
   const toPlatformIdForDB = to_platform_id === 'wallet' ? null : to_platform_id;
   const toPlatformUserIdForDB = to_platform_id === 'wallet' ? null : to_platform_user_id;
