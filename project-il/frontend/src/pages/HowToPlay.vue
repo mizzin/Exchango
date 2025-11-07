@@ -13,10 +13,13 @@
 
 <script setup>
 import UserLayout from '@/components/UserLayout.vue'
-
+import { useI18n } from 'vue-i18n'
+const { locale } = useI18n()
 // Vite 경로 인식용
+
 const getImagePath = (n) => {
-  return new URL(`../assets/img/${n}.png`, import.meta.url).href
+  const lang = locale.value === 'ko' ? 'ko' : 'en'
+  return new URL(`../assets/img/${lang}/${n}.png`, import.meta.url).href
 }
 </script>
 
