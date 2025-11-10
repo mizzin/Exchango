@@ -362,12 +362,9 @@ const goToLogin = () => {
       
         <select v-model="platform.platform_id" @change="onPlatformChange(index)">
           <option disabled value="">{{ $t('register.platform') }}</option>
-          <option v-for="opt in platformOptions" :key="opt.platform_id" :value="opt.platform_id">
+          <option v-for="opt in platformOptions" :key="opt.id" :value="opt.id">
             {{ opt.name }}
           </option>
-        <!--<option v-for="opt in platformOptions" :key="opt.id" :value="opt.id">
-           {{ opt.name }}
-          </option>-->
         </select>
         <input
           v-model="platform.platform_user_id"
