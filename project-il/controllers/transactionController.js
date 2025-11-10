@@ -573,7 +573,7 @@ exports.createWalletWithdraw = async (req, res) => {
 
     // ✅ 텔레그램 알림 (서버 계산 기준으로 변경)
     await sendTelegramMessage(
-      `[지갑 출금신청]\n유저명: ${user.username}\n출금액: ${amount_usd} USD\n통화: ${currency}\n환산금액: ${grossKrwAmount.toLocaleString()} KRW\n환율: ${exchangeRate}\n수수료: ${feeAmount} USD (${feePercent}%)\n실제 지급: ${finalKrwAmount.toLocaleString()} KRW\n메모: ${user_memo || '-'}`
+      `[지갑 출금신청]\n유저명: ${user.username}\n출금액: ${amount_usd} USD\n통화: ${currency}\n환산금액: ${grossKrwAmount.toLocaleString()} ${currency}\n환율: ${exchangeRate}\n수수료: ${feeAmount} USD (${feePercent}%)\n수수료 제외: ${amount_usd} USD - ${feeAmount} USD = ${finalExpectedAmount} USD\n실제 지급: ${finalKrwAmount.toLocaleString()} ${currency}\n메모: ${user_memo || '-'}`
     );
 
     res.status(201).json({ message: '출금 신청이 완료되었습니다.' });
@@ -868,6 +868,7 @@ exports.getWalletWithdrawList = async (req, res) => {
         t.fee_percent,
         t.fee_amount,
         t.expected_amount,
+        t.krw_amount,
         t.status,
         t.created_at,
         t.updated_at
@@ -884,11 +885,18 @@ exports.getWalletWithdrawList = async (req, res) => {
     const [rows] = await db.execute(listQuery, params);
     const [countRows] = await db.execute(countQuery, params);
 
-    const formattedRows = rows.map(r => ({
-      ...r,
-      created_at: toManilaTime(r.created_at),
-      updated_at: toManilaTime(r.updated_at)
-    }));
+    const formattedRows = rows.map(r => {
+      
+      if (r.currency === 'KRW' || r.currency === 'PHP') {
+        r.expected_amount = r.krw_amount;
+      }
+
+      return {
+        ...r,
+        created_at: toManilaTime(r.created_at),
+        updated_at: toManilaTime(r.updated_at)
+      }
+    });
 
     res.json({ data: formattedRows, total: countRows[0].total });
   } catch (err) {
