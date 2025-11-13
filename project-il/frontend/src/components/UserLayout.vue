@@ -9,17 +9,20 @@
             </router-link>
             <span v-if="!isMobile" class="break-time-notice" style="margin-left: 15px; font-size: 0.8em; color: #888; font-weight: normal;">{{ $t('notice.breakTime') }}</span>
             <!-- ✅ 모바일 전용 언어 셀렉트 (로고 옆 고정) -->
-              <select
-                v-if="isMobile"
-                v-model="$i18n.locale"
-                @change="onChangeLang"
-                class="lang-select-mobile"
-              >
-                <option value="en">EN</option>
-                <option value="ko">한국어</option>
-                <option value="zh">中文</option>
-                <option value="ja">日本語</option>
-              </select>
+              <div v-if="isMobile" class="lang-mobile-wrapper">
+                <span class="globe-icon" aria-hidden="true">🌐</span>
+                <select
+                  v-model="$i18n.locale"
+                  @change="onChangeLang"
+                  class="lang-select-mobile"
+                  aria-label="language"
+                >
+                  <option value="en">EN</option>
+                  <option value="ko">한국어</option>
+                  <option value="zh">中文</option>
+                  <option value="ja">日本語</option>
+                </select>
+              </div>
 
             <!-- 💰 보유금액 박스: 햄버거/로고와 같은 라인, PC만 노출 -->
           <div v-if="isMember && userInfo && userInfo.balance != null && !isMobile" class="user-balance">
@@ -98,12 +101,15 @@
             <router-link to="/login" class="nav-item" v-if="isMember" @click="logout">{{ $t('nav.logout') }}</router-link>
             <router-link to="/login" class="nav-item" v-else>{{ $t('nav.login') }}</router-link>
 
-            <select v-model="$i18n.locale" @change="onChangeLang" class="lang-select">
-              <option value="en">EN</option>
-              <option value="ko">한국어</option>
-              <option value="zh">中文</option>
-              <option value="ja">日本語</option>
-            </select>
+            <div class="lang-select-wrapper">
+              <span class="globe-icon" aria-hidden="true">🌐</span>
+              <select v-model="$i18n.locale" @change="onChangeLang" class="lang-select">
+                <option value="en">EN</option>
+                <option value="ko">한국어</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+              </select>
+            </div>
           </nav>
         </div>
       </header>
@@ -423,6 +429,18 @@ const toggleMenu = () => {
   display: inline-block;
 }
 
+.lang-select-wrapper {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* Push to the right */
+  gap: 5px; /* Space between globe and select */
+}
+
+.lang-select-wrapper .globe-icon {
+  font-size: 1.2rem; /* Adjust size as needed */
+  color: #555; /* Adjust color as needed */
+}
+
 .hamburger {
   display: none; /* PC에서는 숨김 */
   font-size: 2rem;   
@@ -498,6 +516,24 @@ select::-ms-expand {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+.lang-mobile-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: absolute;
+  right: 3.5rem;
+  z-index: 1000;
+  flex-direction: row; /* Explicitly set to ensure order */
+}
+.globe-icon {
+  font-size: 18px;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+  color: inherit;
+  margin-right: 4px; /* 아이콘과 셀렉트 사이 간격 */
 }
 
 @media (max-width: 768px) {
