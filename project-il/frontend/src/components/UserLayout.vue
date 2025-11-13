@@ -527,10 +527,10 @@ select::-ms-expand {
   z-index: 1000;
 }
 .lang-mobile-wrapper .globe-icon {
-  order: 1; /* Globe icon first */
+  order: 1 !important; /* Globe icon first */
 }
 .lang-mobile-wrapper .lang-select-mobile {
-  order: 2; /* Select box second */
+  order: 2 !important; /* Select box second */
 }
 .globe-icon {
   font-size: 18px;
