@@ -525,7 +525,12 @@ select::-ms-expand {
   position: absolute;
   right: 3.5rem;
   z-index: 1000;
-  flex-direction: row; /* Explicitly set to ensure order */
+}
+.lang-mobile-wrapper .globe-icon {
+  order: 1; /* Globe icon first */
+}
+.lang-mobile-wrapper .lang-select-mobile {
+  order: 2; /* Select box second */
 }
 .globe-icon {
   font-size: 18px;
