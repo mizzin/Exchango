@@ -81,7 +81,11 @@
     "inquiry": "1:1 문의",
     "mypage": "마이페이지",
     "messages": "쪽지함",
-    "guide": "가입 가이드",
+    "guide": "이용가이드",
+    "howToPlay": "하우투 플레이",
+    "joinGuide": "조인 가이드",
+    "resources": "자료실",
+    "clubGgGuide": "클럽 GG 가입방법",
     "login": "로그인 / 회원가입",
     "logout": "로그아웃"
   },
@@ -90,6 +94,14 @@
     "dateLabel": "기준일",
     "inquiry": "문의: 1:1게시판",
     "usdtUnavailable": "현재 업비트 점검 중입니다"
+  },
+  "resources": {
+    "title": "자료실",
+    "comingSoon": "준비중입니다"
+  },
+  "clubGgGuide": {
+    "title": "클럽 GG 가입방법",
+    "comingSoon": "준비중입니다"
   },
     "charge":
      {   
@@ -397,7 +409,7 @@
   }
 },"notice": {
 "backToList":"목록으로",
-"breakTime": "브레이크타임 11:00~15:00 ｜ 상담 일시 중단"
+"breakTime": "브레이크타임 09:00~15:00(Koreatime) ｜ 상담 일시 중단"
 },
  "inquiry": {
     "list": {

@@ -1,4 +1,4 @@
-{"eventNotice":" First Deposit Event: Only deposits between $100–$5,000 are eligible.",
+{
   "error": {
   "money_password_incorrect": "The current withdrawal password does not match.",
   "user_not_found": "User not found.",
@@ -82,7 +82,11 @@
     "inquiry": "1:1 Inquiry",
     "mypage": "My Page",
     "messages": "Messages",
-    "guide": "Join Guide",
+    "guide": "Guide",
+    "howToPlay": "How to Play",
+    "joinGuide": "Join Guide",
+    "resources": "Resources",
+    "clubGgGuide": "How to Join Club GG",
     "login": "Login / Sign Up",
     "logout": "Logout"
   },
@@ -92,6 +96,14 @@
     "inquiry": "Inquiry: 1:1 Board",
     "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
 
+  },
+  "resources": {
+    "title": "Resources",
+    "comingSoon": "Coming Soon"
+  },
+  "clubGgGuide": {
+    "title": "How to Join Club GG",
+    "comingSoon": "Coming Soon"
   },
   "charge": { 
       "wallet": {
@@ -341,7 +353,7 @@
   "selectOption": "Select Account Type",
 "notice": {
 "backToList":"List",
-"breakTime": "Break Time 11:00–15:00 (Korea) ｜ System on / Chat paused"
+"breakTime": "Break Time 09:00–15:00 (Koreatime) ｜ System on / Chat paused"
 },
 "register": {
    "emailNote": "Your email will be used for password recovery. Please enter it correctly.",

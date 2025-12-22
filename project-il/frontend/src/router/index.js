@@ -189,7 +189,18 @@ const routes = [
   path: '/how-to-play',
   name: 'HowToPlay',
   component: () => import('@/pages/HowToPlay.vue')
-},{
+},
+{
+  path: '/resources',
+  name: 'Resources',
+  component: () => import('@/pages/Resources.vue')
+},
+{
+  path: '/club-gg-guide',
+  name: 'ClubGgGuide',
+  component: () => import('@/pages/ClubGgGuide.vue')
+},
+{
   path: '/admin/events',
   name: 'AdminEvents',
   component: () => import('@/pages/AdminEvents.vue'),

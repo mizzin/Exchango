@@ -25,10 +25,7 @@
       <div class="form-group">
         <label>{{ $t('charge.wallet.inputUsdAmount') }}</label>
         <input type="number" v-model.number="amountUsd" @input="calculateSendAmount" />
-        <p class="event-notice">
-    🎉 {{ $t('eventNotice') }}
-  </p>
-      </div>
+              </div>
 
       <!-- 입금해야 할 금액 표시 -->
       <div class="form-group">
@@ -351,15 +348,4 @@ select, input {
   margin-top: 6px;
   line-height: 1.4;
 }
-.event-notice {
-  margin-top: 6px;
-  font-size: 0.9rem;
-  color: #007bff; /* 파란색 강조 */
-  background: #f5f9ff; /* 은은한 배경 */
-  border-radius: 8px;
-  padding: 6px 10px;
-  display: inline-block;
-  font-weight: 500;
-}
-
 </style>

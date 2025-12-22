@@ -10,7 +10,11 @@
     "inquiry": "1对1咨询",
     "mypage": "我的页面",
     "messages": "消息",
-    "guide": "注册指南",
+    "guide": "使用指南",
+    "howToPlay": "游戏玩法指南",
+    "joinGuide": "加入指南",
+    "resources": "资料室",
+    "clubGgGuide": "Club GG 加入方法",
     "login": "登录 / 注册",
     "logout": "登出"
   },"alert": {
@@ -81,6 +85,14 @@
     "dateLabel": "基准日",
     "inquiry": "咨询：1对1留言板",
     "usdtUnavailable": "Currently unavailable (Upbit maintenance)"
+  },
+  "resources": {
+    "title": "资料室",
+    "comingSoon": "准备中"
+  },
+  "clubGgGuide": {
+    "title": "Club GG 加入方法",
+    "comingSoon": "准备中"
   },
       "charge": { 
           "wallet": {
@@ -360,7 +372,7 @@
 }
 },"notice": {
 "backToList":"返回列表",
-"breakTime": "休息时间 11:00–15:00（韩国时间）｜ 系统正常运行 / 1对1咨询暂时暂停"
+"breakTime": "休息时间 09:00–15:00（韩国时间）｜ 系统正常运行 / 1对1咨询暂时暂停"
 },
  "inquiry": {
       "list": {

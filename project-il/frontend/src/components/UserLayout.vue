@@ -47,7 +47,18 @@
           <nav :class="['nav', { open: isOpen || !isMobile }]">
             <router-link to="/" class="nav-item">{{ $t('nav.home') }}</router-link>
 
-            <router-link to="/guide" class="nav-item" v-if="!isMember">{{ $t('nav.guide') }}</router-link>
+            <!-- 이용가이드 드롭다운 -->
+            <div class="dropdown nav-item">
+              <span class="nav-item" @click="toggleDropdown('guide')">
+                {{ $t('nav.guide') }} ▾
+              </span>
+              <div v-if="dropdown === 'guide' || !isMobile" class="dropdown-menu">
+                <router-link to="/how-to-play" class="dropdown-item">{{ $t('nav.howToPlay') }}</router-link>
+                <router-link to="/guide" class="dropdown-item">{{ $t('nav.joinGuide') }}</router-link>
+                <router-link to="/resources" class="dropdown-item">{{ $t('nav.resources') }}</router-link>
+                <router-link to="/club-gg-guide" class="dropdown-item">{{ $t('nav.clubGgGuide') }}</router-link>
+              </div>
+            </div>
 
             <!-- 거래 드롭다운 -->
             <div class="dropdown nav-item" v-if="isMember">
@@ -96,7 +107,6 @@
   <span v-if="unreadCount > 0" class="msg-badge-inline">
     {{ unreadCount > 9 ? '9+' : unreadCount }}
   </span>            </router-link>
-            <router-link to="/how-to-play" class="nav-item">how-to-play</router-link>
 
             <router-link to="/login" class="nav-item" v-if="isMember" @click="logout">{{ $t('nav.logout') }}</router-link>
             <router-link to="/login" class="nav-item" v-else>{{ $t('nav.login') }}</router-link>
