@@ -165,7 +165,7 @@ exports.register = async (req, res) => {
   console.log("➡️ 회원가입 요청 수정수정:", req.body);
 
   // 1. 필수값 확인
-  if (!username || !password || !email || !phone) {
+  if (!username || !password || !phone) {
     return res.status(400).json({ message: 'Required field missing' });
   }
 
@@ -183,7 +183,7 @@ exports.register = async (req, res) => {
     }
 
     // 4. 이메일 인증 여부 확인
-    const [rows] = await db.query(
+    /* const [rows] = await db.query(
       'SELECT verified, expires_at FROM email_verifications WHERE email = ?',
       [email]
     );
@@ -192,7 +192,7 @@ exports.register = async (req, res) => {
     }
     if (new Date() > new Date(rows[0].expires_at)) {
       return res.status(400).json({ message: 'Email verification has expired.' });
-    }
+    } */
 
     // 5. 추천인 유효성 확인 (선택)
     if (referral_id) {
@@ -220,7 +220,7 @@ exports.register = async (req, res) => {
         [
           username,
           hashed,
-          email,
+          email|| null,
           phone,
           country_code || null,
           real_name || null,
@@ -260,7 +260,7 @@ try {
     const content = template.content
       .replace('{{nickname}}', username)
 
-    await sendMessage({
+    await messageModel.createMessage({
       to_user_id: userId,
       subject: '🎉 Welcome to Tranasia!',
       content,
@@ -416,27 +416,40 @@ exports.updateBankInfo = async (req, res) => {
   }
 }
 
-// 사용자용 공지사항 전체 조회 (언어 필터 + limit 지원)
+// 사용자용 공지사항 전체 조회 (언어 필터 + 페이지네이션 지원)
 exports.getPublicNotices = async (req, res) => {
   try {
-    const lang = req.query.lang || req.headers['accept-language']?.split(',')[0].slice(0,2) || 'ko'
-    const limit = parseInt(req.query.limit) || 10
+    const lang = req.query.lang || req.headers['accept-language']?.split(',')[0].slice(0, 2) || 'ko';
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const offset = (page - 1) * limit;
 
+    // 공지사항 목록 조회
     const [rows] = await db.query(
-      `SELECT id, title, created_at 
+      `SELECT id, title, created_at, pinned 
        FROM notices 
        WHERE language = ?
-       ORDER BY created_at DESC 
-       LIMIT ?`,
-      [lang, limit]
-    )
+       ORDER BY pinned DESC, created_at DESC 
+       LIMIT ? OFFSET ?`,
+      [lang, limit, offset]
+    );
 
-    res.json({ notices: rows })
+    // 전체 개수 조회
+    const [[{ total }]] = await db.query(
+      'SELECT COUNT(*) as total FROM notices WHERE language = ?',
+      [lang]
+    );
+
+    res.json({
+      notices: rows,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (err) {
-    console.error('❌ 공지사항 조회 실패:', err)
-    res.status(500).json({ message: '공지사항을 불러오지 못했습니다.' })
+    console.error('❌ 공지사항 조회 실패:', err);
+    res.status(500).json({ message: '공지사항을 불러오지 못했습니다.' });
   }
-}
+};
 
 // 사용자용 공지사항 상세 조회
 exports.getPublicNoticeById = async (req, res) => {

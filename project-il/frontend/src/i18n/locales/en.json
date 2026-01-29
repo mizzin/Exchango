@@ -86,7 +86,7 @@
     "howToPlay": "How to Play",
     "joinGuide": "Join Guide",
     "resources": "Resources",
-    "clubGgGuide": "How to Join Club GG",
+    "clubGgGuide": "How to Join Clubgg private game",
     "login": "Login / Sign Up",
     "logout": "Logout"
   },
@@ -252,7 +252,7 @@
     "pokerbros": "PokerBros",
     "xpoker": "X-Poker",
     "pokernex": "Pokernex",
-    "ggclub": "GG Club"
+    "ggclub": "Clubgg private game"
   }
 },
 "guide": {
@@ -489,7 +489,7 @@
 "inputAmount": "Enter Amount",
 "amountKrw": "Enter Amount (KRW)",
 "usdPlatform": "USD-Based Withdrawal",
-"usdDesc": "For USD-based platforms such as GG Club and Poker Bros.",
+"usdDesc": "For USD-based platforms such as Clubgg private game and Poker Bros.",
 "krwPlatform": "KRW-Based Withdrawal",
 "selectCurrency": "Select Currency to Exchange",
 "selectPlatform": "Select Platform",

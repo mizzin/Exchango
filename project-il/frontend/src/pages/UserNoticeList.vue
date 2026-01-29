@@ -14,9 +14,24 @@
           class="card"
           @click="goToDetail(notice.id)"
         >
+          <span v-if="notice.pinned" class="pinned-label">📌 Pinned</span>
           <h3 class="card-title">{{ notice.title || 'Untitled' }}</h3>
           <p class="date">{{ formatDate(notice.created_at) }}</p>
         </div>
+      </div>
+
+      <!-- Pagination -->
+      <div v-if="totalPages > 1" class="pagination">
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Prev</button>
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          @click="changePage(page)"
+          :class="{ active: page === currentPage }"
+        >
+          {{ page }}
+        </button>
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
       </div>
     </div>
   </UserLayout>
@@ -30,15 +45,31 @@ import UserLayout from '@/components/UserLayout.vue'
 
 const notices = ref([])
 const router = useRouter()
+const currentPage = ref(1)
+const totalPages = ref(1)
+const perPage = 10
 
 const fetchNotices = async () => {
   const lang = localStorage.getItem('lang') || 'ko'
   try {
-    const res = await axios.get(`/users/notices?lang=${lang}`)
+    const res = await axios.get('/users/notices', {
+      params: {
+        lang: lang,
+        page: currentPage.value,
+        limit: perPage
+      }
+    })
     notices.value = res.data.notices
+    totalPages.value = res.data.totalPages
   } catch (err) {
     console.error('❌ 공지 목록 불러오기 실패:', err)
   }
+}
+
+const changePage = (page) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  fetchNotices()
 }
 
 const formatDate = (dateStr) => {
@@ -51,10 +82,6 @@ const goToDetail = (id) => {
 }
 
 onMounted(fetchNotices)
-onMounted(async () => {
-  await axiosUser.get('/users/info')
-})
-
 </script>
 
 <style scoped>
@@ -105,6 +132,40 @@ onMounted(async () => {
 .date {
   font-size: 0.85rem;
   color: #666;
+}
+
+.pinned-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #4a6ef6;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+.pagination button {
+  margin: 0 5px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+.pagination button:hover {
+  background: #f0f0f0;
+}
+.pagination button.active {
+  font-weight: bold;
+  background-color: #4a6ef6;
+  color: #fff;
+  border-color: #4a6ef6;
+}
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {

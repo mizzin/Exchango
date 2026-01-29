@@ -11,6 +11,11 @@
         <option value="zh">Chinese</option>
       </select>
 
+      <div class="form-group">
+        <input type="checkbox" id="pinned" v-model="pinned" />
+        <label for="pinned">Pin Notice</label>
+      </div>
+
       <label>Content</label>
       <VueEditor v-model="content" :editorToolbar="toolbar" :editorOptions="editorOptions" />
 
@@ -33,6 +38,7 @@ const id = route.params.id
 const title = ref('')
 const language = ref('en')
 const content = ref('')
+const pinned = ref(false) // Add pinned ref
 
 const toolbar = [
   ['bold', 'italic', 'underline', 'strike'],
@@ -61,6 +67,7 @@ onMounted(async () => {
     title.value = notice.title
     language.value = notice.language
     content.value = notice.content || ''
+    pinned.value = notice.pinned || false // Populate pinned status
   } catch (err) {
     console.error('❌ 공지 로딩 실패:', err)
   }
@@ -101,7 +108,8 @@ const updateNotice = async () => {
   const payload = {
     title: title.value,
     content: content.value,
-    language: language.value
+    language: language.value,
+    pinned: pinned.value // Include pinned status
   }
 
   // 150KB 제한 체크
@@ -152,5 +160,15 @@ const updateNotice = async () => {
 }
 .editor-wrapper {
   margin: 16px 0;
+}
+.form-group {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.form-group label {
+  margin-left: 8px;
+  font-weight: bold;
 }
 </style>

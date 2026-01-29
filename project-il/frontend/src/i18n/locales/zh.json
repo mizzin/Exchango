@@ -14,7 +14,7 @@
     "howToPlay": "游戏玩法指南",
     "joinGuide": "加入指南",
     "resources": "资料室",
-    "clubGgGuide": "Club GG 加入方法",
+    "clubGgGuide": "Clubgg private game 加入方法",
     "login": "登录 / 注册",
     "logout": "登出"
   },"alert": {
@@ -232,7 +232,7 @@
     "pokerbros": "PokerBros",
     "xpoker": "X-Poker",
     "pokernex": "Pokernex",
-    "ggclub": "GG Club"
+    "ggclub": "Clubgg private game"
   }
 },
 "guide": {

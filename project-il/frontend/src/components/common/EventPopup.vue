@@ -25,9 +25,9 @@ const { locale, t } = useI18n()
 const showPopup = ref(false)
 const dontShowToday = ref(false)
 
-// 이벤트 기간 설정 (2025-10-30 ~ 2025-11-05)
-const startDate = new Date('2025-10-27T00:00:00')
-const endDate = new Date('2025-11-06T00:00:00')
+// 이벤트 기간 설정 
+const startDate = new Date('2025-12-23T00:00:00')
+const endDate = new Date('2026-01-01T00:00:00')
 
 // 언어별 이미지
 const popupImage = computed(() => {

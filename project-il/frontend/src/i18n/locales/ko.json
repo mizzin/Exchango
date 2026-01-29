@@ -85,7 +85,7 @@
     "howToPlay": "하우투 플레이",
     "joinGuide": "조인 가이드",
     "resources": "자료실",
-    "clubGgGuide": "클럽 GG 가입방법",
+    "clubGgGuide": "Clubgg private game 가입방법",
     "login": "로그인 / 회원가입",
     "logout": "로그아웃"
   },
@@ -129,7 +129,7 @@
           "inputAmount": "입력 금액",
           "amountKrw": "입력 금액",
           "usdPlatform": "USD 플랫폼 충전",
-          "usdDesc": "GG 클럽, 포커브로스 등 USD 기반 충전 플랫폼입니다.",
+          "usdDesc": "Clubgg private game, 포커브로스 등 USD 기반 충전 플랫폼입니다.",
           "krwPlatform": "KRW 플랫폼 충전",
           "selectCurrency": "환전할 통화 선택",
           "selectPlatform": "플랫폼 선택",
@@ -258,7 +258,7 @@
     "pokerbros": "포커브로스",
     "xpoker": "X포커",
      "pokernex": "포커넥스",
-    "ggclub": "GG 클럽"
+    "ggclub": "Clubgg private game"
   }
 },
 "guide": {
@@ -502,7 +502,7 @@
           "inputAmount": "입력 금액",
           "amountKrw": "입력 금액",
           "usdPlatform": "USD 플랫폼 출금",
-          "usdDesc": "GG 클럽, 포커브로스 등 USD 기반 출금 플랫폼입니다.",
+          "usdDesc": "Clubgg private game, 포커브로스 등 USD 기반 출금 플랫폼입니다.",
           "krwPlatform": "KRW 플랫폼 출금",
           "selectCurrency": "환전할 통화 선택",
           "selectPlatform": "플랫폼 선택",

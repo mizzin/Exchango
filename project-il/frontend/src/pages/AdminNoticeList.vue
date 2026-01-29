@@ -112,19 +112,23 @@ onMounted(fetchNotices)
             <th>Language</th>
             <th>Title</th>
             <th>Created At</th>
+            <th>Pinned</th> <!-- New column for pinned status -->
             <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
           <tr v-if="filteredNotices.length === 0">
-            <td colspan="5" style="text-align: center; padding: 20px;">해당 언어의 공지사항이 없습니다.</td>
+            <td colspan="6" style="text-align: center; padding: 20px;">해당 언어의 공지사항이 없습니다.</td>
           </tr>
           <tr v-else v-for="notice in filteredNotices" :key="notice.id">
             <td>{{ notice.id }}</td>
             <td>{{ notice.language }}</td>
             <td>{{ notice.title }}</td>
             <td>{{ formatDate(notice.created_at) }}</td>
+            <td>
+              <span v-if="notice.pinned" class="pinned-icon">📌</span>
+            </td>
             <td>
               <button @click="editNotice(notice.id)">Edit</button>
               <button @click="deleteNotice(notice.id)">Delete</button>
@@ -235,6 +239,10 @@ th, td {
   padding: 10px;
   border: 1px solid #ccc;
   text-align: left;
+}
+
+.pinned-icon {
+  font-size: 1.2em;
 }
 
 button {

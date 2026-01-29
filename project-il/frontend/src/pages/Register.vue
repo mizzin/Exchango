@@ -146,14 +146,14 @@ const removePlatform = (index) => {
 
  const handleRegister = async () => {
 
-  if (!emailVerified.value) {
+  /* if (!emailVerified.value) {
     alert(t('register.alert.verifyEmailFirst'))
     return
-  }
+  } */
   form.language = localStorage.getItem('lang') || 'en'
 
   // ✅ 기본 필수 항목 입력 확인
-  if (!form.username || !form.password || !confirmPassword.value || !form.money_password || !form.phone || !form.email) {
+  if (!form.username || !form.password || !confirmPassword.value || !form.money_password || !form.phone) {
     alert(t('register.alert.fillAllRequiredFields')) // 다국어 메시지로 "모든 필수 항목을 입력해 주세요"
     return
   }
@@ -167,10 +167,10 @@ const removePlatform = (index) => {
     alert(t('register.alert.passwordMismatch'))
     return
   }
-if (!emailVerified.value) {
+/* if (!emailVerified.value) {
   alert(t('register.alert.verifyEmailFirst')) // "이메일 인증을 먼저 완료해 주세요"
   return
-}
+} */
   if (!/^\d{6}$/.test(form.money_password)) {
     alert(t('register.alert.invalidMoneyPassword'))
     return
@@ -317,12 +317,10 @@ const goToLogin = () => {
       <!-- Email -->
        <div class="form-item ">
       <label>{{ $t('register.email') }}</label>
-      <small class="form-note warning">{{ $t('register.emailNote') }}</small>
       <input
         v-model="form.email"
         type="email"
         :placeholder="$t('register.emailPlaceholder')"
-        required
       />
       </div>
       <!-- 이메일 인증 요청 버튼 -->

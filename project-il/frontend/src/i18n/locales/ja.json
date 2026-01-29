@@ -84,7 +84,7 @@
     "howToPlay": "遊び方ガイド",
     "joinGuide": "参加ガイド",
     "resources": "資料室",
-    "clubGgGuide": "Club GG 参加方法",
+    "clubGgGuide": "Clubgg private game 参加方法",
     "login": "ログイン / 新規登録",
     "logout": "ログアウト"
   },"footer": {
@@ -242,7 +242,7 @@
     "pokerbros": "PokerBros",
     "xpoker": "X-Poker",
     "pokernex": "Pokernex",
-    "ggclub": "GG Club"
+    "ggclub": "Clubgg private game"
   }
 },
 "guide": {

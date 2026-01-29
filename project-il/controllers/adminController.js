@@ -112,11 +112,11 @@ exports.getAllUsers = async (req, res) => {
   if (referral_id) {
     conditions.push('u.referral_id = ?');
     values.push(referral_id);
-  }  
-   if (wallet_address) {
-      sql += ' AND wallet_address LIKE ?'
-      params.push(`%${wallet_address}%`)
-    }
+  }
+  if (wallet_address) {
+    conditions.push('u.wallet_address LIKE ?');
+    values.push(`%${wallet_address}%`);
+  }
   if (warningOnly === 'true') {
     conditions.push('wcnt.warning_count >= 1');
   }
@@ -570,11 +570,11 @@ exports.deleteMessage = async (req, res) => {
 }
 //공지사항 작성
 exports.createNotice = async (req, res) => {
-  const { title, content, language } = req.body
+  const { title, content, language, pinned } = req.body
   try {
     const [result] = await db.query(
-      'INSERT INTO notices (title, content, language) VALUES (?, ?, ?)',
-      [title, content, language]
+      'INSERT INTO notices (title, content, language, pinned) VALUES (?, ?, ?, ?)',
+      [title, content, language, pinned || false]
     )
     res.json({ success: true, id: result.insertId })
   } catch (err) {
@@ -591,19 +591,19 @@ exports.getAllNotices = async (req, res) => {
 
   try {
     const [notices] = await db.query(
-      'SELECT id, title, language, created_at FROM notices ORDER BY id DESC LIMIT ? OFFSET ?',
+      'SELECT id, title, language, created_at, pinned FROM notices ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?',
       [limit, offset]
     )
 
     const [countResult] = await db.query('SELECT COUNT(*) AS total FROM notices')
     const total = countResult[0].total
-    const totalPages = Math.ceil(total / limit)   // ✅ 계산
+    const totalPages = Math.ceil(total / limit)
 
     const formattedNotices = notices.map(n => ({
       ...n,
       created_at: toManilaTime(n.created_at)
     }))
-    res.json({ 
+    res.json({
       success: true,
       notices: formattedNotices,
       total,
@@ -639,11 +639,11 @@ exports.getNoticeById = async (req, res) => {
 }
 exports.updateNotice = async (req, res) => {
   const noticeId = req.params.id
-  const { title, content, language } = req.body
+  const { title, content, language, pinned } = req.body
   try {
     await db.query(
-      'UPDATE notices SET title = ?, content = ?, language = ? WHERE id = ?',
-      [title, content, language, noticeId]
+      'UPDATE notices SET title = ?, content = ?, language = ?, pinned = ? WHERE id = ?',
+      [title, content, language, pinned || false, noticeId]
     )
     res.json({ success: true, message: '공지 수정 완료' })
   } catch (err) {
